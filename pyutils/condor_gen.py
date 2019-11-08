@@ -36,7 +36,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("config", type=str, help="TRExFitter config file")
     parser.add_argument("outfile", type=str, help="output condor submit script")
-    args = parser.parse_args()
+    return parser.parse_args()
 
 
 def main():
@@ -49,7 +49,7 @@ def main():
                 continue
             elif line.startswith("Region:"):
                 reg = line.strip().split("Region: ")[-1].replace('"', "")
-                commands.append("n {} Region={}".format(full_config, reg))
+                commands.append("n {} Regions={}".format(full_config, reg))
 
     with open(args.outfile, "w") as f:
         exe = os.popen("which trex-fitter").read().strip()
