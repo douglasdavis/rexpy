@@ -25,8 +25,8 @@ notification    = Error
 notify_user     = ddavis@phy.duke.edu
 GetEnv          = True
 Executable      = {}
-Output          = .condor_stdout/job.out.trexntup.$(cluster).$(process)
-Error           = .condor_stderr/job.err.trexntup.$(cluster).$(process)
+Output          = logs/job.out.trexntup.$(cluster).$(process)
+Error           = logs/job.err.trexntup.$(cluster).$(process)
 Log             = /tmp/ddavis/log.$(cluster).$(process)
 request_memory  = 2.0G
 """
@@ -40,6 +40,7 @@ def parse_args():
 
 
 def main():
+    PosixPath("logs").mkdir(exist_ok=True)
     args = parse_args()
     full_config = str(PosixPath(args.config).resolve())
     commands = []
