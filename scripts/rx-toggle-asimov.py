@@ -6,10 +6,22 @@ import argparse
 import fileinput
 import re
 
+DESCRIPTION = (
+    "Toggle the blind fit setting in a "
+    "trex-fitter configuration file. This "
+    "will augment '_asimov' to the end of the "
+    "fit name if it's set to unblinded mode. "
+    "If the script is set to blind mode, it "
+    "expects an '_asimov' suffix to exist in "
+    "the Job and Fit name and it will remove that suffix"
+)
+
 
 def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("inputfile", type=str, help="input file to asimov-ify or unasimov-ify")
+    parser = argparse.ArgumentParser(description=DESCRIPTION)
+    parser.add_argument(
+        "inputfile", type=str, help="input file to asimov-ify or unasimov-ify"
+    )
     return parser.parse_args()
 
 
