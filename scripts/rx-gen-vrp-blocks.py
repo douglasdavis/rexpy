@@ -12,10 +12,11 @@ BLOCK_TEMPLATE = """Region: "VRP_{region}_{var}"
   Type: VALIDATION
   Label: "{region}"
   Variable: "{var}",{nbins},{xmin},{xmax}
+  LogScale: {logscale}
 """
 
 
-def block(region, selection, var, title, nbins, xmin, xmax):
+def block(region, selection, var, title, nbins, xmin, xmax, logscale):
     return BLOCK_TEMPLATE.format(
         region=region,
         var=var,
@@ -24,6 +25,7 @@ def block(region, selection, var, title, nbins, xmin, xmax):
         nbins=nbins,
         xmin=xmin,
         xmax=xmax,
+        logscale=logscale,
     )
 
 
@@ -48,6 +50,7 @@ def main():
     blocks = []
     for entry in region_table["r1j1b"]:
         var = entry["var"]
+        logscale = "TRUE" if entry["log"] else "FALSE"
         bk = block(
             "1j1b",
             "reg1j1b == 1 && OS == 1",
@@ -56,10 +59,12 @@ def main():
             entry["nbins"],
             entry["xmin"],
             entry["xmax"],
+            logscale,
         )
         blocks.append(bk)
     for entry in region_table["r2j1b"]:
         var = entry["var"]
+        logscale = "TRUE" if entry["log"] else "FALSE"
         bk = block(
             "2j1b",
             "reg2j1b == 1 && OS == 1",
@@ -68,10 +73,12 @@ def main():
             entry["nbins"],
             entry["xmin"],
             entry["xmax"],
+            logscale,
         )
         blocks.append(bk)
     for entry in region_table["r2j2b"]:
         var = entry["var"]
+        logscale = "TRUE" if entry["log"] else "FALSE"
         bk = block(
             "2j2b",
             "reg2j2b == 1 && OS == 1",
@@ -80,6 +87,7 @@ def main():
             entry["nbins"],
             entry["xmin"],
             entry["xmax"],
+            logscale,
         )
         blocks.append(bk)
 
