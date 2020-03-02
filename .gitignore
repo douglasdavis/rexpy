@@ -2,5 +2,14 @@
 .condor*
 *.sub
 logs
-tW
-tW_*
+
+**/Fits/
+**/Histograms/
+**/Plots/
+**/RooStats/
+**/CorrMatrix.pdf
+**/Gammas.pdf
+**/Norm*pdf
+**/NuisPar*pdf
+**/Pruning*
+**/SignalRegions.pdf
