@@ -1,7 +1,7 @@
 .DS_Store
 .condor*
 *.sub
-logs
+logs/
 
 **/Fits/
 **/Histograms/
