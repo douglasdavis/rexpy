@@ -1,9 +1,14 @@
+## random
 .DS_Store
 .condor*
 *.sub
 *.tar.gz
 logs/
 
+## executables
+app/augment-tree-with-npy
+
+## fit stuff
 **/Fits/
 **/Histograms/
 **/Plots/
