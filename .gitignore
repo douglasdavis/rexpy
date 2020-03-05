@@ -7,6 +7,7 @@ logs/
 **/Histograms/
 **/Plots/
 **/RooStats/
+**/Systematics/
 **/CorrMatrix.pdf
 **/Gammas.pdf
 **/Norm*pdf
