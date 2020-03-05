@@ -2,9 +2,10 @@
 
 # stdlib
 import argparse
+import glob
+import logging
 import os
 import re
-import logging
 import time
 import subprocess
 
@@ -57,19 +58,19 @@ def main():
     )
 
     rfd = args.rootfiledir
-    if rfd.startswith("~/")
+    if rfd.startswith("~/"):
         rfd = os.path.expanduser("~") + rfd[2:]
-    nfd = args.rootfiledir
-    if nfd.startswith("~/")
+    nfd = args.npyfiledir
+    if nfd.startswith("~/"):
         nfd = os.path.expanduser("~") + nfd[2:]
 
     rootfiledir = os.path.abspath(rfd)
-    npyfiledir = os.path.abspath(ndf)
+    npyfiledir = os.path.abspath(nfd)
 
-    if not os.path.exists(rootfiledir)
+    if not os.path.exists(rootfiledir):
         log.error("ROOT file directory doesn't exist, exiting")
         return 0
-    if not os.path.exists(npyfiledir)
+    if not os.path.exists(npyfiledir):
         log.error("numpy file directory doesn't exist, exiting")
         return 0
 
@@ -121,12 +122,12 @@ def main():
 
         tree_name = "WtLoop_{}".format(tree_name)
 
-        numpy_file = os.path.join(npyfiledir, base_root_str.replace(".root", ".{}.npy".format(npybranchname))
-        if not os.path.exists(numpy_file)
+        numpy_file = os.path.join(npyfiledir, base_root_str.replace(".root", ".{}.npy".format(npybranchname)))
+        if not os.path.exists(numpy_file):
             log.warn("numpy file doesn't exist for {}, skipping".format(rootfile.name))
 
         command = "augment-tree-with-npy {} {} {} -b {}".format(
-            full_root_str, tree_name, numpy_file.resolve(), npybranchname
+            full_root_str, tree_name, os.path.abspath(numpy_file), npybranchname
         )
         commands.append(command)
 
