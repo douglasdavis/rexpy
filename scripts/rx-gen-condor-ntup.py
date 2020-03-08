@@ -48,7 +48,10 @@ def get_args():
 def main():
     args = get_args()
     config_name = PosixPath(args.config).name
-    outfile = "condor.ntup.{}.sub".format(config_name)
+    if args.quick:
+        outfile = "condor.ntup.quick.{}.sub".format(config_name)
+    else:
+        outfile = "condor.ntup.{}.sub".format(config_name)
     full_config = str(PosixPath(args.config).resolve())
     commands = []
     with open(full_config, "r") as f:
