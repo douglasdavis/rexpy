@@ -41,12 +41,14 @@ DESCRIPTION = (
 def get_args():
     parser = argparse.ArgumentParser(description=DESCRIPTION)
     parser.add_argument("config", type=str, help="TRExFitter config file")
-    parser.add_argument("outfile", type=str, help="output condor submit script")
+    parser.add_argument("--quick", action="store_true", help="generate a quick submission (Lumi systematic only")
     return parser.parse_args()
 
 
 def main():
     args = get_args()
+    config_name = PosixPath(args.config).name
+    outfile = "condor.ntup.{}.sub".format(config_name)
     full_config = str(PosixPath(args.config).resolve())
     commands = []
     with open(full_config, "r") as f:
@@ -55,9 +57,12 @@ def main():
                 continue
             elif line.startswith("Region:"):
                 reg = line.strip().split("Region: ")[-1].replace('"', "")
-                commands.append("n {} Regions={}".format(full_config, reg))
+                if args.quick:
+                    commands.append("n {} Systematics=Lumi:Regions={}".format(full_config, reg))
+                else:
+                    commands.append("n {} Regions={}".format(full_config, reg))
 
-    with open(args.outfile, "w") as f:
+    with open(outfile, "w") as f:
         exe = os.popen("which trex-fitter").read().strip()
         print(BNL_CONDOR_HEADER.format(exe), file=f)
         for com in commands:
