@@ -20,7 +20,6 @@ uncertainties=(
 )
 
 for SYS in "${uncertainties[@]}"; do
-    mkdir -p $STABILITY_TEST_DIR/$SYS
     echo "Universe        = vanilla" > $STABILITY_TEST_DIR/$SYS/condor.sub
     echo "notification    = Error" >> $STABILITY_TEST_DIR/$SYS/condor.sub
     echo "notify_user     = ddavis@phy.duke.edu" >> $STABILITY_TEST_DIR/$SYS/condor.sub
