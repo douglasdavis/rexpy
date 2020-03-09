@@ -1,6 +1,7 @@
 ## random
 .DS_Store
 .condor*
+*.pdf
 *.sub
 *.tar.gz
 logs/
