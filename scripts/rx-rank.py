@@ -2,9 +2,10 @@
 
 from __future__ import print_function
 
-import argparse
 import sys
 import os
+
+import click
 
 try:
     from pathlib import PosixPath
@@ -31,22 +32,13 @@ Log             = /tmp/ddavis/log.$(cluster).$(process)
 request_memory  = 2.0G
 """
 
-DESCRIPTION = (
-    "Generate a condor submission script which "
-    "performs the TRExFitter NP ranking work."
-)
-
-
-def get_args():
-    parser = argparse.ArgumentParser(description=DESCRIPTION)
-    parser.add_argument("config", type=str, help="TRExFitter config file")
-    parser.add_argument("outfile", type=str, help="output condor submit script")
-    return parser.parse_args()
-
-
-def main():
-    args = get_args()
-    full_config = str(PosixPath(args.config).resolve())
+@click.command()
+@click.argument("config", type=str)
+def rx_rank(config):
+    """Generate a condor submission script to do the ranking plot steps"""
+    config_file = PosixPath(config)
+    config_name = config_file.name
+    full_config = str(config_file.resolve())
     systematics, commands = [], []
     with open(full_config, "r") as f:
         for line in f.readlines():
@@ -59,7 +51,8 @@ def main():
     for s in systematics:
         commands.append("r {} Ranking={}".format(full_config, s))
 
-    with open(args.outfile, "w") as f:
+    outfile = "condor.r.{}.sub".format(config_name)
+    with open(outfile, "w") as f:
         exe = os.popen("which trex-fitter").read().strip()
         print(BNL_CONDOR_HEADER.format(exe), file=f)
         for com in commands:
@@ -70,4 +63,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    rx_rank()
