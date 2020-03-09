@@ -4,6 +4,7 @@
 *.sub
 *.tar.gz
 logs/
+stability_tests/
 
 ## executables
 app/augment-tree-with-npy
