@@ -28,6 +28,7 @@ def get_mu(fit_file):
     down = round(float(elements[3]), 5)
     return central, up, down
 
+
 def get_B00(fit_file):
     central, up, down = -1, -1, -1
     with open(fit_file, "r") as f:
@@ -115,7 +116,6 @@ def year_b00_test(nominal_file, testfiles):
     fig.savefig("b00.pdf")
     plt.close(fig)
     return 0
-
 
 
 @click.command()

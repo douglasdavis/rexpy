@@ -14,26 +14,26 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 
-def get_mu(fit_file):
-    central, up, down = -1, -1, -1
-    with open(fit_file, "r") as f:
-        for line in f.readlines():
-            if "SigXsec" in line:
-                res_line = line
-                break
-    elements = line.split()
-    assert elements[0] == "SigXsecOverSM"
-    central = round(float(elements[1]), 5)
-    up = round(float(elements[2]), 5)
-    down = round(float(elements[3]), 5)
-    return central, up, down
-
-
 @click.command()
 @click.argument("nominal", type=str)
 @click.argument("tests", type=str)
 def plot_stab_test(nominal, tests):
     """Plot delta(mu) for some stability tests"""
+
+    def get_mu(fit_file):
+        central, up, down = -1, -1, -1
+        with open(fit_file, "r") as f:
+            for line in f.readlines():
+                if "SigXsec" in line:
+                    res_line = line
+                    break
+        elements = line.split()
+        assert elements[0] == "SigXsecOverSM"
+        central = round(float(elements[1]), 5)
+        up = round(float(elements[2]), 5)
+        down = round(float(elements[3]), 5)
+        return central, up, down
+
     nominal_directory = os.path.abspath(nominal)
     test_directory = os.path.abspath(tests)
     test_itr = glob.iglob("{}/**/tWrw/Fits/tWrw.txt".format(test_directory))
