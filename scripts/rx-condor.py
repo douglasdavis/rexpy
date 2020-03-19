@@ -3,8 +3,9 @@
 from __future__ import print_function
 
 import argparse
-import sys
 import os
+import re
+import sys
 
 import click
 from pathlib2 import PosixPath
@@ -36,7 +37,6 @@ def cli():
 @click.option("--this-sys", type=str, help="do a single user defined systematic")
 def ntup(config, quick, this_sys):
     """Generate a condor submission script for the ntuple creation step of TRExFitter"""
-    PosixPath("logs").mkdir(exist_ok=True)
     config_name = PosixPath(config).name
     if quick:
         if this_sys is not None:
@@ -70,11 +70,55 @@ def ntup(config, quick, this_sys):
             print("Queue\n", file=f)
 
 
+@cli.command("fit")
+@click.option("--config", "-c", multiple=True, type=str, help="config file(s) to fit")
+def fit(config):
+    """Generate a condor submission script to run the fit step on some config files"""
+    configs = [str(PosixPath(c).resolve()) for c in config]
+    outfile = "condor.fit.sub"
+    with open(outfile, "w") as f:
+        exe = os.popen("which trex-fitter").read().strip()
+        print(BNL_CONDOR_HEADER.format(exe, "fit"), file=f)
+        for conf in configs:
+            print("Arguments = wf {}".format(conf), file=f)
+            print("Queue\n", file=f)
+
+
+@cli.command("draw")
+@click.option("--config", "-c", multiple=True, type=str, help="config file(s) to draw")
+@click.option("--postfit", "-p", is_flag=True, help="also run the postfit draw step")
+def draw(config, postfit):
+    """Generate a condor submission script to run the drawing steps on some config files"""
+    region_re = re.compile(r"^Region: \"\w+\"")
+    def get_arguments(config_file, do_postfit):
+        regions = []
+        with open(config_file, "r") as f:
+            for line in f.readlines():
+                if region_re.match(line):
+                    region = line.strip().split("Region: ")[-1].replace('"', "")
+                    regions.append(region)
+        arguments = []
+        prefix = "dp" if do_postfit else "d"
+        for region in regions:
+            arguments.append("{} {} Regions={}".format(prefix, config_file, region))
+        return arguments
+
+    configs = [str(PosixPath(c).resolve()) for c in config]
+    outfile = "condor.draw.sub"
+    with open(outfile, "w") as f:
+        exe = os.popen("which trex-fitter").read().strip()
+        print(BNL_CONDOR_HEADER.format(exe, "draw"), file=f)
+        for conf in configs:
+            args = get_arguments(conf, postfit)
+            for arg in args:
+                print("Arguments = {}".format(arg), file=f)
+                print("Queue\n", file=f)
+
+
 @cli.command("rank")
 @click.argument("config", type=str)
 def rank(config):
     """Generate a condor submission script to do the ranking plot steps"""
-    PosixPath("logs").mkdir(exist_ok=True)
     config_file = PosixPath(config)
     config_name = config_file.name
     full_config = str(config_file.resolve())
@@ -100,4 +144,5 @@ def rank(config):
 
 
 if __name__ == "__main__":
+    PosixPath("logs").mkdir(exist_ok=True)
     cli()
