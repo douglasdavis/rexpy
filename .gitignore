@@ -15,6 +15,7 @@ app/augment-tree-with-npy
 **/Histograms/
 **/Plots/
 **/RooStats/
+**/Tables/
 **/Systematics/
 **/CorrMatrix.pdf
 **/Gammas.pdf
