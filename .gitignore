@@ -10,6 +10,18 @@ stability_tests/
 ## executables
 app/augment-tree-with-npy
 
+## condor dirs
+**/err/*.error
+**/log/*.log
+**/out/*.output
+**/sub/*.submit
+**/sub/*.err
+**/sub/*.out
+**/sub/*.output
+**/sub/*.lock
+**/sub/*.log
+**/sub/*.metrics
+
 ## fit stuff
 **/Fits/
 **/Histograms/
