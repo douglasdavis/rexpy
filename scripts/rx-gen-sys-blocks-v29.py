@@ -117,7 +117,6 @@ SYS_WEIGHTS["B_ev_L_19"] = NTSysWeight("weight_sys_bTagSF_MV2c10_Continuous_eige
 
 
 PDF_WEIGHTS = OrderedDict()
-#PDF_WEIGHTS["PDFset90900"] = NTSysPDF("weight_sys_PDFset_90900", "PDF", "40", "PDF 90900", False)
 PDF_WEIGHTS["PDFset90901"] = NTSysPDF("weight_sys_PDFset_90901", "PDF", "40", "PDF 90901", False)
 PDF_WEIGHTS["PDFset90902"] = NTSysPDF("weight_sys_PDFset_90902", "PDF", "40", "PDF 90902", False)
 PDF_WEIGHTS["PDFset90903"] = NTSysPDF("weight_sys_PDFset_90903", "PDF", "40", "PDF 90903", False)
@@ -189,16 +188,16 @@ SYS_TREES_TWOSIDED["MUON_SAGITTA_RHO"                  ] = NTSysTree2s("MUON_SAG
 SYS_TREES_TWOSIDED["MUON_SCALE"                        ] = NTSysTree2s("MUON_SCALE__1up"                                                      , "MUON_SCALE__1down"                                                      , "LeptonInstrum"   , "40", "Muon Scale"                        , False)
 
 SYS_TREES_ONESIDED = OrderedDict()
-SYS_TREES_ONESIDED["MET_SoftTrk_ResoPara"          ] = NTSysTree1s("MET_SoftTrk_ResoPara"                                        , "MET"   , "40", "MET SoftTrk ResoPara"          , False)
-SYS_TREES_ONESIDED["MET_SoftTrk_ResoPerp"          ] = NTSysTree1s("MET_SoftTrk_ResoPerp"                                        , "MET"   , "40", "MET SoftTrk ResoPerp"          , False)
-SYS_TREES_ONESIDED["Jet_JER_DataVsMC"              ] = NTSysTree1s("JET_CategoryReduction_JET_JER_DataVsMC_MC16__1up"            , "JER"   , "40", "Jet JER DataVsMC"              , False)
-SYS_TREES_ONESIDED["Jet_JER_EffNP_1"               ] = NTSysTree1s("JET_CategoryReduction_JET_JER_EffectiveNP_1__1up"            , "JER"   , "40", "Jet JER EffNP 1"               , False)
-SYS_TREES_ONESIDED["Jet_JER_EffNP_2"               ] = NTSysTree1s("JET_CategoryReduction_JET_JER_EffectiveNP_2__1up"            , "JER"   , "40", "Jet JER EffNP 2"               , False)
-SYS_TREES_ONESIDED["Jet_JER_EffNP_3"               ] = NTSysTree1s("JET_CategoryReduction_JET_JER_EffectiveNP_3__1up"            , "JER"   , "40", "Jet JER EffNP 3"               , False)
-SYS_TREES_ONESIDED["Jet_JER_EffNP_4"               ] = NTSysTree1s("JET_CategoryReduction_JET_JER_EffectiveNP_4__1up"            , "JER"   , "40", "Jet JER EffNP 4"               , False)
-SYS_TREES_ONESIDED["Jet_JER_EffNP_5"               ] = NTSysTree1s("JET_CategoryReduction_JET_JER_EffectiveNP_5__1up"            , "JER"   , "40", "Jet JER EffNP 5"               , False)
-SYS_TREES_ONESIDED["Jet_JER_EffNP_6"               ] = NTSysTree1s("JET_CategoryReduction_JET_JER_EffectiveNP_6__1up"            , "JER"   , "40", "Jet JER EffNP 6"               , False)
-SYS_TREES_ONESIDED["Jet_JER_EffectiveNP_7restTerm" ] = NTSysTree1s("JET_CategoryReduction_JET_JER_EffectiveNP_7restTerm__1up"    , "JER"   , "40", "Jet JER EffectiveNP 7restTerm" , False)
+SYS_TREES_ONESIDED["MET_SoftTrk_ResoPara"          ] = NTSysTree1s("MET_SoftTrk_ResoPara"                                        , "MET"   , "40", "MET SoftTrk ResoPara"      , False)
+SYS_TREES_ONESIDED["MET_SoftTrk_ResoPerp"          ] = NTSysTree1s("MET_SoftTrk_ResoPerp"                                        , "MET"   , "40", "MET SoftTrk ResoPerp"      , False)
+SYS_TREES_ONESIDED["Jet_JER_DataVsMC"              ] = NTSysTree1s("JET_CategoryReduction_JET_JER_DataVsMC_MC16__1up"            , "JER"   , "40", "JER DataVsMC"              , False)
+SYS_TREES_ONESIDED["Jet_JER_EffNP_1"               ] = NTSysTree1s("JET_CategoryReduction_JET_JER_EffectiveNP_1__1up"            , "JER"   , "40", "JER EffNP 1"               , False)
+SYS_TREES_ONESIDED["Jet_JER_EffNP_2"               ] = NTSysTree1s("JET_CategoryReduction_JET_JER_EffectiveNP_2__1up"            , "JER"   , "40", "JER EffNP 2"               , False)
+SYS_TREES_ONESIDED["Jet_JER_EffNP_3"               ] = NTSysTree1s("JET_CategoryReduction_JET_JER_EffectiveNP_3__1up"            , "JER"   , "40", "JER EffNP 3"               , False)
+SYS_TREES_ONESIDED["Jet_JER_EffNP_4"               ] = NTSysTree1s("JET_CategoryReduction_JET_JER_EffectiveNP_4__1up"            , "JER"   , "40", "JER EffNP 4"               , False)
+SYS_TREES_ONESIDED["Jet_JER_EffNP_5"               ] = NTSysTree1s("JET_CategoryReduction_JET_JER_EffectiveNP_5__1up"            , "JER"   , "40", "JER EffNP 5"               , False)
+SYS_TREES_ONESIDED["Jet_JER_EffNP_6"               ] = NTSysTree1s("JET_CategoryReduction_JET_JER_EffectiveNP_6__1up"            , "JER"   , "40", "JER EffNP 6"               , False)
+SYS_TREES_ONESIDED["Jet_JER_EffectiveNP_7restTerm" ] = NTSysTree1s("JET_CategoryReduction_JET_JER_EffectiveNP_7restTerm__1up"    , "JER"   , "40", "JER EffectiveNP 7restTerm" , False)
 
 
 for name, properties in SYS_WEIGHTS.items():
