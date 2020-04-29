@@ -10,6 +10,9 @@ import sys
 import click
 from pathlib2 import PosixPath
 
+import pycondor
+
+TREX_EXE = os.popen("which trex-fitter").read().strip()
 
 BNL_CONDOR_HEADER = """
 Universe        = vanilla
@@ -26,6 +29,124 @@ request_memory  = 2.0G
 CONTEXT_SETTINGS = {"max_content_width": 92}
 
 
+def get_list_of_systematics(config, specific_sys=None):
+    """Get list of relevant systematics.
+
+    If `specific_sys` is None (default), this will return all of
+    the systematics in the config. If `specific_sys` is not None,
+    the entries will be tested against all possible systematics found
+    in the config file and that list will be returned.
+
+    Parameters
+    ----------
+    config : str
+        The path of the config file.
+    specific_sys : iterable(str), optional
+        A set of desired systematics.
+
+    Returns
+    -------
+    list(str)
+        The relevant systematics.
+
+    """
+
+    systematics = []
+    with open(config, "r") as f:
+        for line in f.readlines():
+            if line.startswith(r"%"):
+                continue
+            elif line.startswith("Systematic:"):
+                sys = line.strip().split(":")[-1].strip().replace('"', '')
+                systematics.append(sys)
+    systematics = sorted(set(systematics), key=str.lower, reverse=True)
+    if specific_sys is None:
+        return systematics
+    elif len(specific_sys) == 0:
+        return systematics
+    else:
+        req_sys = []
+        for s in specific_sys:
+            s = str(s)
+            if s not in systematics:
+                raise ValueError("systematic {} not possible".format(s))
+            req_sys.append(s)
+        return sorted(set(req_sys), key=str.lower, reverse=True)
+
+
+def get_list_of_regions(config):
+    """Get the list of regions in a config file.
+
+    Parameters
+    ----------
+    config : str
+        The path of the config file.
+
+    Returns
+    -------
+    list(str)
+        The list of regions in the config file.
+
+    """
+    regions = []
+    with open(config, "r") as f:
+        for line in f.readlines():
+            if line.startswith("%"):
+                continue
+            elif line.startswith("Region:"):
+                reg = line.strip().split(":")[-1].strip().replace('"', '')
+                regions.append(reg)
+    return regions
+
+
+def get_rank_arguments(config, specific_sys=None):
+    """Get a set of trex-fitter executable arguments for ranking.
+
+    Parameters
+    ----------
+    config : str
+        The path of the config file.
+    specific_sys : iterable(str), optional
+        The set of systematics to use; if None (the default), uses all
+        discovered systematics.
+
+    Returns
+    -------
+    list(str)
+        The list of trex-fitter arguments.
+
+    """
+    systematics = get_list_of_systematics(config, specific_sys=specific_sys)
+    return ["r {} Ranking={}".format(config, sys) for sys in systematics]
+
+
+def get_ntuple_arguments(config, specific_sys=None):
+    """Get the set of trex-fitter executable arguments for ntupling.
+
+    config : str
+        The path of the config file.
+    specific_sys : iterable(str), optional
+        The set of systematics to use; if None (the default), uses all
+        discovered systematics.
+
+    Returns
+    -------
+    list(str)
+        The list of trex-fitter arguments
+
+    """
+    regions = get_list_of_regions(config)
+
+    ## first no specific systematics
+    if specific_sys is None:
+        return ["n {} Regions={}".format(config, r) for r in regions]
+
+    ## otherwise, construct for specific systematics
+    systematics = get_list_of_systematics(config, specific_sys=specific_sys)
+    systematics = ",".join(systematics)
+    return ["n {} Regions={}:Systematics={}".format(config, r, systematics) for r in regions]
+
+
 @click.group(context_settings=CONTEXT_SETTINGS)
 def cli():
     pass
@@ -36,6 +157,7 @@ def cli():
 @click.option("--quick", is_flag=True, help="generate a 'quick' submission (Lumi sys only)")
 @click.option("--this-sys", type=str, help="do a single user defined systematic")
 def ntup(config, quick, this_sys):
+
     """Generate a condor submission script for the ntuple creation step of TRExFitter"""
     config_name = PosixPath(config).name
     if quick:
@@ -63,8 +185,7 @@ def ntup(config, quick, this_sys):
                     commands.append("n {} Regions={}".format(full_config, reg))
 
     with open(outfile, "w") as f:
-        exe = os.popen("which trex-fitter").read().strip()
-        print(BNL_CONDOR_HEADER.format(exe, "ntup"), file=f)
+        print(BNL_CONDOR_HEADER.format(TREX_EXE, "ntup"), file=f)
         for com in commands:
             print("Arguments = {}".format(com), file=f)
             print("Queue\n", file=f)
@@ -77,8 +198,7 @@ def fit(config):
     configs = [str(PosixPath(c).resolve()) for c in config]
     outfile = "condor.fit.sub"
     with open(outfile, "w") as f:
-        exe = os.popen("which trex-fitter").read().strip()
-        print(BNL_CONDOR_HEADER.format(exe, "fit"), file=f)
+        print(BNL_CONDOR_HEADER.format(TREX_EXE, "fit"), file=f)
         for conf in configs:
             print("Arguments = wf {}".format(conf), file=f)
             print("Queue\n", file=f)
@@ -106,8 +226,7 @@ def draw(config, postfit):
     configs = [str(PosixPath(c).resolve()) for c in config]
     outfile = "condor.draw.sub"
     with open(outfile, "w") as f:
-        exe = os.popen("which trex-fitter").read().strip()
-        print(BNL_CONDOR_HEADER.format(exe, "draw"), file=f)
+        print(BNL_CONDOR_HEADER.format(TREX_EXE, "draw"), file=f)
         for conf in configs:
             args = get_arguments(conf, postfit)
             for arg in args:
@@ -122,27 +241,92 @@ def rank(config):
     config_file = PosixPath(config)
     config_name = config_file.name
     full_config = str(config_file.resolve())
-    systematics, commands = [], []
-    with open(full_config, "r") as f:
-        for line in f.readlines():
-            if line.startswith(r"%"):
-                continue
-            elif line.startswith("Systematic:"):
-                s = line.strip().split("Systematic: ")[-1].replace('"', "")
-                systematics.append(s)
-    systematics = set(systematics)
+    commands = []
+    systematics = get_list_of_systematics(config)
     for s in systematics:
         commands.append("r {} Ranking={}".format(full_config, s))
 
     outfile = "condor.rank.{}.sub".format(config_name)
     with open(outfile, "w") as f:
-        exe = os.popen("which trex-fitter").read().strip()
-        print(BNL_CONDOR_HEADER.format(exe, "rank"), file=f)
+        print(BNL_CONDOR_HEADER.format(TREX_EXE, "rank"), file=f)
         for com in commands:
             print("Arguments = {}".format(com), file=f)
             print("Queue\n", file=f)
 
 
+@cli.command("complete")
+@click.argument("config", type=click.Path(exists=True, resolve_path=True))
+@click.option("--and-submit", is_flag=True, help="also submit to condor")
+@click.option("--dont-fit", is_flag=True, help="only do n and d steps")
+@click.option("-s", "--systematic", type=str, multiple=True, help="only these systematics")
+@click.option("-w", "--ws-suffix", type=str, help="extra workspace suffix")
+def complete(config, and_submit, dont_fit, systematic, ws_suffix):
+    """Run a complete set of trex-fitter stages ('n', then 'wf', then 'dp', then 'r')"""
+    config_name = PosixPath(config).stem
+    workspace = "rxcondor-workspace_{}".format(config_name)
+    if ws_suffix:
+        workspace = "{}_{}".format(workspace, ws_suffix)
+    os.mkdir(workspace)
+    workspace = os.path.abspath(workspace)
+
+    systematics = get_list_of_systematics(config, specific_sys=systematic)
+    regions = get_list_of_regions(config)
+
+    dagman = pycondor.Dagman(name="rx-condor_complete", submit=os.path.join(workspace, "sub"))
+    standard_params = dict(
+        universe="vanilla",
+        getenv=True,
+        notification="Error",
+        request_memory="2GB",
+        extra_lines=["email = ddavis@phy.duke.edu"],
+        executable=TREX_EXE,
+        submit=os.path.join(workspace, "sub"),
+        error=os.path.join(workspace, "err"),
+        output=os.path.join(workspace, "out"),
+        log=os.path.join(workspace, "log"),
+    )
+
+
+    ntuple = pycondor.Job(name="ntuple", dag=dagman, **standard_params)
+
+    if systematic:
+        ntuple.add_args(get_ntuple_arguments(config, specific_sys=systematics))
+    else:
+        ntuple.add_args(get_ntuple_arguments(config))
+
+    if dont_fit:
+        draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
+        draw.add_args(["d {} Regions={}".format(config, r) for r in regions])
+        # now define the dependencies
+        draw.add_parent(ntuple)
+    else:
+        # the fit step
+        fit = pycondor.Job(name="fit", dag=dagman, **standard_params)
+        fit.add_arg("wf {}".format(config))
+        # the draw step
+        draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
+        draw.add_args(["dp {} Regions={}".format(config, r) for r in regions])
+        # the rank (fit) step
+        rank = pycondor.Job(name="rank", dag=dagman, **standard_params)
+        rank.add_args(get_rank_arguments(config, specific_sys=systematics))
+        # the rank (plot) step
+        rank_draw = pycondor.Job(name="rank_draw", dag=dagman, **standard_params)
+        rank_draw.add_arg("r {} Ranking=plot".format(config))
+        # now define the dependencies starting with the last step and working upstream
+        rank_draw.add_parent(rank)
+        rank.add_parent(draw)
+        draw.add_parent(fit)
+        fit.add_parent(ntuple)
+
+    orig_path = os.getcwd()
+    os.chdir(workspace)
+    if and_submit:
+        dagman.build_submit()
+    else:
+        dagman.build()
+    os.chdir(orig_path)
+
+    return 0
+
 if __name__ == "__main__":
-    PosixPath("logs").mkdir(exist_ok=True)
     cli()
