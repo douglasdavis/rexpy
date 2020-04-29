@@ -19,7 +19,7 @@ GetEnv          = True
 Executable      = {0}
 Output          = logs/job.out.{1}.$(cluster).$(process)
 Error           = logs/job.err.{1}.$(cluster).$(process)
-Log             = /tmp/ddavis/log.$(cluster).$(process)
+Log             = logs/job.log.{1}.$(cluster).$(process)
 request_memory  = 2.0G
 """
 
