@@ -23,9 +23,9 @@ notification    = Error
 notify_user     = ddavis@phy.duke.edu
 GetEnv          = True
 Executable      = {exe}
-Output          = logs/job.out.wt-augment-npy.$(cluster).$(process)
-Error           = logs/job.err.wt-augment-npy.$(cluster).$(process)
-Log             = /tmp/ddavis/log.$(cluster).$(process)
+Output          = logs/job.out.$(cluster).$(process)
+Error           = logs/job.err.$(cluster).$(process)
+Log             = logs/job.log.$(cluster).$(process)
 request_memory  = 2.0G
 
 """
