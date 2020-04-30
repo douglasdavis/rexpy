@@ -21,6 +21,7 @@ app/augment-tree-with-npy
 **/sub/*.lock
 **/sub/*.log
 **/sub/*.metrics
+rxcondor-workspace*/
 
 ## fit stuff
 **/Fits/
