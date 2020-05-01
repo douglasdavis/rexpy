@@ -126,7 +126,7 @@ def main():
         if not os.path.exists(numpy_file):
             log.warn("numpy file doesn't exist for {}, skipping".format(rootfile.name))
 
-        command = "augment-tree-with-npy {} {} {} -b {}".format(
+        command = "augment-tree-with-npy {} {} {} {}".format(
             full_root_str, tree_name, os.path.abspath(numpy_file), npybranchname
         )
         commands.append(command)
