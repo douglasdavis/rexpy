@@ -225,6 +225,7 @@ Systematic: "{name}"
   NtupleFilesUp: ttbar_410472_FS_MC16a_{tree_up},ttbar_410472_FS_MC16d_{tree_up},ttbar_410472_FS_MC16e_{tree_up}
   NtupleNameUp: "WtLoop_{tree_up}"
   Type: HISTO
+  Symmetrisation: ONESIDED
   Samples: ttbar
 
 Systematic: "{name}"
@@ -234,6 +235,7 @@ Systematic: "{name}"
   NtupleFilesUp: tW_DR_410648_FS_MC16a_{tree_up},tW_DR_410648_FS_MC16d_{tree_up},tW_DR_410648_FS_MC16e_{tree_up},tW_DR_410649_FS_MC16a_{tree_up},tW_DR_410649_FS_MC16d_{tree_up},tW_DR_410649_FS_MC16e_{tree_up}
   NtupleNameUp: "WtLoop_{tree_up}"
   Type: HISTO
+  Symmetrisation: ONESIDED
   Samples: tW'''.format(
       name=name,
       title=properties.title,
