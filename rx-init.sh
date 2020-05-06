@@ -3,12 +3,17 @@
 ## This will setup a good ROOT environment via AtlasSetup and also set
 ## the shell PATH to find rexuple's apps and scripts.
 
-setupATLAS -q
-lsetup "root 6.18.04-x86_64-centos7-gcc8-opt" --quiet
+if [ "$(uname)" == "Darwin" ]; then
+    setupPyenv
+    pyenv activate py2
+else
+    setupATLAS -q
+    lsetup "root 6.18.04-x86_64-centos7-gcc8-opt" --quiet
+fi
 
 REXUPLE_DIR=$(realpath $(dirname "${BASH_SOURCE[0]}"))
 REXUPLE_SCRIPT_DIR=$REXUPLE_DIR/scripts
 REXUPLE_APP_DIR=$REXUPLE_DIR/app
 
 export PATH=$PATH:$REXUPLE_SCRIPT_DIR:$REXUPLE_APP_DIR
-export PYTHONPATH=$PYTHONPATH:$REXUPLE_DIR/pyexternal
+export PYTHONPATH=$PYTHONPATH:$REXUPLE_DIR
