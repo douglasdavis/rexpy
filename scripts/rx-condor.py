@@ -47,7 +47,6 @@ def cli():
 @click.option("--quick", is_flag=True, help="generate a 'quick' submission (Lumi sys only)")
 @click.option("--this-sys", type=str, help="do a single user defined systematic")
 def ntup(config, quick, this_sys):
-
     """Generate a condor submission script for the ntuple creation step of TRExFitter"""
     config_name = PosixPath(config).name
     if quick:
