@@ -121,6 +121,40 @@ def get_rank_arguments(config, specific_sys=None):
     return ["r {} Ranking={}".format(config, sys) for sys in systematics]
 
 
+def get_fit_argument(config, specific_sys=None, dont_fit_vr=True):
+    """Get the fit trex-fitter step argument.
+
+    Parameters
+    ----------
+    config : str
+        The path of the config file.
+    specific_sys : iterable(str), optional
+        The set of systematics to use; if None (the default), uses all
+        discovered systematics.
+
+    Returns
+    -------
+    str
+        the fit step argument
+    """
+    region_arg = ""
+    if dont_fit_vr:
+        regions = get_list_of_regions(config)
+        regions = [r for r in regions if not r.startswith("VR")]
+        region_arg = "Regions={}".format(",".join(regions))
+
+    if specific_sys is None:
+        return "wf {} {}".format(config, region_arg).strip()
+
+    systematics = get_list_of_systematics(config, specific_sys=specific_sys)
+    systematics = ",".join(systematics)
+
+    if not region_arg:
+        return "wf {} Systematics={}".format(config, systematics)
+    else:
+        return "wf {} {}:Systematics={}".format(config, region_arg, systematics)
+
+
 def get_ntuple_arguments(config, specific_sys=None):
     """Get the set of trex-fitter executable arguments for ntupling.
 
@@ -305,7 +339,7 @@ def complete(config, and_submit, dont_fit, systematic, ws_suffix):
     else:
         # the fit step
         fit = pycondor.Job(name="fit", dag=dagman, **standard_params)
-        fit.add_arg("wf {}".format(config))
+        fit.add_arg(get_fit_argument(config, specific_sys=systematics if systematic else None))
         # the draw step
         draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
         draw.add_args(["dp {} Regions={}".format(config, r) for r in regions])
