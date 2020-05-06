@@ -10,6 +10,9 @@ stability_tests/
 ## executables
 app/augment-tree-with-npy
 
+## everything in run
+run/*
+
 ## condor dirs
 **/err/*.error
 **/log/*.log
