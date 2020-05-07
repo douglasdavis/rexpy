@@ -4,6 +4,7 @@
 *.pdf
 *.sub
 *.tar.gz
+*.pyc
 logs/
 stability_tests/
 
