@@ -13,6 +13,7 @@ import click
 from pathlib2 import PosixPath
 
 # rexuple
+from rexuple.batch import job_params
 import rexuple.pycondor as pycondor
 from rexuple.parse import (
     get_regions,
@@ -164,18 +165,7 @@ def complete(config, and_submit, dont_fit, systematic, ws_suffix):
     regions = get_regions(config)
 
     dagman = pycondor.Dagman(name="rx-condor_complete", submit=os.path.join(workspace, "sub"))
-    standard_params = dict(
-        universe="vanilla",
-        getenv=True,
-        notification="Error",
-        request_memory="2GB",
-        extra_lines=["email = ddavis@phy.duke.edu"],
-        executable=TREX_EXE,
-        submit=os.path.join(workspace, "sub"),
-        error=os.path.join(workspace, "err"),
-        output=os.path.join(workspace, "out"),
-        log=os.path.join(workspace, "log"),
-    )
+    standard_params = job_params(workspace, TREX_EXE)
 
     ntuple = pycondor.Job(name="ntuple", dag=dagman, **standard_params)
 
