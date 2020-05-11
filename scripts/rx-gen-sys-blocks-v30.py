@@ -136,7 +136,6 @@ SYS_TREES_ONESIDED["Jet_JER_EffNP_5"               ] = NTSysTree1s("CategoryRedu
 SYS_TREES_ONESIDED["Jet_JER_EffNP_6"               ] = NTSysTree1s("CategoryReduction_JET_JER_EffectiveNP_6__1up"            , "JER"   , "40", "JER EffNP 6"               , False)
 SYS_TREES_ONESIDED["Jet_JER_EffectiveNP_7restTerm" ] = NTSysTree1s("CategoryReduction_JET_JER_EffectiveNP_7restTerm__1up"    , "JER"   , "40", "JER EffectiveNP 7restTerm" , False)
 
-
 for name, properties in SYS_WEIGHTS.items():
     block = '''
 Systematic: "{name}"
@@ -197,6 +196,7 @@ Systematic: "{name}"
   NtupleNameDown: "WtLoop_{tree_down}"
   Samples: ttbar
   Type: HISTO
+  Symmetrisation: TWOSIDED
 
 Systematic: "{name}"
   NuisanceParameter: "{name}"
@@ -207,7 +207,8 @@ Systematic: "{name}"
   NtupleNameUp: "WtLoop_{tree_up}"
   NtupleNameDown: "WtLoop_{tree_down}"
   Samples: tW
-  Type: HISTO'''.format(
+  Type: HISTO
+  Symmetrisation: TWOSIDED'''.format(
       name=name,
       category=properties.category,
       title=properties.title,
