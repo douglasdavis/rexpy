@@ -6,7 +6,7 @@ def job_params(workspace, executable, **kwargs):
     getenv = kwargs.get("getenv", True)
     notification = kwargs.get("notification", "Error")
     request_memory = kwargs.get("request_memory", "2GB")
-    extra_lines = kwargs.get("extra_lines", ["email = ddavis@phy.duke.edu"])
+    extra_lines = kwargs.get("extra_lines", ["notify_user = ddavis@phy.duke.edu"])
     return dict(
         executable=executable,
         universe=universe,
