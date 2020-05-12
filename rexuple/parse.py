@@ -1,4 +1,6 @@
-"""A module for parsing TRExFitter configs"""
+"""A module for parsing TRExFitter configs and results"""
+
+from __future__ import print_function
 
 
 def get_systematics(config, specific_sys=None):
@@ -12,24 +14,23 @@ def get_systematics(config, specific_sys=None):
     Parameters
     ----------
     config : str
-        The path of the config file.
+        Path of the config file.
     specific_sys : iterable(str), optional
-        A set of desired systematics.
+        Specific systematics to use; if None (the default), uses all
+        discovered systematics.
 
     Returns
     -------
     list(str)
         The relevant systematics.
-
     """
-
     systematics = []
     with open(config, "r") as f:
         for line in f.readlines():
             if line.startswith(r"%"):
                 continue
             elif line.startswith("Systematic:"):
-                sys = line.strip().split(":")[-1].strip().replace('"', '')
+                sys = line.strip().split(":")[-1].strip().replace('"', "")
                 systematics.append(sys)
     systematics = sorted(set(systematics), key=str.lower, reverse=True)
     if specific_sys is None:
@@ -46,19 +47,20 @@ def get_systematics(config, specific_sys=None):
         return sorted(set(req_sys), key=str.lower, reverse=True)
 
 
-def get_regions(config):
+def get_regions(config, exclude=None):
     """Get the list of regions in a config file.
 
     Parameters
     ----------
     config : str
-        The path of the config file.
+        Path of the config file.
+    exclude : list(str)
+        Regions to skip (if present in config).
 
     Returns
     -------
     list(str)
         The list of regions in the config file.
-
     """
     regions = []
     with open(config, "r") as f:
@@ -66,7 +68,10 @@ def get_regions(config):
             if line.startswith("%"):
                 continue
             elif line.startswith("Region:"):
-                reg = line.strip().split(":")[-1].strip().replace('"', '')
+                reg = line.strip().split(":")[-1].strip().replace('"', "")
+                if exclude is not None:
+                    if reg in exclude:
+                        continue
                 regions.append(reg)
     return regions
 
@@ -77,16 +82,15 @@ def gen_rank_arguments(config, specific_sys=None):
     Parameters
     ----------
     config : str
-        The path of the config file.
+        Path of the config file.
     specific_sys : iterable(str), optional
-        The set of systematics to use; if None (the default), uses all
+        Specific systematics to use; if None (the default), uses all
         discovered systematics.
 
     Returns
     -------
     list(str)
         The list of trex-fitter arguments.
-
     """
     systematics = get_systematics(config, specific_sys=specific_sys)
     return ["r {} Ranking={}".format(config, sys) for sys in systematics]
@@ -98,9 +102,9 @@ def gen_fit_argument(config, specific_sys=None, dont_fit_vr=True):
     Parameters
     ----------
     config : str
-        The path of the config file.
+        Path of the config file.
     specific_sys : iterable(str), optional
-        The set of systematics to use; if None (the default), uses all
+        Specific systematics to use; if None (the default), uses all
         discovered systematics.
 
     Returns
@@ -130,7 +134,7 @@ def gen_ntuple_arguments(config, specific_sys=None):
     """Get the set of trex-fitter executable arguments for ntupling.
 
     config : str
-        The path of the config file.
+        Path of the config file.
     specific_sys : iterable(str), optional
         The set of systematics to use; if None (the default), uses all
         discovered systematics.
@@ -150,4 +154,6 @@ def gen_ntuple_arguments(config, specific_sys=None):
     ## otherwise, construct for specific systematics
     systematics = get_systematics(config, specific_sys=specific_sys)
     systematics = ",".join(systematics)
-    return ["n {} Regions={}:Systematics={}".format(config, r, systematics) for r in regions]
+    return [
+        "n {} Regions={}:Systematics={}".format(config, r, systematics) for r in regions
+    ]

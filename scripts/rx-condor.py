@@ -20,7 +20,7 @@ from rexuple.parse import (
     get_systematics,
     gen_fit_argument,
     gen_rank_arguments,
-    gen_ntuple_arguments
+    gen_ntuple_arguments,
 )
 
 TREX_EXE = os.popen("which trex-fitter").read().strip()
@@ -45,7 +45,9 @@ def cli():
 
 @cli.command("ntup")
 @click.argument("config")
-@click.option("--quick", is_flag=True, help="generate a 'quick' submission (Lumi sys only)")
+@click.option(
+    "--quick", is_flag=True, help="generate a 'quick' submission (Lumi sys only)"
+)
 @click.option("--this-sys", type=str, help="do a single user defined systematic")
 def ntup(config, quick, this_sys):
     """Generate a condor submission script for the ntuple creation step of TRExFitter"""
@@ -68,9 +70,15 @@ def ntup(config, quick, this_sys):
             elif line.startswith("Region:"):
                 reg = line.strip().split("Region: ")[-1].replace('"', "")
                 if quick:
-                    commands.append("n {} Systematics=Lumi:Regions={}".format(full_config, reg))
+                    commands.append(
+                        "n {} Systematics=Lumi:Regions={}".format(full_config, reg)
+                    )
                 elif this_sys is not None:
-                    commands.append("n {} Systematics={}:Regions={}".format(full_config, this_sys, reg))
+                    commands.append(
+                        "n {} Systematics={}:Regions={}".format(
+                            full_config, this_sys, reg
+                        )
+                    )
                 else:
                     commands.append("n {} Regions={}".format(full_config, reg))
 
@@ -100,6 +108,7 @@ def fit(config):
 def draw(config, postfit):
     """Generate a condor submission script to run the drawing steps on some config files"""
     region_re = re.compile(r"^Region: \"\w+\"")
+
     def get_arguments(config_file, do_postfit):
         regions = []
         with open(config_file, "r") as f:
@@ -148,7 +157,9 @@ def rank(config):
 @click.argument("config", type=click.Path(exists=True, resolve_path=True))
 @click.option("--dont-submit", is_flag=True, help="do not submit to condor")
 @click.option("--dont-fit", is_flag=True, help="only do n and d steps")
-@click.option("-s", "--systematic", type=str, multiple=True, help="only these systematics")
+@click.option(
+    "-s", "--systematic", type=str, multiple=True, help="only these systematics"
+)
 @click.option("-w", "--ws-suffix", type=str, help="extra workspace suffix")
 def complete(config, dont_submit, dont_fit, systematic, ws_suffix):
     """Run a complete set of trex-fitter stages ('n', then 'wf', then 'dp', then 'r')"""
@@ -164,7 +175,9 @@ def complete(config, dont_submit, dont_fit, systematic, ws_suffix):
     systematics = get_systematics(config, specific_sys=systematic)
     regions = get_regions(config)
 
-    dagman = pycondor.Dagman(name="rx-condor_complete", submit=os.path.join(workspace, "sub"))
+    dagman = pycondor.Dagman(
+        name="rx-condor_complete", submit=os.path.join(workspace, "sub")
+    )
     standard_params = job_params(workspace, TREX_EXE)
 
     ntuple = pycondor.Job(name="ntuple", dag=dagman, **standard_params)
@@ -182,7 +195,9 @@ def complete(config, dont_submit, dont_fit, systematic, ws_suffix):
     else:
         # the fit step
         fit = pycondor.Job(name="fit", dag=dagman, **standard_params)
-        fit.add_arg(gen_fit_argument(config, specific_sys=systematics if systematic else None))
+        fit.add_arg(
+            gen_fit_argument(config, specific_sys=systematics if systematic else None)
+        )
         # the draw step
         draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
         draw.add_args(["dp {} Regions={}".format(config, r) for r in regions])
@@ -207,6 +222,7 @@ def complete(config, dont_submit, dont_fit, systematic, ws_suffix):
     os.chdir(orig_path)
 
     return 0
+
 
 if __name__ == "__main__":
     cli()
