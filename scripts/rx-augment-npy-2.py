@@ -22,9 +22,8 @@ def get_args():
     parser.add_argument("rootfiledir", type=str, help="Directory with ROOT files")
     parser.add_argument("npyfiledir", type=str, help="Directory with npyfiles")
     parser.add_argument("--dry", action="store_true", help="dry run, don't execute")
-    parser.add_argument("--ignore-main", action="store_true", help="skip 'main' samples (ttbar & tW_(DR,DS) nominal FS)")
     parser.add_argument("--condor-sub", type=str, help="generate condor submission workspace (for BNL use)")
-    parser.add_argument("--and-submit", action="store_true", help="submit condor as well")
+    parser.add_argument("--dont-submit", action="store_true", help="dont submit condor")
     return parser.parse_args()
 
 
@@ -79,21 +78,10 @@ def main():
 
     log.info("Determined numpy branch name: {}".format(npybranchname))
 
-    main_samples_pfxs = (
-        "tW_DR_410648_FS",
-        "tW_DR_410649_FS",
-        "tW_DS_410656_FS",
-        "tW_DS_410657_FS",
-        "ttbar_410472_FS",
-    )
-
     commands = []
     for rootfile in rootfiles:
         full_root_str = os.path.abspath(rootfile)
         base_root_str = os.path.basename(rootfile)
-
-        if args.ignore_main and base_root_str.startswith(main_samples_pfxs):
-            continue
 
         if not full_root_str.endswith(".root"):
             continue
@@ -130,10 +118,10 @@ def main():
         augjob.add_args(commands)
         orig_path = os.getcwd()
         os.chdir(workspace)
-        if args.and_submit:
-            dagman.build_submit()
-        else:
+        if args.dont_submit:
             dagman.build()
+        else:
+            dagman.build_submit()
         os.chdir(orig_path)
         return 0
 
