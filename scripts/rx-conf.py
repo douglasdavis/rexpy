@@ -22,6 +22,7 @@ from rexuple.constants import (
 )
 
 DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"
+DEF_1j1b_swmc = "reg1j1b == 1 && OS == 1 && mass_lep1jet1 < 155 && mass_lep2jet1 < 155"
 DEF_1j1b_vari = "bdtres00"
 DEF_1j1b_nbin = 12
 DEF_1j1b_xmin = 0.17
@@ -29,6 +30,7 @@ DEF_1j1b_xmax = 0.76
 DEF_1j1b_bins = "{},{},{}".format(DEF_1j1b_nbin, DEF_1j1b_xmin, DEF_1j1b_xmax)
 
 DEF_2j1b_sels = "reg2j1b == 1 && OS == 1"
+DEF_2j1b_swmc = "reg2j1b == 1 && OS == 1 && mass_lep1jetb < 155 && mass_lep2jetb < 155"
 DEF_2j1b_vari = "bdtres00"
 DEF_2j1b_nbin = 12
 DEF_2j1b_xmin = 0.22
@@ -36,6 +38,7 @@ DEF_2j1b_xmax = 0.85
 DEF_2j1b_bins = "{},{},{}".format(DEF_2j1b_nbin, DEF_2j1b_xmin, DEF_2j1b_xmax)
 
 DEF_2j2b_sels = "reg2j2b == 1 && OS == 1"
+DEF_2j2b_swmc = "reg2j2b == 1 && OS == 1 && minimaxmbl < 155"
 DEF_2j2b_vari = "bdtres00"
 DEF_2j2b_nbin = 12
 DEF_2j2b_xmin = 0.20
@@ -167,9 +170,9 @@ def simple_setup0(outname):
 def simple_setup1(outname):
     """Generate a config from default settings using mass cuts, save to OUTNAME."""
     preamble = top(
-        reg1j1b_selection="reg1j1b == 1 && OS == 1 && mass_lep1jet1 < 155 && mass_lep2jet1 < 155",
-        reg2j1b_selection="reg2j1b == 1 && OS == 1 && mass_lep1jetb < 155 && mass_lep2jetb < 155",
-        reg2j2b_selection="reg2j2b == 1 && OS == 1 && minimaxmbl < 155",
+        reg1j1b_selection=DEF_1j1b_swmc,
+        reg2j1b_selection=DEF_2j1b_swmc,
+        reg2j2b_selection=DEF_2j2b_swmc,
         reg1j1b_variable="bdtres01",
         reg2j1b_variable="bdtres01",
         reg2j2b_variable="bdtres01",
