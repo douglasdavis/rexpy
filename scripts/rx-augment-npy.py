@@ -9,42 +9,26 @@ import re
 import time
 import subprocess
 
-logging.basicConfig(level=logging.INFO, format="{:25}  %(levelname)s  %(message)s".format("[%(name)s : %(funcName)s]"))
-logging.addLevelName(logging.WARNING, "\033[1;31m{:8}\033[1;0m".format(logging.getLevelName(logging.WARNING)))
-logging.addLevelName(logging.ERROR, "\033[1;35m{:8}\033[1;0m".format(logging.getLevelName(logging.ERROR)))
-logging.addLevelName(logging.INFO, "\033[1;32m{:8}\033[1;0m".format(logging.getLevelName(logging.INFO)))
-logging.addLevelName(logging.DEBUG, "\033[1;34m{:8}\033[1;0m".format(logging.getLevelName(logging.DEBUG)))
-log = logging.getLogger("wt-utils-mass-augment-npy")
+from rexuple.batch import job_params
+import rexuple.pycondor as pycondor
+from rexuple import setup_logging
+setup_logging()
 
+log = logging.getLogger("rx-augment-npy")
 
-CONDOR_HEADER = """
-Universe        = vanilla
-notification    = Error
-notify_user     = ddavis@phy.duke.edu
-GetEnv          = True
-Executable      = {exe}
-Output          = logs/job.out.$(cluster).$(process)
-Error           = logs/job.err.$(cluster).$(process)
-Log             = logs/job.log.$(cluster).$(process)
-request_memory  = 2.0G
-
-"""
 
 def get_args():
     parser = argparse.ArgumentParser(description="Augment a set of ROOT files using a set of .npy files")
     parser.add_argument("rootfiledir", type=str, help="Directory with ROOT files")
     parser.add_argument("npyfiledir", type=str, help="Directory with npyfiles")
     parser.add_argument("--dry", action="store_true", help="dry run, don't execute")
-    parser.add_argument("--max", type=int, help="max parallel tasks")
-    parser.add_argument("--ignore-main", action="store_true", help="skip 'main' samples (ttbar & tW_(DR,DS) nominal FS)")
-    parser.add_argument("--condor-sub", type=str, help="generate condor submission script with this name (for BNL use)")
+    parser.add_argument("--condor-sub", type=str, help="generate condor submission workspace (for BNL use)")
+    parser.add_argument("--dont-submit", action="store_true", help="dont submit condor")
     return parser.parse_args()
 
 
 def main():
     args = get_args()
-    if not os.path.exists("logs"):
-        os.mkdir("logs")
 
     npyfile_re = re.compile(r"((?P<name>\w+)\.(?P<branch>\w+)\.npy)")
     sample_info_re = re.compile(
@@ -94,21 +78,10 @@ def main():
 
     log.info("Determined numpy branch name: {}".format(npybranchname))
 
-    main_samples_pfxs = (
-        "tW_DR_410648_FS",
-        "tW_DR_410649_FS",
-        "tW_DS_410656_FS",
-        "tW_DS_410657_FS",
-        "ttbar_410472_FS",
-    )
-
     commands = []
     for rootfile in rootfiles:
         full_root_str = os.path.abspath(rootfile)
         base_root_str = os.path.basename(rootfile)
-
-        if args.ignore_main and base_root_str.startswith(main_samples_pfxs):
-            continue
 
         if not full_root_str.endswith(".root"):
             continue
@@ -126,7 +99,7 @@ def main():
         if not os.path.exists(numpy_file):
             log.warn("numpy file doesn't exist for {}, skipping".format(rootfile.name))
 
-        command = "augment-tree-with-npy {} {} {} {}".format(
+        command = "{} {} {} {}".format(
             full_root_str, tree_name, os.path.abspath(numpy_file), npybranchname
         )
         commands.append(command)
@@ -136,20 +109,26 @@ def main():
             print(com)
         return 0
 
-
     if args.condor_sub:
-        with open(args.condor_sub, "w") as f:
-            f.write(unicode(CONDOR_HEADER.format(
-                exe=os.popen("which augment-tree-with-npy").read().strip())))
-            for command in commands:
-                arguments = command.split("augment-tree-with-npy ")[-1]
-                f.write(unicode("Arguments = {}\nQueue\n\n".format(arguments)))
+        workspace = os.path.abspath(args.condor_sub)
+        os.mkdir(workspace)
+        dagman = pycondor.Dagman(name="rx-augment-npy", submit=os.path.join(workspace, "sub"))
+        params = job_params(workspace, os.popen("which augment-tree-with-npy").read().strip())
+        augjob = pycondor.Job(name="augment", dag=dagman, **params)
+        augjob.add_args(commands)
+        orig_path = os.getcwd()
+        os.chdir(workspace)
+        if args.dont_submit:
+            dagman.build()
+        else:
+            dagman.build_submit()
+        os.chdir(orig_path)
         return 0
 
     ncalls = len(commands)
     log.info("starting calls (total: {})".format(ncalls))
     for i, com in enumerate(commands):
-        subprocess.call(com, shell=True)
+        subprocess.call("augment-tree-with-npy {}".format(com), shell=True)
         log.info("done with {} ({}/{})".format(
             os.path.abspath(com.split()[1]).name, i + 1, ncalls))
 
