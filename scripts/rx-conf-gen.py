@@ -21,6 +21,27 @@ from rexuple.constants import (
     SYS_ONESIDED_TREE_BLOCKS,
 )
 
+DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"
+DEF_1j1b_vari = "bdtres00"
+DEF_1j1b_nbin = 12
+DEF_1j1b_xmin = 0.17
+DEF_1j1b_xmax = 0.76
+DEF_1j1b_bins = "{},{},{}".format(DEF_1j1b_nbin, DEF_1j1b_xmin, DEF_1j1b_xmax)
+
+DEF_2j1b_sels = "reg2j1b == 1 && OS == 1"
+DEF_2j1b_vari = "bdtres00"
+DEF_2j1b_nbin = 12
+DEF_2j1b_xmin = 0.22
+DEF_2j1b_xmax = 0.85
+DEF_2j1b_bins = "{},{},{}".format(DEF_2j1b_nbin, DEF_2j1b_xmin, DEF_2j1b_xmax)
+
+DEF_2j2b_sels = "reg2j2b == 1 && OS == 1"
+DEF_2j2b_vari = "bdtres00"
+DEF_2j2b_nbin = 12
+DEF_2j2b_xmin = 0.20
+DEF_2j2b_xmax = 0.90
+DEF_2j2b_bins = "{},{},{}".format(DEF_2j2b_nbin, DEF_2j2b_xmin, DEF_2j2b_xmax)
+
 def top(**kwargs):
     params = dict(
         job="tW",
@@ -30,15 +51,15 @@ def top(**kwargs):
         dotables="TRUE",
         systplots="TRUE",
         fitblind="TRUE",
-        reg1j1b_selection="reg1j1b == 1 && OS == 1",
-        reg1j1b_variable="bdtres00",
-        reg1j1b_binning="12,0.17,0.76",
-        reg2j1b_selection="reg2j1b == 1 && OS == 1",
-        reg2j1b_variable="bdtres00",
-        reg2j1b_binning="12,0.22,0.85",
-        reg2j2b_selection="reg2j2b == 1 && OS == 1",
-        reg2j2b_variable="bdtres00",
-        reg2j2b_binning="12,0.2,0.90",
+        reg1j1b_selection=DEF_1j1b_sels,
+        reg1j1b_variable=DEF_1j1b_vari,
+        reg1j1b_binning=DEF_1j1b_bins,
+        reg2j1b_selection=DEF_2j1b_sels,
+        reg2j1b_variable=DEF_2j1b_vari,
+        reg2j1b_binning=DEF_2j1b_bins,
+        reg2j2b_selection=DEF_2j2b_sels,
+        reg2j2b_variable=DEF_2j2b_vari,
+        reg2j2b_binning=DEF_2j2b_bins,
     )
     for k in kwargs:
         params[k] = kwargs[k]
@@ -117,7 +138,7 @@ def top(**kwargs):
     '''.format(**params))
 
 
-def all_put_preamble(f):
+def all_but_preamble(f):
     print(SAMPLE_BLOCKS, file=f)
     print(NORMFACTOR_BLOCKS, file=f)
     print(MODELING_BLOCKS, file=f)
@@ -132,27 +153,45 @@ def cli():
     pass
 
 
-@cli.command("simple")
+@cli.command("simple-setup0")
 @click.argument("outname", type=click.Path(resolve_path=True))
-def simple(outname):
+def simple_setup0(outname):
     """Generate a config from default settings, save to OUTNAME."""
     with open(outname, "w") as f:
         print(top(), file=f)
-        all_put_preamble(f)
+        all_but_preamble(f)
+    return 0
+
+@cli.command("simple-setup1")
+@click.argument("outname", type=click.Path(resolve_path=True))
+def simple_setup1(outname):
+    """Generate a config from default settings using mass cuts, save to OUTNAME."""
+    preamble = top(
+        reg1j1b_selection="reg1j1b == 1 && OS == 1 && mass_lep1jet1 < 155 && mass_lep2jet1 < 155",
+        reg2j1b_selection="reg2j1b == 1 && OS == 1 && mass_lep1jetb < 155 && mass_lep2jetb < 155",
+        reg2j2b_selection="reg2j2b == 1 && OS == 1 && minimaxmbl < 155",
+        reg1j1b_variable="bdtres01",
+        reg2j1b_variable="bdtres01",
+        reg2j2b_variable="bdtres01",
+        reg1j1b_binning="12,0.17,0.745",
+    )
+    with open(outname, "w") as f:
+        print(preamble, file=f)
+        all_but_preamble(f)
     return 0
 
 
 @cli.command("tunable")
 @click.argument("outname", type=click.Path(resolve_path=True))
-@click.option("--bin-1j1b", type=str, default="12,0.17,0.76", help="1j1b region binning settings")
-@click.option("--bin-2j1b", type=str, default="12,0.22,0.85", help="2j1b region binning settings")
-@click.option("--bin-2j2b", type=str, default="12,0.2,0.90", help="2j2b region binning settings")
-@click.option("--var-1j1b", type=str, default="bdtres00", help="1j1b region variable setting")
-@click.option("--var-2j1b", type=str, default="bdtres00", help="2j1b region variable setting")
-@click.option("--var-2j2b", type=str, default="bdtres00", help="2j2b region variable setting")
-@click.option("--sel-1j1b", type=str, default="reg1j1b == 1 && OS == 1", help="1j1b region selection setting")
-@click.option("--sel-2j1b", type=str, default="reg2j1b == 1 && OS == 1", help="2j1b region selection setting")
-@click.option("--sel-2j2b", type=str, default="reg2j2b == 1 && OS == 1", help="2j2b region selection setting")
+@click.option("--bin-1j1b", type=str, default=DEF_1j1b_bins, help="1j1b region binning settings")
+@click.option("--bin-2j1b", type=str, default=DEF_2j1b_bins, help="2j1b region binning settings")
+@click.option("--bin-2j2b", type=str, default=DEF_2j2b_bins, help="2j2b region binning settings")
+@click.option("--var-1j1b", type=str, default=DEF_1j1b_vari, help="1j1b region variable setting")
+@click.option("--var-2j1b", type=str, default=DEF_2j1b_vari, help="2j1b region variable setting")
+@click.option("--var-2j2b", type=str, default=DEF_2j2b_vari, help="2j2b region variable setting")
+@click.option("--sel-1j1b", type=str, default=DEF_1j1b_sels, help="1j1b region selection setting")
+@click.option("--sel-2j1b", type=str, default=DEF_2j1b_sels, help="2j1b region selection setting")
+@click.option("--sel-2j2b", type=str, default=DEF_2j2b_sels, help="2j2b region selection setting")
 @click.option("--skip-tables", is_flag=True, help="Don't produce tables")
 @click.option("--skip-syst-plots", is_flag=True, help="Don't produce red/blue plots")
 def tunable(
@@ -185,7 +224,7 @@ def tunable(
     )
     with open(outname, "w") as f:
         print(preamble, file=f)
-        all_put_preamble(f)
+        all_but_preamble(f)
     return 0
 
 
