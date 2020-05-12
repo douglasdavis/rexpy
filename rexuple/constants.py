@@ -330,8 +330,8 @@ Sample: "Diboson"
   NtupleFiles: Diboson_999999_FS_MC16a_nominal,Diboson_999999_FS_MC16d_nominal,Diboson_999999_FS_MC16e_nominal
 
 Sample: "MCNP"
-  Title: "MCNP"
-  TexTitle: "MCNP"
+  Title: "Non-prompt"
+  TexTitle: "Non-prompt"
   FillColor: 875
   LineColor: 1
   Type: BACKGROUND

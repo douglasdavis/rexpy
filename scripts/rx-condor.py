@@ -146,15 +146,15 @@ def rank(config):
 
 @cli.command("complete")
 @click.argument("config", type=click.Path(exists=True, resolve_path=True))
-@click.option("--and-submit", is_flag=True, help="also submit to condor")
+@click.option("--dont-submit", is_flag=True, help="do not submit to condor")
 @click.option("--dont-fit", is_flag=True, help="only do n and d steps")
 @click.option("-s", "--systematic", type=str, multiple=True, help="only these systematics")
 @click.option("-w", "--ws-suffix", type=str, help="extra workspace suffix")
-def complete(config, and_submit, dont_fit, systematic, ws_suffix):
+def complete(config, dont_submit, dont_fit, systematic, ws_suffix):
     """Run a complete set of trex-fitter stages ('n', then 'wf', then 'dp', then 'r')"""
     config_path = PosixPath(config)
     config_name = config_path.name
-    workspace = "rxcondor-workspace_{}".format(config_path.stem)
+    workspace = "rxcws-{}".format(config_path.stem)
     if ws_suffix:
         workspace = "{}_{}".format(workspace, ws_suffix)
     os.mkdir(workspace)
@@ -200,10 +200,10 @@ def complete(config, and_submit, dont_fit, systematic, ws_suffix):
 
     orig_path = os.getcwd()
     os.chdir(workspace)
-    if and_submit:
-        dagman.build_submit()
-    else:
+    if dont_submit:
         dagman.build()
+    else:
+        dagman.build_submit()
     os.chdir(orig_path)
 
     return 0
