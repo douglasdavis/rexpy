@@ -2,6 +2,30 @@
 
 from __future__ import print_function
 
+import six
+from pathlib2 import PosixPath
+
+
+def get_blocks(config, delimiter="\n\n"):
+    """Get all blocks in a config based on a delimiter.
+
+    Paramters
+    ---------
+    config : str
+        Path of the config file
+    delimiter : str
+        Delimiter to use on the config string to separate into
+        blocks. This should only overwrite the default in very special
+        cases, a double new line is standard.
+
+    Returns
+    -------
+    list(str)
+        Configuration blocks.
+    """
+    config_str = six.ensure_str(PosixPath(config).read_text())
+    return config_str.split(delimiter)
+
 
 def get_systematics(config, specific_sys=None):
     """Get list of relevant systematics.
