@@ -22,7 +22,9 @@ def remove_region(config_blocks, region):
     summary_plot_regions_n = summary_plot_regions_o.split(",")
     if region in summary_plot_regions_n:
         summary_plot_regions_n.remove(region)
-    new_blocks[0] = new_blocks[0].replace(summary_plot_regions_o, ",".join(summary_plot_regions_n))
+    new_blocks[0] = new_blocks[0].replace(
+        summary_plot_regions_o, ",".join(summary_plot_regions_n)
+    )
     return new_blocks
 
 
