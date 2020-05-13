@@ -7,6 +7,7 @@ from __future__ import print_function
 from textwrap import dedent
 
 # third party
+import six
 import click
 from pathlib2 import PosixPath
 
@@ -21,6 +22,8 @@ from rexuple.constants import (
     SYS_ONESIDED_TREE_BLOCKS,
 )
 from rexuple.vrp import load_meta_table, all_three_regions
+from rexuple.parse_conf import get_vrp_regions, get_blocks
+
 
 DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"
 DEF_1j1b_swmc = "reg1j1b == 1 && OS == 1 && mass_lep1jet1 < 155 && mass_lep2jet1 < 155"
@@ -265,6 +268,70 @@ def tunable(
         all_but_preamble(f)
 
     return 0
+
+
+@cli.command("vrp-sys-update")
+@click.argument("infile", type=click.Path(resolve_path=True))
+@click.argument("outfile", type=click.Path())
+def vrp_sys(infile, outfile):
+    """Update region based systematics to work with VRPs."""
+    whole = six.ensure_str(PosixPath(infile).read_text())
+    vrps = get_vrp_regions(infile)
+    vrps_1j1b = [v for v in vrps if "1j1b" in v]
+    vrps_2j1b = [v for v in vrps if "2j1b" in v]
+    vrps_2j2b = [v for v in vrps if "2j2b" in v]
+    vrps_1j1b = ",".join(vrps_1j1b)
+    vrps_2j1b = ",".join(vrps_2j1b)
+    vrps_2j2b = ",".join(vrps_2j2b)
+    whole = whole.replace(
+        "  Regions: reg1j1b", "  Regions: reg1j1b,{}".format(
+            vrps_1j1b
+        )
+    ).replace(
+        "  Regions: reg2j1b", "  Regions: reg2j1b,{}".format(
+            vrps_2j1b
+        )
+    ).replace(
+        "  Regions: reg2j2b", "  Regions: reg2j2b,{}".format(
+            vrps_2j2b
+        )
+    )
+    with open(outfile, "w") as f:
+        print(whole, file=f)
+
+
+@cli.command("rm-region")
+@click.argument("infile", type=click.Path(resolve_path=True))
+@click.argument("outfile", type=click.Path())
+@click.option("-r", "--region", type=str, multiple=True)
+def rm_region(config, region):
+    """Remove regions from a config file."""
+    ##
+    def remove_region(config_blocks, region):
+        new_blocks = []
+        for block in config_blocks:
+            if block.startswith("Region:"):
+                if region in block:
+                    continue
+            if block.startswith("Systematic:"):
+                if region in block:
+                    continue
+            new_blocks.append(block)
+
+        summary_plot_regions_o = new_blocks[0].split("SummaryPlotRegions: ")[-1].split()[0]
+        summary_plot_regions_n = summary_plot_regions_o.split(",")
+        if region in summary_plot_regions_n:
+            summary_plot_regions_n.remove(region)
+        new_blocks[0] = new_blocks[0].replace(
+            summary_plot_regions_o, ",".join(summary_plot_regions_n)
+        )
+        return new_blocks
+    ##
+    blocks = get_blocks(config)
+    for r in region:
+        blocks = remove_region(blocks, r)
+    with open(outfile, "w") as f:
+        print("\n\n".join(blocks), file=f)
 
 
 if __name__ == "__main__":

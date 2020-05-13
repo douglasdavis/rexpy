@@ -100,6 +100,25 @@ def get_regions(config, exclude=None):
     return regions
 
 
+def get_vrp_regions(config, exclude=None):
+    """Get list of VRP regions
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+    exclude : list(str)
+        Regions to skip (if present in config).
+
+    Returns
+    -------
+    list(str)
+        The list of regions in the config file.
+    """
+    regs = get_regions(config, exclude=exclude)
+    return [r for r in regs if r.startswith("VRP")]
+
+
 def gen_rank_arguments(config, specific_sys=None):
     """Get a set of trex-fitter executable arguments for ranking.
 
