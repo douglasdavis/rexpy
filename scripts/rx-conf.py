@@ -20,6 +20,7 @@ from rexuple.constants import (
     SYS_TWOSIDED_TREE_BLOCKS,
     SYS_ONESIDED_TREE_BLOCKS,
 )
+from rexuple.vrp import load_meta_table, all_three_regions
 
 DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"
 DEF_1j1b_swmc = "reg1j1b == 1 && OS == 1 && mass_lep1jet1 < 155 && mass_lep2jet1 < 155"
@@ -45,6 +46,7 @@ DEF_2j2b_xmin = 0.20
 DEF_2j2b_xmax = 0.90
 DEF_2j2b_bins = "{},{},{}".format(DEF_2j2b_nbin, DEF_2j2b_xmin, DEF_2j2b_xmax)
 
+
 def top(**kwargs):
     params = dict(
         job="tW",
@@ -67,7 +69,8 @@ def top(**kwargs):
     for k in kwargs:
         params[k] = kwargs[k]
 
-    return dedent('''\
+    return dedent(
+        """\
     Job: "{job}"
       Label: "{label}"
       ReadFrom: NTUP
@@ -138,7 +141,10 @@ def top(**kwargs):
       Selection: "{reg2j2b_selection}"
       Type: SIGNAL
       Variable: "{reg2j2b_variable}",{reg2j2b_binning}
-    '''.format(**params))
+    """.format(
+            **params
+        )
+    )
 
 
 def all_but_preamble(f):
@@ -165,6 +171,7 @@ def simple_setup0(outname):
         all_but_preamble(f)
     return 0
 
+
 @cli.command("simple-setup1")
 @click.argument("outname", type=click.Path(resolve_path=True))
 def simple_setup1(outname):
@@ -186,17 +193,40 @@ def simple_setup1(outname):
 
 @cli.command("tunable")
 @click.argument("outname", type=click.Path(resolve_path=True))
-@click.option("--bin-1j1b", type=str, default=DEF_1j1b_bins, help="1j1b region binning settings")
-@click.option("--bin-2j1b", type=str, default=DEF_2j1b_bins, help="2j1b region binning settings")
-@click.option("--bin-2j2b", type=str, default=DEF_2j2b_bins, help="2j2b region binning settings")
-@click.option("--var-1j1b", type=str, default=DEF_1j1b_vari, help="1j1b region variable setting")
-@click.option("--var-2j1b", type=str, default=DEF_2j1b_vari, help="2j1b region variable setting")
-@click.option("--var-2j2b", type=str, default=DEF_2j2b_vari, help="2j2b region variable setting")
-@click.option("--sel-1j1b", type=str, default=DEF_1j1b_sels, help="1j1b region selection setting")
-@click.option("--sel-2j1b", type=str, default=DEF_2j1b_sels, help="2j1b region selection setting")
-@click.option("--sel-2j2b", type=str, default=DEF_2j2b_sels, help="2j2b region selection setting")
+@click.option(
+    "--bin-1j1b", type=str, default=DEF_1j1b_bins, help="1j1b region binning settings"
+)
+@click.option(
+    "--bin-2j1b", type=str, default=DEF_2j1b_bins, help="2j1b region binning settings"
+)
+@click.option(
+    "--bin-2j2b", type=str, default=DEF_2j2b_bins, help="2j2b region binning settings"
+)
+@click.option(
+    "--var-1j1b", type=str, default=DEF_1j1b_vari, help="1j1b region variable setting"
+)
+@click.option(
+    "--var-2j1b", type=str, default=DEF_2j1b_vari, help="2j1b region variable setting"
+)
+@click.option(
+    "--var-2j2b", type=str, default=DEF_2j2b_vari, help="2j2b region variable setting"
+)
+@click.option(
+    "--sel-1j1b", type=str, default=DEF_1j1b_sels, help="1j1b region selection setting"
+)
+@click.option(
+    "--sel-2j1b", type=str, default=DEF_2j1b_sels, help="2j1b region selection setting"
+)
+@click.option(
+    "--sel-2j2b", type=str, default=DEF_2j2b_sels, help="2j2b region selection setting"
+)
 @click.option("--skip-tables", is_flag=True, help="Don't produce tables")
 @click.option("--skip-syst-plots", is_flag=True, help="Don't produce red/blue plots")
+@click.option(
+    "--vrp",
+    type=click.Path(resolve_path=True, exists=True),
+    help="validation region plots",
+)
 def tunable(
     outname,
     bin_1j1b,
@@ -209,7 +239,8 @@ def tunable(
     sel_2j1b,
     sel_2j2b,
     skip_tables,
-    skip_syst_plots
+    skip_syst_plots,
+    vrp,
 ):
     """Generate a config with user defined binning, save to OUTNAME."""
     preamble = top(
@@ -227,7 +258,12 @@ def tunable(
     )
     with open(outname, "w") as f:
         print(preamble, file=f)
+        if vrp is not None:
+            meta = load_meta_table(vrp)
+            print(all_three_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b), file=f)
+            print("", file=f)
         all_but_preamble(f)
+
     return 0
 
 
