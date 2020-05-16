@@ -9,6 +9,10 @@ from pathlib2 import PosixPath
 def get_blocks(config, delimiter="\n\n"):
     """Get all blocks in a config based on a delimiter.
 
+    The TRExFitter configuration schema is pretty rigid. We nominally
+    expect exactly one blank line between all blocks, so the delimiter
+    between two blocks should be exactly two new newlines.
+
     Paramters
     ---------
     config : str
@@ -22,9 +26,70 @@ def get_blocks(config, delimiter="\n\n"):
     -------
     list(str)
         Configuration blocks.
+
     """
     config_str = six.ensure_str(PosixPath(config).read_text())
     return config_str.split(delimiter)
+
+
+def top_block_titles(config, block_type):
+    """Extract the set of titles associated with a block type.
+
+    Each top level TRExFitter block has a title and we can extract the
+    titles of a specific top level block type.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file,
+    block_type : str
+        Block type the titles are associated with.
+
+    Returns
+    -------
+    set(str)
+        Titles of the requested blocks.
+
+    Examples
+    --------
+    A config with some blocks of the form::
+
+      Region: "reg2j2b"
+        Label: "..."
+        ShortLabel: "..."
+        Selection: "..."
+        Binning ...
+
+      Region: "reg2j1b"
+        Label: "..."
+        ShortLabel: "..."
+        Selection: "..."
+        Binning ...
+
+    will yield::
+
+      >>> top_block_titles("/path/to/fit.conf", "Region")
+      ["reg2j2b", "reg2j1b"]
+
+    """
+    with open(config, "r") as f:
+        return set(
+            map(
+                lambda line: line.split(": ")[1][1:-2],
+                filter(
+                    lambda line: str(line).startswith("%s: " % block_type),
+                    f.readlines(),
+                ),
+            )
+        )
+
+
+def get_systematics2(config, specific_sys=None):
+    systs = top_block_titles(config, "Systematic")
+    if specific_sys is None or len(specific_sys) == 0:
+        return systs
+    else:
+        return list(filter(lambda s: s in systs, specific_sys))
 
 
 def get_systematics(config, specific_sys=None):
