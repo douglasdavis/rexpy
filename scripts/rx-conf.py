@@ -22,7 +22,7 @@ from rexuple.constants import (
     SYS_ONESIDED_TREE_BLOCKS,
 )
 from rexuple.vrp import load_meta_table, all_three_regions
-from rexuple.parse_conf import get_vrp_regions, get_blocks
+from rexuple.confparse import get_vrp_regions, get_blocks
 
 
 DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"

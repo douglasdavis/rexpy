@@ -15,7 +15,7 @@ from pathlib2 import PosixPath
 # rexuple
 from rexuple.batch import job_params
 import rexuple.pycondor as pycondor
-from rexuple.parse_conf import (
+from rexuple.confparse import (
     get_regions,
     get_systematics,
     gen_fit_argument,

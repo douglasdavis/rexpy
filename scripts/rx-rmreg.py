@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import click
 
-from rexuple.parse_conf import get_blocks
+from rexuple.confparse import get_blocks
 
 
 def remove_region(config_blocks, region):
