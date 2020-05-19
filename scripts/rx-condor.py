@@ -189,7 +189,8 @@ def complete(config, dont_submit, dont_fit, systematic, ws_suffix):
 
     if dont_fit:
         draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
-        draw.add_args(["d {} Regions={}".format(config, r) for r in regions])
+        draw.add_arg("dp {}".format(config))
+        # draw.add_args(["d {} Regions={}".format(config, r) for r in regions])
         # now define the dependencies
         draw.add_parent(ntuple)
     else:
@@ -200,7 +201,8 @@ def complete(config, dont_submit, dont_fit, systematic, ws_suffix):
         )
         # the draw step
         draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
-        draw.add_args(["dp {} Regions={}".format(config, r) for r in regions])
+        draw.add_arg("dp {}".format(config))
+        # draw.add_args(["dp {} Regions={}".format(config, r) for r in regions])
         # the rank (fit) step
         rank = pycondor.Job(name="rank", dag=dagman, **standard_params)
         rank.add_args(gen_rank_arguments(config, specific_sys=systematics))
