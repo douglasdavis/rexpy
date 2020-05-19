@@ -18,6 +18,7 @@ import rexuple.pycondor as pycondor
 from rexuple.confparse import (
     get_regions,
     get_systematics,
+    get_draw_argument,
     gen_fit_argument,
     gen_rank_arguments,
     gen_ntuple_arguments,
@@ -201,7 +202,7 @@ def complete(config, dont_submit, dont_fit, systematic, ws_suffix):
         )
         # the draw step
         draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
-        draw.add_arg("dp {}".format(config))
+        draw.add_arg(get_draw_argument(config, specific_sys=systematics if systematic else None))
         # draw.add_args(["dp {} Regions={}".format(config, r) for r in regions])
         # the rank (fit) step
         rank = pycondor.Job(name="rank", dag=dagman, **standard_params)

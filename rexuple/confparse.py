@@ -6,7 +6,7 @@ import six
 from pathlib2 import PosixPath
 
 
-def get_blocks(config, delimiter="\n\n"):
+def all_blocks(config, delimiter="\n\n"):
     """Get all blocks in a config based on a delimiter.
 
     The TRExFitter configuration schema is pretty rigid. We nominally
@@ -75,7 +75,7 @@ def top_block_titles(config, block_type):
     with open(config, "r") as f:
         return set(
             map(
-                lambda line: line.split(": ")[1][1:-2],
+                lambda line: line.split(": ")[1].replace('"', ""),
                 filter(
                     lambda line: str(line).startswith("%s: " % block_type),
                     f.readlines(),
@@ -84,7 +84,7 @@ def top_block_titles(config, block_type):
         )
 
 
-def get_systematics2(config, specific_sys=None):
+def get_systematics(config, specific_sys=None):
     systs = top_block_titles(config, "Systematic")
     if specific_sys is None or len(specific_sys) == 0:
         return systs
@@ -92,7 +92,7 @@ def get_systematics2(config, specific_sys=None):
         return list(filter(lambda s: s in systs, specific_sys))
 
 
-def get_systematics(config, specific_sys=None):
+def get_systematics_old(config, specific_sys=None):
     """Get list of relevant systematics.
 
     If `specific_sys` is None (default), this will return all of
@@ -202,6 +202,29 @@ def gen_rank_arguments(config, specific_sys=None):
     """
     systematics = get_systematics(config, specific_sys=specific_sys)
     return ["r {} Ranking={}".format(config, sys) for sys in systematics]
+
+
+def get_draw_argument(config, specific_sys=None):
+    """Get the draw trex-fitter step argument"
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+    specific_sys : iterable(str), optional
+        Specific systematics to use; if None (the default), uses all
+        discovered systematics.
+
+    Returns
+    -------
+    str
+        the fit step argument
+    """
+    if specific_sys is not None:
+        systs = ",".join(get_systematics(config, specific_sys))
+        return "dp {} Systematics={}".format(config, systs)
+    else:
+        return "dp {}".format(config)
 
 
 def gen_fit_argument(config, specific_sys=None, dont_fit_vr=True):

@@ -22,7 +22,7 @@ from rexuple.constants import (
     SYS_ONESIDED_TREE_BLOCKS,
 )
 from rexuple.vrp import load_meta_table, all_three_regions
-from rexuple.confparse import get_vrp_regions, get_blocks
+from rexuple.confparse import get_vrp_regions, all_blocks
 
 
 DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"
@@ -327,7 +327,7 @@ def rm_region(config, region):
         )
         return new_blocks
     ##
-    blocks = get_blocks(config)
+    blocks = all_blocks(config)
     for r in region:
         blocks = remove_region(blocks, r)
     with open(outfile, "w") as f:
