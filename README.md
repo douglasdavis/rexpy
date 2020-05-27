@@ -1,8 +1,9 @@
 rexpy
 =====
 
-Libraries and scripts to guide TRExFitter with a real programming
-language (Python).
+Libraries and scripts to guide
+[TRExFitter](https://gitlab.cern.ch/TRExStats/TRExFitter) with a real
+programming language (Python).
 
 Setup
 -----
