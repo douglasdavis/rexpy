@@ -11,8 +11,8 @@ import six
 import click
 from pathlib2 import PosixPath
 
-# rexuple
-from rexuple.constants import (
+# rexpy
+from rexpy.constants import (
     SAMPLE_BLOCKS,
     NORMFACTOR_BLOCKS,
     MODELING_BLOCKS,
@@ -21,8 +21,8 @@ from rexuple.constants import (
     SYS_TWOSIDED_TREE_BLOCKS,
     SYS_ONESIDED_TREE_BLOCKS,
 )
-from rexuple.vrp import load_meta_table, all_three_regions
-from rexuple.confparse import all_blocks, regions_from
+from rexpy.vrp import load_meta_table, all_three_regions
+from rexpy.confparse import all_blocks, regions_from
 
 
 DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"

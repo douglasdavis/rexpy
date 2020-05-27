@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## This will setup a good ROOT environment via AtlasSetup and also set
-## the shell PATH to find rexuple's apps and scripts.
+## the shell PATH to find rexpy's apps and scripts.
 
 if [ "$(uname)" == "Darwin" ]; then
     setupPyenv

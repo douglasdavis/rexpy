@@ -12,10 +12,10 @@ import sys
 import click
 from pathlib2 import PosixPath
 
-# rexuple
-from rexuple.batch import job_params
-import rexuple.pycondor as pycondor
-from rexuple.confparse import (
+# rexpy
+from rexpy.batch import job_params
+import rexpy.pycondor as pycondor
+from rexpy.confparse import (
     regions_from,
     systematics_from,
     draw_argument,

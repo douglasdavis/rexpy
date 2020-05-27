@@ -1,5 +1,5 @@
-rexuple
-=======
+rexpy
+=====
 
 Some tools to guide TRExFitter with a real programming language
 (Python).
@@ -13,5 +13,5 @@ script tries to make this a little easier, CVMFS installed with the
 standard LHC Computing Grid repositories are required; just run:
 
 ```
-$ . rx-init.sh
+$ . rp-init.sh
 ```
