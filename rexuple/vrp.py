@@ -92,11 +92,13 @@ def blocks_for_region(meta, region, selection):
     for entry in regions:
         var = entry["var"]
         logscale = "TRUE" if entry["log"] else "FALSE"
+        unit = titles[var]["unit"]
+        unit = " [{}]".format(unit) if unit else ""
         bk = block(
             region,
             selection,
             var,
-            titles[var]["rex"],
+            "{}{}".format(titles[var]["rex"], unit),
             entry["nbins"],
             entry["xmin"],
             entry["xmax"],

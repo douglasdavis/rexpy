@@ -22,7 +22,7 @@ from rexuple.constants import (
     SYS_ONESIDED_TREE_BLOCKS,
 )
 from rexuple.vrp import load_meta_table, all_three_regions
-from rexuple.confparse import get_vrp_regions, all_blocks
+from rexuple.confparse import all_blocks, regions_from
 
 
 DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"
@@ -276,7 +276,8 @@ def tunable(
 def vrp_sys(infile, outfile):
     """Update region based systematics to work with VRPs."""
     whole = six.ensure_str(PosixPath(infile).read_text())
-    vrps = get_vrp_regions(infile)
+    regions = regions_from(infile)
+    vrps = filter(lambda r: "VRP_" in r, regions)
     vrps_1j1b = [v for v in vrps if "1j1b" in v]
     vrps_2j1b = [v for v in vrps if "2j1b" in v]
     vrps_2j2b = [v for v in vrps if "2j2b" in v]

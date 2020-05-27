@@ -26,7 +26,6 @@ def all_blocks(config, delimiter="\n\n"):
     -------
     list(str)
         Configuration blocks.
-
     """
     config_str = six.ensure_str(PosixPath(config).read_text())
     return config_str.split(delimiter)
@@ -75,7 +74,7 @@ def top_block_titles(config, block_type):
     with open(config, "r") as f:
         return set(
             map(
-                lambda line: line.split(": ")[1].replace('"', ""),
+                lambda line: line.split(": ")[1].replace('"', "").strip(),
                 filter(
                     lambda line: str(line).startswith("%s: " % block_type),
                     f.readlines(),
@@ -84,7 +83,27 @@ def top_block_titles(config, block_type):
         )
 
 
-def get_systematics(config, specific_sys=None):
+def systematics_from(config, specific_sys=None):
+    """Get list of relevant systematics.
+
+    If `specific_sys` is None (default), this will return all of
+    the systematics in the config. If `specific_sys` is not None,
+    the entries will be tested against all possible systematics found
+    in the config file and that list will be returned.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+    specific_sys : iterable(str), optional
+        Specific systematics to use; if None (the default), uses all
+        discovered systematics.
+
+    Returns
+    -------
+    list(str)
+        The relevant systematics.
+    """
     systs = top_block_titles(config, "Systematic")
     if specific_sys is None or len(specific_sys) == 0:
         return systs
@@ -92,7 +111,29 @@ def get_systematics(config, specific_sys=None):
         return list(filter(lambda s: s in systs, specific_sys))
 
 
-def get_systematics_old(config, specific_sys=None):
+def regions_from(config, exclude=None):
+    """Get the list of regions in a config file.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+    exclude : list(str)
+        Regions to skip (if present in config).
+
+    Returns
+    -------
+    list(str)
+        The list of regions in the config file.
+    """
+    regs = top_block_titles(config, "Region")
+    if exclude is not None:
+        return list(filter(lambda r: r not in exclude, regs))
+    else:
+        return regs
+
+
+def systematics_from_old(config, specific_sys=None):
     """Get list of relevant systematics.
 
     If `specific_sys` is None (default), this will return all of
@@ -136,7 +177,7 @@ def get_systematics_old(config, specific_sys=None):
         return sorted(set(req_sys), key=str.lower, reverse=True)
 
 
-def get_regions(config, exclude=None):
+def regions_from_old(config, exclude=None):
     """Get the list of regions in a config file.
 
     Parameters
@@ -165,26 +206,7 @@ def get_regions(config, exclude=None):
     return regions
 
 
-def get_vrp_regions(config, exclude=None):
-    """Get list of VRP regions
-
-    Parameters
-    ----------
-    config : str
-        Path of the config file.
-    exclude : list(str)
-        Regions to skip (if present in config).
-
-    Returns
-    -------
-    list(str)
-        The list of regions in the config file.
-    """
-    regs = get_regions(config, exclude=exclude)
-    return [r for r in regs if r.startswith("VRP")]
-
-
-def gen_rank_arguments(config, specific_sys=None):
+def rank_arguments(config, specific_sys=None):
     """Get a set of trex-fitter executable arguments for ranking.
 
     Parameters
@@ -200,11 +222,11 @@ def gen_rank_arguments(config, specific_sys=None):
     list(str)
         The list of trex-fitter arguments.
     """
-    systematics = get_systematics(config, specific_sys=specific_sys)
+    systematics = systematics_from(config, specific_sys=specific_sys)
     return ["r {} Ranking={}".format(config, sys) for sys in systematics]
 
 
-def get_draw_argument(config, specific_sys=None):
+def draw_argument(config, specific_sys=None):
     """Get the draw trex-fitter step argument"
 
     Parameters
@@ -221,13 +243,13 @@ def get_draw_argument(config, specific_sys=None):
         the fit step argument
     """
     if specific_sys is not None:
-        systs = ",".join(get_systematics(config, specific_sys))
+        systs = ",".join(systematics_from(config, specific_sys))
         return "dp {} Systematics={}".format(config, systs)
     else:
         return "dp {}".format(config)
 
 
-def gen_fit_argument(config, specific_sys=None, dont_fit_vr=True):
+def fit_argument(config, specific_sys=None, dont_fit_vr=True):
     """Get the fit trex-fitter step argument.
 
     Parameters
@@ -245,14 +267,14 @@ def gen_fit_argument(config, specific_sys=None, dont_fit_vr=True):
     """
     region_arg = ""
     if dont_fit_vr:
-        regions = get_regions(config)
+        regions = regions_from(config)
         regions = [r for r in regions if not r.startswith("VR")]
         region_arg = "Regions={}".format(",".join(regions))
 
     if specific_sys is None:
         return "wf {} {}".format(config, region_arg).strip()
 
-    systematics = get_systematics(config, specific_sys=specific_sys)
+    systematics = systematics_from(config, specific_sys=specific_sys)
     systematics = ",".join(systematics)
 
     if not region_arg:
@@ -261,7 +283,7 @@ def gen_fit_argument(config, specific_sys=None, dont_fit_vr=True):
         return "wf {} {}:Systematics={}".format(config, region_arg, systematics)
 
 
-def gen_ntuple_arguments(config, specific_sys=None):
+def ntuple_arguments(config, specific_sys=None):
     """Get the set of trex-fitter executable arguments for ntupling.
 
     config : str
@@ -276,14 +298,14 @@ def gen_ntuple_arguments(config, specific_sys=None):
         The list of trex-fitter arguments
 
     """
-    regions = get_regions(config)
+    regions = regions_from(config)
 
     ## first no specific systematics
     if specific_sys is None:
         return ["n {} Regions={}".format(config, r) for r in regions]
 
     ## otherwise, construct for specific systematics
-    systematics = get_systematics(config, specific_sys=specific_sys)
+    systematics = systematics_from(config, specific_sys=specific_sys)
     systematics = ",".join(systematics)
     return [
         "n {} Regions={}:Systematics={}".format(config, r, systematics) for r in regions
