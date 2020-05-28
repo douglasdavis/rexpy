@@ -21,7 +21,7 @@ from rexpy.constants import (
     SYS_TWOSIDED_TREE_BLOCKS,
     SYS_ONESIDED_TREE_BLOCKS,
 )
-from rexpy.vrp import load_meta_table, all_three_regions
+from rexpy.valplot import load_meta_table, all_three_regions
 from rexpy.confparse import all_blocks, regions_from
 
 
@@ -226,7 +226,7 @@ def simple_setup1(outname):
 @click.option("--skip-tables", is_flag=True, help="Don't produce tables")
 @click.option("--skip-syst-plots", is_flag=True, help="Don't produce red/blue plots")
 @click.option(
-    "--vrp",
+    "--valplot",
     type=click.Path(resolve_path=True, exists=True),
     help="validation region plots",
 )
@@ -243,7 +243,7 @@ def tunable(
     sel_2j2b,
     skip_tables,
     skip_syst_plots,
-    vrp,
+    valplot,
 ):
     """Generate a config with user defined binning, save to OUTNAME."""
     preamble = top(
@@ -261,8 +261,8 @@ def tunable(
     )
     with open(outname, "w") as f:
         print(preamble, file=f)
-        if vrp is not None:
-            meta = load_meta_table(vrp)
+        if valplot is not None:
+            meta = load_meta_table(valplot)
             print(all_three_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b), file=f)
             print("", file=f)
         all_but_preamble(f)
@@ -270,31 +270,31 @@ def tunable(
     return 0
 
 
-@cli.command("vrp-sys-update")
+@cli.command("valplot-sys-update")
 @click.argument("infile", type=click.Path(resolve_path=True))
 @click.argument("outfile", type=click.Path())
-def vrp_sys(infile, outfile):
-    """Update region based systematics to work with VRPs."""
+def valplot_sys(infile, outfile):
+    """Update region based systematics to work with validation plots."""
     whole = six.ensure_str(PosixPath(infile).read_text())
     regions = regions_from(infile)
-    vrps = filter(lambda r: "VRP_" in r, regions)
-    vrps_1j1b = [v for v in vrps if "1j1b" in v]
-    vrps_2j1b = [v for v in vrps if "2j1b" in v]
-    vrps_2j2b = [v for v in vrps if "2j2b" in v]
-    vrps_1j1b = ",".join(vrps_1j1b)
-    vrps_2j1b = ",".join(vrps_2j1b)
-    vrps_2j2b = ",".join(vrps_2j2b)
+    valplots = filter(lambda r: "VRP_" in r, regions)
+    valplots_1j1b = [v for v in valplots if "1j1b" in v]
+    valplots_2j1b = [v for v in valplots if "2j1b" in v]
+    valplots_2j2b = [v for v in valplots if "2j2b" in v]
+    valplots_1j1b = ",".join(valplots_1j1b)
+    valplots_2j1b = ",".join(valplots_2j1b)
+    valplots_2j2b = ",".join(valplots_2j2b)
     whole = whole.replace(
         "  Regions: reg1j1b", "  Regions: reg1j1b,{}".format(
-            vrps_1j1b
+            valplots_1j1b
         )
     ).replace(
         "  Regions: reg2j1b", "  Regions: reg2j1b,{}".format(
-            vrps_2j1b
+            valplots_2j1b
         )
     ).replace(
         "  Regions: reg2j2b", "  Regions: reg2j2b,{}".format(
-            vrps_2j2b
+            valplots_2j2b
         )
     )
     with open(outfile, "w") as f:

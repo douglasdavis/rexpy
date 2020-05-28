@@ -16,7 +16,7 @@ def all_blocks(config, delimiter="\n\n"):
     Paramters
     ---------
     config : str
-        Path of the config file
+        Path of the config file.
     delimiter : str
         Delimiter to use on the config string to separate into
         blocks. This should only overwrite the default in very special
@@ -40,7 +40,7 @@ def top_block_titles(config, block_type):
     Parameters
     ----------
     config : str
-        Path of the config file,
+        Path of the config file.
     block_type : str
         Block type the titles are associated with.
 

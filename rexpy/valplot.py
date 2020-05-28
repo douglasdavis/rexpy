@@ -1,4 +1,8 @@
 import yaml
+import six
+from pathlib2 import PosixPath
+
+from rexpy.confparse import regions_from
 
 
 BLOCK_TEMPLATE = """\
@@ -135,3 +139,36 @@ def all_three_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b):
         "\n\n".join(b2j1b),
         "\n\n".join(b2j2b)
     )
+
+
+def fix_systematics(config):
+    """Fix systematic definitions to work with validation plots.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+    """
+    whole = six.ensure_str(PosixPath(config).read_text())
+    regions = regions_from(config)
+    valplots = filter(lambda r: "VRP_" in r, regions)
+    valplots_1j1b = [v for v in valplots if "1j1b" in v]
+    valplots_2j1b = [v for v in valplots if "2j1b" in v]
+    valplots_2j2b = [v for v in valplots if "2j2b" in v]
+    valplots_1j1b = ",".join(valplots_1j1b)
+    valplots_2j1b = ",".join(valplots_2j1b)
+    valplots_2j2b = ",".join(valplots_2j2b)
+    whole = whole.replace(
+        "  Regions: reg1j1b", "  Regions: reg1j1b,{}".format(
+            valplots_1j1b
+        )
+    ).replace(
+        "  Regions: reg2j1b", "  Regions: reg2j1b,{}".format(
+            valplots_2j1b
+        )
+    ).replace(
+        "  Regions: reg2j2b", "  Regions: reg2j2b,{}".format(
+            valplots_2j2b
+        )
+    )
+    ## TODO
