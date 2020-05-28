@@ -166,7 +166,7 @@ def complete(config, dont_submit, dont_fit, systematic, ws_suffix):
     """Run a complete set of trex-fitter stages ('n', then 'wf', then 'dp', then 'r')"""
     config_path = PosixPath(config)
     config_name = config_path.name
-    workspace = "rxcws-{}".format(config_path.stem)
+    workspace = "rpcc_{}".format(config_path.stem)
     if ws_suffix:
         workspace = "{}_{}".format(workspace, ws_suffix)
     os.mkdir(workspace)
