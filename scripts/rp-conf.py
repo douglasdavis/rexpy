@@ -21,7 +21,6 @@ from rexpy.constants import (
     SYS_TWOSIDED_TREE_BLOCKS,
     SYS_ONESIDED_TREE_BLOCKS,
 )
-from rexpy.valplot import load_meta_table, all_three_regions
 from rexpy.confparse import all_blocks, regions_from
 
 
@@ -246,6 +245,7 @@ def tunable(
     valplot,
 ):
     """Generate a config with user defined binning, save to OUTNAME."""
+    from rexpy.valplot import load_meta_table, all_three_regions, fix_systematics
     preamble = top(
         reg1j1b_binning=bin_1j1b,
         reg2j1b_binning=bin_2j1b,
@@ -266,39 +266,9 @@ def tunable(
             print(all_three_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b), file=f)
             print("", file=f)
         all_but_preamble(f)
-
+    if valplot is not None:
+        fix_systematics(outname)
     return 0
-
-
-@cli.command("valplot-sys-update")
-@click.argument("infile", type=click.Path(resolve_path=True))
-@click.argument("outfile", type=click.Path())
-def valplot_sys(infile, outfile):
-    """Update region based systematics to work with validation plots."""
-    whole = six.ensure_str(PosixPath(infile).read_text())
-    regions = regions_from(infile)
-    valplots = filter(lambda r: "VRP_" in r, regions)
-    valplots_1j1b = [v for v in valplots if "1j1b" in v]
-    valplots_2j1b = [v for v in valplots if "2j1b" in v]
-    valplots_2j2b = [v for v in valplots if "2j2b" in v]
-    valplots_1j1b = ",".join(valplots_1j1b)
-    valplots_2j1b = ",".join(valplots_2j1b)
-    valplots_2j2b = ",".join(valplots_2j2b)
-    whole = whole.replace(
-        "  Regions: reg1j1b", "  Regions: reg1j1b,{}".format(
-            valplots_1j1b
-        )
-    ).replace(
-        "  Regions: reg2j1b", "  Regions: reg2j1b,{}".format(
-            valplots_2j1b
-        )
-    ).replace(
-        "  Regions: reg2j2b", "  Regions: reg2j2b,{}".format(
-            valplots_2j2b
-        )
-    )
-    with open(outfile, "w") as f:
-        print(whole, file=f)
 
 
 @cli.command("rm-region")

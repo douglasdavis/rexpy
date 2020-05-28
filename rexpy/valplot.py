@@ -1,3 +1,6 @@
+from __future__ import print_function
+
+import os
 import yaml
 import six
 from pathlib2 import PosixPath
@@ -144,6 +147,9 @@ def all_three_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b):
 def fix_systematics(config):
     """Fix systematic definitions to work with validation plots.
 
+    This will remove the config file and replace it with a new
+    modified config with proper systematic definitions.
+
     Parameters
     ----------
     config : str
@@ -171,4 +177,6 @@ def fix_systematics(config):
             valplots_2j2b
         )
     )
-    ## TODO
+    os.remove(config)
+    with open(config, "w") as f:
+        print(whole, file=f)
