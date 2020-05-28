@@ -115,8 +115,8 @@ def blocks_for_region(meta, region, selection):
     return blocks
 
 
-def all_three_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b):
-    """Short cut function to get string for all region blocks.
+def blocks_for_all_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b):
+    """Shortcut function to get string for all region blocks.
 
     Parameters
     ----------

@@ -245,7 +245,7 @@ def tunable(
     valplot,
 ):
     """Generate a config with user defined binning, save to OUTNAME."""
-    from rexpy.valplot import load_meta_table, all_three_regions, fix_systematics
+    from rexpy.valplot import load_meta_table, blocks_for_all_regions, fix_systematics
     preamble = top(
         reg1j1b_binning=bin_1j1b,
         reg2j1b_binning=bin_2j1b,
@@ -263,7 +263,7 @@ def tunable(
         print(preamble, file=f)
         if valplot is not None:
             meta = load_meta_table(valplot)
-            print(all_three_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b), file=f)
+            print(blocks_for_all_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b), file=f)
             print("", file=f)
         all_but_preamble(f)
     if valplot is not None:
