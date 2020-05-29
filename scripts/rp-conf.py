@@ -12,10 +12,11 @@ import click
 from pathlib2 import PosixPath
 
 # rexpy
-from rexpy.constants import (
+from rexpy.blocks import (
+    modeling_blocks,
     SAMPLE_BLOCKS,
     NORMFACTOR_BLOCKS,
-    MODELING_BLOCKS,
+    SYS_MINOR_BLOCKS,
     SYS_WEIGHT_BLOCKS,
     SYS_PDF_WEIGHT_BLOCKS,
     SYS_TWOSIDED_TREE_BLOCKS,
@@ -23,6 +24,7 @@ from rexpy.constants import (
 )
 from rexpy.confparse import all_blocks, regions_from
 
+NTUP_DIR = "/atlasgpfs01/usatlas/data/ddavis/wtloop/WTA01_20200506"
 
 DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"
 DEF_1j1b_swmc = "reg1j1b == 1 && OS == 1 && mass_lep1jet1 < 155 && mass_lep2jet1 < 155"
@@ -54,7 +56,7 @@ def top(**kwargs):
         job="tW",
         fit="tW",
         label="tW Dilepton",
-        ntuplepaths="/atlasgpfs01/usatlas/data/ddavis/wtloop/WTA01_20200506",
+        ntuplepaths=NTUP_DIR,
         dotables="TRUE",
         systplots="TRUE",
         fitblind="TRUE",
@@ -149,10 +151,8 @@ def top(**kwargs):
     )
 
 
-def all_but_preamble(f):
-    print(SAMPLE_BLOCKS, file=f)
-    print(NORMFACTOR_BLOCKS, file=f)
-    print(MODELING_BLOCKS, file=f)
+def const_sys_blocks(f):
+    print(SYS_MINOR_BLOCKS, file=f)
     print(SYS_PDF_WEIGHT_BLOCKS, file=f)
     print(SYS_WEIGHT_BLOCKS, file=f)
     print(SYS_TWOSIDED_TREE_BLOCKS, file=f)
@@ -170,7 +170,10 @@ def simple_setup0(outname):
     """Generate a config from default settings, save to OUTNAME."""
     with open(outname, "w") as f:
         print(top(), file=f)
-        all_but_preamble(f)
+        print(SAMPLE_BLOCKS, file=f)
+        print(NORMFACTOR_BLOCKS, file=f)
+        print(modeling_blocks(NTUP_DIR, DEF_1j1b_sels, DEF_2j1b_sels, DEF_2j2b_sels), file=f)
+        const_sys_blocks(f)
     return 0
 
 
@@ -189,7 +192,10 @@ def simple_setup1(outname):
     )
     with open(outname, "w") as f:
         print(preamble, file=f)
-        all_but_preamble(f)
+        print(SAMPLE_BLOCKS, file=f)
+        print(NORMFACTOR_BLOCKS, file=f)
+        print(modeling_blocks(NTUP_DIR, DEF_1j1b_swmc, DEF_2j1b_swmc, DEF_2j2b_swmc), file=f)
+        const_sys_blocks(f)
     return 0
 
 
@@ -265,7 +271,10 @@ def tunable(
             meta = load_meta_table(valplot)
             print(blocks_for_all_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b), file=f)
             print("", file=f)
-        all_but_preamble(f)
+        print(SAMPLE_BLOCKS, file=f)
+        print(NORMFACTOR_BLOCKS, file=f)
+        print(modeling_blocks(NTUP_DIR, sel_1j1b, sel_2j1b, sel_2j2b), file=f)
+        const_sys_blocks(f)
     if valplot is not None:
         fix_systematics(outname)
     return 0

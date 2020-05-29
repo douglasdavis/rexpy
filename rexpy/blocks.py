@@ -2,6 +2,8 @@
 from textwrap import dedent
 from collections import OrderedDict, namedtuple
 
+from rexpy.shower import norm_uncertainties_tW, norm_uncertainties_ttbar
+
 
 NTSysWeight = namedtuple("SysWeight" , "branch_up branch_down category smoothing title tiny")
 NTSysPDF    = namedtuple("SysPDF"    , "branch category smoothing title tiny")
@@ -355,7 +357,207 @@ NormFactor: "mu_ttbar"
   Title: "#it{#mu}_{#it{t#bar{t}}}"
 '''
 
-MODELING_BLOCKS = '''\
+SYS_MINOR_BLOCKS = '''\
+Systematic: "Norm_Diboson_1j1b"
+  Type: OVERALL
+  Title: "Norm Diboson 1j1b"
+  Regions: reg1j1b
+  Samples: Diboson
+  OverallUp: 0.22
+  OverallDown: -0.22
+  Category: "Norms"
+
+Systematic: "Norm_Diboson_2j1b"
+  Type: OVERALL
+  Title: "Norm Diboson 2j1b"
+  Regions: reg2j1b
+  Samples: Diboson
+  OverallUp: 0.22
+  OverallDown: -0.22
+  Category: "Norms"
+
+Systematic: "Norm_Diboson_2j2b"
+  Type: OVERALL
+  Title: "Norm Diboson 2j2b"
+  Regions: reg2j2b
+  Samples: Diboson
+  OverallUp: 0.13
+  OverallDown: -0.13
+  Category: "Norms"
+
+Systematic: "Norm_Zjets_1j1b"
+  Type: OVERALL
+  Title: "Norm Zjets 1j1b"
+  Regions: reg1j1b
+  Samples: Zjets
+  OverallUp: 0.11
+  OverallDown: -0.11
+  Category: "Norms"
+
+Systematic: "Norm_Zjets_2j1b"
+  Type: OVERALL
+  Title: "Norm Zjets 2j1b"
+  Regions: reg2j1b
+  Samples: Zjets
+  OverallUp: 0.11
+  OverallDown: -0.11
+  Category: "Norms"
+
+Systematic: "Norm_Zjets_2j2b"
+  Type: OVERALL
+  Title: "Norm Zjets 2j2b"
+  Regions: reg2j2b
+  Samples: Zjets
+  OverallUp: 0.17
+  OverallDown: -0.17
+  Category: "Norms"
+
+Systematic: "Norm_MCNP_1j1b"
+  Type: OVERALL
+  Title: "Norm MCNP 1j1b"
+  Regions: reg1j1b
+  Samples: MCNP
+  OverallUp: 0.5
+  OverallDown: -0.5
+  Category: "Norms"
+
+Systematic: "Norm_MCNP_2j1b"
+  Type: OVERALL
+  Title: "Norm MCNP 2j1b"
+  Regions: reg2j1b
+  Samples: MCNP
+  OverallUp: 0.5
+  OverallDown: -0.5
+  Category: "Norms"
+
+Systematic: "Norm_MCNP_2j2b"
+  Type: OVERALL
+  Title: "Norm MCNP 2j2b"
+  Regions: reg2j2b
+  Samples: MCNP
+  OverallUp: 0.5
+  OverallDown: -0.5
+  Category: "Norms"
+
+Systematic: "Lumi"
+  OverallDown: -0.017
+  Category: Instrumental
+  OverallUp: 0.017
+  Title: "Lumi"
+  Samples: tW,ttbar
+  Type: OVERALL
+'''
+
+SYS_WEIGHT_BLOCKS = _get_sys_weights()
+SYS_PDF_WEIGHT_BLOCKS = _get_pdf_weights()
+SYS_TWOSIDED_TREE_BLOCKS = _get_twosided_trees()
+SYS_ONESIDED_TREE_BLOCKS = _get_onesided_trees()
+
+
+def tW_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
+    overall, m1j1b, m2j1b, m2j2b = norm_uncertainties_tW(
+        ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b
+    )
+    return dedent(
+        """\
+    Systematic: "tW_PS_norm"
+      Category: "Modeling"
+      Title: "tW Parton Shower Norm"
+      Type: OVERALL
+      OverallUp: {0}
+      OverallDown: -{0}
+      Samples: tW
+
+    Systematic: "tW_PS_migration"
+      Category: "Modeling"
+      Title: "tW Parton Shower Migration"
+      NuisanceParameter: "tW_PS_migration"
+      Type: OVERALL
+      OverallUp: {1}
+      OverallDown: -{1}
+      Samples: tW
+      Regions: reg1j1b
+
+    Systematic: "tW_PS_migration"
+      Category: "Modeling"
+      Title: "tW Parton Shower Migration"
+      NuisanceParameter: "tW_PS_migration"
+      Type: OVERALL
+      OverallUp: {2}
+      OverallDown: -{2}
+      Samples: tW
+      Regions: reg2j1b
+
+    Systematic: "tW_PS_migration"
+      Category: "Modeling"
+      Title: "tW Parton Shower Migration"
+      NuisanceParameter: "tW_PS_migration"
+      Type: OVERALL
+      OverallUp: {3}
+      OverallDown: -{3}
+      Samples: tW
+      Regions: reg2j2b""".format(
+            overall, m1j1b, m2j1b, m2j2b
+        )
+    )
+
+
+def ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
+    overall, m1j1b, m2j1b, m2j2b = norm_uncertainties_ttbar(
+        ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b
+    )
+    return dedent(
+        """\
+    Systematic: "ttbar_PS_norm"
+      Category: "Modeling"
+      Title: "ttbar Parton Shower Norm"
+      Type: OVERALL
+      OverallUp: {0}
+      OverallDown: -{0}
+      Samples: ttbar
+
+    Systematic: "ttbar_PS_migration"
+      Category: "Modeling"
+      Title: "ttbar Parton Shower Migration"
+      NuisanceParameter: "ttbar_PS_migration"
+      Type: OVERALL
+      OverallUp: {1}
+      OverallDown: -{1}
+      Samples: ttbar
+      Regions: reg1j1b
+
+    Systematic: "ttbar_PS_migration"
+      Category: "Modeling"
+      Title: "ttbar Parton Shower Migration"
+      NuisanceParameter: "ttbar_PS_migration"
+      Type: OVERALL
+      OverallUp: {2}
+      OverallDown: -{2}
+      Samples: ttbar
+      Regions: reg2j1b
+
+    Systematic: "ttbar_PS_migration"
+      Category: "Modeling"
+      Title: "ttbar Parton Shower Migration"
+      NuisanceParameter: "ttbar_PS_migration"
+      Type: OVERALL
+      OverallUp: {3}
+      OverallDown: -{3}
+      Samples: ttbar
+      Regions: reg2j2b""".format(
+            overall, m1j1b, m2j1b, m2j2b
+        )
+    )
+
+
+def shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
+    tW = tW_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b)
+    ttbar = ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b)
+    return "{}\n\n{}".format(tW, ttbar)
+
+
+def modeling_blocks(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
+    return '''\
 Systematic: "tW_DRDS"
   Category: "Modeling"
   Symmetrisation: ONESIDED
@@ -364,43 +566,7 @@ Systematic: "tW_DRDS"
   Type: HISTO
   NtupleFilesUp: tW_DS_410657_FS_MC16d_nominal,tW_DS_410657_FS_MC16e_nominal,tW_DS_410657_FS_MC16a_nominal,tW_DS_410656_FS_MC16e_nominal,tW_DS_410656_FS_MC16a_nominal,tW_DS_410656_FS_MC16d_nominal
 
-Systematic: "tW_PS_norm"
-  Category: "Modeling"
-  Title: "tW Parton Shower Norm"
-  Type: OVERALL
-  OverallUp: 0.061
-  OverallDown: -0.061
-  Samples: tW
-
-Systematic: "tW_PS_migration"
-  Category: "Modeling"
-  Title: "tW Parton Shower Migration"
-  NuisanceParameter: "tW_PS_migration"
-  Type: OVERALL
-  OverallUp: 0.019
-  OverallDown: -0.019
-  Samples: tW
-  Regions: reg1j1b
-
-Systematic: "tW_PS_migration"
-  Category: "Modeling"
-  Title: "tW Parton Shower Migration"
-  NuisanceParameter: "tW_PS_migration"
-  Type: OVERALL
-  OverallUp: 0.06
-  OverallDown: -0.06
-  Samples: tW
-  Regions: reg2j1b
-
-Systematic: "tW_PS_migration"
-  Category: "Modeling"
-  Title: "tW Parton Shower Migration"
-  NuisanceParameter: "tW_PS_migration"
-  Type: OVERALL
-  OverallUp: 0.1
-  OverallDown: -0.1
-  Samples: tW
-  Regions: reg2j2b
+{0}
 
 Systematic: "tW_PS_1j1b"
   Category: "Modeling"
@@ -434,6 +600,39 @@ Systematic: "tW_PS_2j2b"
   Type: HISTO
   Regions: reg2j2b
   NtupleFilesUp: tW_DR_411038_AFII_MC16a_nominal,tW_DR_411038_AFII_MC16d_nominal,tW_DR_411039_AFII_MC16a_nominal,tW_DR_411039_AFII_MC16d_nominal,tW_DR_411038_AFII_MC16e_nominal,tW_DR_411039_AFII_MC16e_nominal
+
+Systematic: "ttbar_PS_1j1b"
+  Category: "Modeling"
+  Title: "ttbar Parton Shower Shape 1j1b"
+  ReferenceSample: ttbar_AFII
+  Symmetrisation: ONESIDED
+  DropNorm: all
+  Samples: ttbar
+  Type: HISTO
+  Regions: reg1j1b
+  NtupleFilesUp: ttbar_411234_AFII_MC16a_nominal,ttbar_411234_AFII_MC16d_nominal,ttbar_411234_AFII_MC16e_nominal
+
+Systematic: "ttbar_PS_2j1b"
+  Category: "Modeling"
+  Title: "ttbar Parton Shower Shape 2j1b"
+  ReferenceSample: ttbar_AFII
+  Symmetrisation: ONESIDED
+  DropNorm: all
+  Samples: ttbar
+  Type: HISTO
+  Regions: reg2j1b
+  NtupleFilesUp: ttbar_411234_AFII_MC16a_nominal,ttbar_411234_AFII_MC16d_nominal,ttbar_411234_AFII_MC16e_nominal
+
+Systematic: "ttbar_PS_2j2b"
+  Category: "Modeling"
+  Title: "ttbar Parton Shower Shape 2j2b"
+  ReferenceSample: ttbar_AFII
+  Symmetrisation: ONESIDED
+  DropNorm: all
+  Samples: ttbar
+  Type: HISTO
+  Regions: reg2j2b
+  NtupleFilesUp: ttbar_411234_AFII_MC16a_nominal,ttbar_411234_AFII_MC16d_nominal,ttbar_411234_AFII_MC16e_nominal
 
 Systematic: "tW_AR_ISR_scale_muR_1j1b"
   Category: "Modeling"
@@ -555,76 +754,35 @@ Systematic: "tW_AR_FSR_2j2b"
   Type: HISTO
   Regions: reg2j2b
 
-Systematic: "ttbar_PS_norm"
+Systematic: "ttbar_hdamp_1j1b"
   Category: "Modeling"
-  Title: "ttbar Parton Shower Norm"
-  Type: OVERALL
-  OverallUp: 0.06
-  OverallDown: -0.06
-  Samples: ttbar
-
-Systematic: "ttbar_PS_migration"
-  Category: "Modeling"
-  Title: "ttbar Parton Shower Migration"
-  NuisanceParameter: "ttbar_PS_migration"
-  Type: OVERALL
-  OverallUp: 0.002
-  OverallDown: -0.002
-  Samples: ttbar
-  Regions: reg1j1b
-
-Systematic: "ttbar_PS_migration"
-  Category: "Modeling"
-  Title: "ttbar Parton Shower Migration"
-  NuisanceParameter: "ttbar_PS_migration"
-  Type: OVERALL
-  OverallUp: 0.03
-  OverallDown: -0.03
-  Samples: ttbar
-  Regions: reg2j1b
-
-Systematic: "ttbar_PS_migration"
-  Category: "Modeling"
-  Title: "ttbar Parton Shower Migration"
-  NuisanceParameter: "ttbar_PS_migration"
-  Type: OVERALL
-  OverallUp: 0.036
-  OverallDown: -0.036
-  Samples: ttbar
-  Regions: reg2j2b
-
-Systematic: "ttbar_PS_1j1b"
-  Category: "Modeling"
-  Title: "ttbar Parton Shower Shape 1j1b"
+  Title: "ttbar hdamp 1j1b"
   ReferenceSample: ttbar_AFII
   Symmetrisation: ONESIDED
-  DropNorm: all
   Samples: ttbar
   Type: HISTO
   Regions: reg1j1b
-  NtupleFilesUp: ttbar_410558_AFII_MC16a_nominal,ttbar_410558_AFII_MC16d_nominal,ttbar_410558_AFII_MC16e_nominal
+  NtupleFilesUp: ttbar_410482_AFII_MC16a_nominal,ttbar_410482_AFII_MC16d_nominal,ttbar_410482_AFII_MC16e_nominal
 
-Systematic: "ttbar_PS_2j1b"
+Systematic: "ttbar_hdamp_2j1b"
   Category: "Modeling"
-  Title: "ttbar Parton Shower Shape 2j1b"
+  Title: "ttbar hdamp 2j1b"
   ReferenceSample: ttbar_AFII
   Symmetrisation: ONESIDED
-  DropNorm: all
   Samples: ttbar
   Type: HISTO
   Regions: reg2j1b
-  NtupleFilesUp: ttbar_410558_AFII_MC16a_nominal,ttbar_410558_AFII_MC16d_nominal,ttbar_410558_AFII_MC16e_nominal
+  NtupleFilesUp: ttbar_410482_AFII_MC16a_nominal,ttbar_410482_AFII_MC16d_nominal,ttbar_410482_AFII_MC16e_nominal
 
-Systematic: "ttbar_PS_2j2b"
+Systematic: "ttbar_hdamp_2j2b"
   Category: "Modeling"
-  Title: "ttbar Parton Shower Shape 2j2b"
+  Title: "ttbar hdamp 2j2b"
   ReferenceSample: ttbar_AFII
   Symmetrisation: ONESIDED
-  DropNorm: all
   Samples: ttbar
   Type: HISTO
   Regions: reg2j2b
-  NtupleFilesUp: ttbar_410558_AFII_MC16a_nominal,ttbar_410558_AFII_MC16d_nominal,ttbar_410558_AFII_MC16e_nominal
+  NtupleFilesUp: ttbar_410482_AFII_MC16a_nominal,ttbar_410482_AFII_MC16d_nominal,ttbar_410482_AFII_MC16e_nominal
 
 Systematic: "ttbar_AR_ISR_scale_muR_1j1b"
   Category: "Modeling"
@@ -746,124 +904,30 @@ Systematic: "ttbar_AR_FSR_2j2b"
   Type: HISTO
   Regions: reg2j2b
 
-%# Systematic: "ttbar_ptreweight1j1b"
-%#   Category: "Modeling"
-%#   Title: "ttbar pt reweighting 1j1b"
-%#   WeightUp: "weight_sys_noreweight"
-%#   Symmetrisation: ONESIDED
-%#   Samples: ttbar
-%#   Type: HISTO
-%#   Regions: reg1j1b
-
-%# Systematic: "ttbar_ptreweight2j1b"
-%#   Category: "Modeling"
-%#   Title: "ttbar pt reweighting 2j1b"
-%#   WeightUp: "weight_sys_noreweight"
-%#   Symmetrisation: ONESIDED
-%#   Samples: ttbar
-%#   Type: HISTO
-%#   Regions: reg2j1b
-
-%# Systematic: "ttbar_ptreweight2j2b"
-%#   Category: "Modeling"
-%#   Title: "ttbar pt reweighting 2j2b"
-%#   WeightUp: "weight_sys_noreweight"
-%#   Symmetrisation: ONESIDED
-%#   Samples: ttbar
-%#   Type: HISTO
-%#   Regions: reg2j2b
-
-Systematic: "Norm_Diboson_1j1b"
-  Type: OVERALL
-  Title: "Norm Diboson 1j1b"
+Systematic: "ttbar_ptreweight_1j1b"
+  Category: "Modeling"
+  Title: "ttbar pt reweight 1j1b"
+  WeightUp: "weight_sys_noreweight"
+  Symmetrisation: ONESIDED
+  Samples: ttbar
+  Type: HISTO
   Regions: reg1j1b
-  Samples: Diboson
-  OverallUp: 0.22
-  OverallDown: -0.22
-  Category: "Norms"
 
-Systematic: "Norm_Diboson_2j1b"
-  Type: OVERALL
-  Title: "Norm Diboson 2j1b"
+Systematic: "ttbar_ptreweight_2j1b"
+  Category: "Modeling"
+  Title: "ttbar pt reweight 2j1b"
+  WeightUp: "weight_sys_noreweight"
+  Symmetrisation: ONESIDED
+  Samples: ttbar
+  Type: HISTO
   Regions: reg2j1b
-  Samples: Diboson
-  OverallUp: 0.22
-  OverallDown: -0.22
-  Category: "Norms"
 
-Systematic: "Norm_Diboson_2j2b"
-  Type: OVERALL
-  Title: "Norm Diboson 2j2b"
+Systematic: "ttbar_ptreweight_2j2b"
+  Category: "Modeling"
+  Title: "ttbar pt reweight 2j2b"
+  WeightUp: "weight_sys_noreweight"
+  Symmetrisation: ONESIDED
+  Samples: ttbar
+  Type: HISTO
   Regions: reg2j2b
-  Samples: Diboson
-  OverallUp: 0.13
-  OverallDown: -0.13
-  Category: "Norms"
-
-Systematic: "Norm_Zjets_1j1b"
-  Type: OVERALL
-  Title: "Norm Zjets 1j1b"
-  Regions: reg1j1b
-  Samples: Zjets
-  OverallUp: 0.11
-  OverallDown: -0.11
-  Category: "Norms"
-
-Systematic: "Norm_Zjets_2j1b"
-  Type: OVERALL
-  Title: "Norm Zjets 2j1b"
-  Regions: reg2j1b
-  Samples: Zjets
-  OverallUp: 0.11
-  OverallDown: -0.11
-  Category: "Norms"
-
-Systematic: "Norm_Zjets_2j2b"
-  Type: OVERALL
-  Title: "Norm Zjets 2j2b"
-  Regions: reg2j2b
-  Samples: Zjets
-  OverallUp: 0.17
-  OverallDown: -0.17
-  Category: "Norms"
-
-Systematic: "Norm_MCNP_1j1b"
-  Type: OVERALL
-  Title: "Norm MCNP 1j1b"
-  Regions: reg1j1b
-  Samples: MCNP
-  OverallUp: 0.5
-  OverallDown: -0.5
-  Category: "Norms"
-
-Systematic: "Norm_MCNP_2j1b"
-  Type: OVERALL
-  Title: "Norm MCNP 2j1b"
-  Regions: reg2j1b
-  Samples: MCNP
-  OverallUp: 0.5
-  OverallDown: -0.5
-  Category: "Norms"
-
-Systematic: "Norm_MCNP_2j2b"
-  Type: OVERALL
-  Title: "Norm MCNP 2j2b"
-  Regions: reg2j2b
-  Samples: MCNP
-  OverallUp: 0.5
-  OverallDown: -0.5
-  Category: "Norms"
-
-Systematic: "Lumi"
-  OverallDown: -0.017
-  Category: Instrumental
-  OverallUp: 0.017
-  Title: "Lumi"
-  Samples: tW,ttbar
-  Type: OVERALL
-'''
-
-SYS_WEIGHT_BLOCKS = _get_sys_weights()
-SYS_PDF_WEIGHT_BLOCKS = _get_pdf_weights()
-SYS_TWOSIDED_TREE_BLOCKS = _get_twosided_trees()
-SYS_ONESIDED_TREE_BLOCKS = _get_onesided_trees()
+'''.format(shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b))
