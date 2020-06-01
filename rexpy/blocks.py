@@ -5,6 +5,142 @@ from collections import OrderedDict, namedtuple
 from rexpy.shower import norm_uncertainties_tW, norm_uncertainties_ttbar
 
 
+NTUP_DIR = "/atlasgpfs01/usatlas/data/ddavis/wtloop/WTA01_20200506"
+
+DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"
+DEF_1j1b_swmc = "reg1j1b == 1 && OS == 1 && mass_lep1jet1 < 155 && mass_lep2jet1 < 155"
+DEF_1j1b_vari = "bdtres00"
+DEF_1j1b_nbin = 12
+DEF_1j1b_xmin = 0.17
+DEF_1j1b_xmax = 0.76
+DEF_1j1b_bins = "{},{},{}".format(DEF_1j1b_nbin, DEF_1j1b_xmin, DEF_1j1b_xmax)
+
+DEF_2j1b_sels = "reg2j1b == 1 && OS == 1"
+DEF_2j1b_swmc = "reg2j1b == 1 && OS == 1 && mass_lep1jetb < 155 && mass_lep2jetb < 155"
+DEF_2j1b_vari = "bdtres00"
+DEF_2j1b_nbin = 12
+DEF_2j1b_xmin = 0.22
+DEF_2j1b_xmax = 0.85
+DEF_2j1b_bins = "{},{},{}".format(DEF_2j1b_nbin, DEF_2j1b_xmin, DEF_2j1b_xmax)
+
+DEF_2j2b_sels = "reg2j2b == 1 && OS == 1"
+DEF_2j2b_swmc = "reg2j2b == 1 && OS == 1 && minimaxmbl < 155"
+DEF_2j2b_vari = "bdtres00"
+DEF_2j2b_nbin = 12
+DEF_2j2b_xmin = 0.20
+DEF_2j2b_xmax = 0.90
+DEF_2j2b_bins = "{},{},{}".format(DEF_2j2b_nbin, DEF_2j2b_xmin, DEF_2j2b_xmax)
+
+
+def top_blocks(**kwargs):
+    params = dict(
+        job="tW",
+        fit="tW",
+        label="tW Dilepton",
+        ntuplepaths=NTUP_DIR,
+        dotables="TRUE",
+        systplots="TRUE",
+        fitblind="TRUE",
+        reg1j1b_selection=DEF_1j1b_sels,
+        reg1j1b_variable=DEF_1j1b_vari,
+        reg1j1b_binning=DEF_1j1b_bins,
+        reg2j1b_selection=DEF_2j1b_sels,
+        reg2j1b_variable=DEF_2j1b_vari,
+        reg2j1b_binning=DEF_2j1b_bins,
+        reg2j2b_selection=DEF_2j2b_sels,
+        reg2j2b_variable=DEF_2j2b_vari,
+        reg2j2b_binning=DEF_2j2b_bins,
+    )
+    for k in kwargs:
+        params[k] = kwargs[k]
+
+    return dedent(
+        """\
+    Job: "{job}"
+      Label: "{label}"
+      ReadFrom: NTUP
+      DebugLevel: 1
+      POI: "SigXsecOverSM"
+      PlotOptions: NOXERR,CHI2
+      MCstatThreshold: 0.001
+      SystPruningNorm: 0.0005
+      SystPruningShape: 0.001
+      NtuplePaths: "{ntuplepaths}"
+      NtupleName: "WtLoop_nominal"
+      HistoChecks: NOCRASH
+      DoPieChartPlot: FALSE
+      CmeLabel: "13 TeV"
+      DoSummaryPlot: FALSE
+      SummaryPlotRegions: reg1j1b,reg2j1b,reg2j2b
+      DoTables: {dotables}
+      SystCategoryTables: FALSE
+      SystControlPlots: {systplots}
+      SystDataPlots: {systplots}
+      LegendNColumns: 1
+      ImageFormat: "pdf"
+      Lumi: 138.965
+      LumiLabel: "139.0 fb^{{-1}}"
+      GetChi2: TRUE
+      UseATLASRoundingTxt: TRUE
+      UseATLASRoundingTex: TRUE
+      TableOptions: STANDALONE
+      RankingPlot: Systs
+      RankingMaxNP: 20
+      RatioYmin: 0.80
+      RatioYmax: 1.20
+      RatioYminPostFit: 0.90
+      RatioYmaxPostFit: 1.10
+      SplitHistoFiles: TRUE
+      CorrelationThreshold: 0.35
+
+    Fit: "{fit}"
+      NumCPU: 1
+      POIAsimov: 1
+      FitType: SPLUSB
+      FitRegion: CRSR
+      FitBlind: {fitblind}
+      UseMinos: all
+      GetGoodnessOfFit: TRUE
+      SaturatedModel: TRUE
+
+    Region: "reg1j1b"
+      VariableTitle: "BDT Classifier Response"
+      ShortLabel: 1j1b
+      Label: 1j1b
+      Selection: "{reg1j1b_selection}"
+      Type: SIGNAL
+      Variable: "{reg1j1b_variable}",{reg1j1b_binning}
+
+    Region: "reg2j1b"
+      VariableTitle: "BDT Classifier Response"
+      ShortLabel: 2j1b
+      Label: 2j1b
+      Selection: "{reg2j1b_selection}"
+      Type: SIGNAL
+      Variable: "{reg2j1b_variable}",{reg2j1b_binning}
+
+    Region: "reg2j2b"
+      VariableTitle: "BDT Classifier Response"
+      ShortLabel: 2j2b
+      Label: 2j2b
+      Selection: "{reg2j2b_selection}"
+      Type: SIGNAL
+      Variable: "{reg2j2b_variable}",{reg2j2b_binning}
+    """.format(
+            **params
+        )
+    )
+
+
+def const_sys_blocks(f):
+    print(SYS_MINOR_BLOCKS, file=f)
+    print(SYS_PDF_WEIGHT_BLOCKS, file=f)
+    print(SYS_WEIGHT_BLOCKS, file=f)
+    print(SYS_TWOSIDED_TREE_BLOCKS, file=f)
+    print(SYS_ONESIDED_TREE_BLOCKS, file=f)
+
+
+# fmt: off
 NTSysWeight = namedtuple("SysWeight" , "branch_up branch_down category smoothing title tiny")
 NTSysPDF    = namedtuple("SysPDF"    , "branch category smoothing title tiny")
 NTSysTree2s = namedtuple("SysTree2s" , "branch_up branch_down category smoothing title tiny")
@@ -136,7 +272,7 @@ SYS_TREES_ONESIDED["Jet_JER_EffNP_4"               ] = NTSysTree1s("CategoryRedu
 SYS_TREES_ONESIDED["Jet_JER_EffNP_5"               ] = NTSysTree1s("CategoryReduction_JET_JER_EffectiveNP_5__1up"            , "JER"   , "40", "JER EffNP 5"               , False)
 SYS_TREES_ONESIDED["Jet_JER_EffNP_6"               ] = NTSysTree1s("CategoryReduction_JET_JER_EffectiveNP_6__1up"            , "JER"   , "40", "JER EffNP 6"               , False)
 SYS_TREES_ONESIDED["Jet_JER_EffectiveNP_7restTerm" ] = NTSysTree1s("CategoryReduction_JET_JER_EffectiveNP_7restTerm__1up"    , "JER"   , "40", "JER EffectiveNP 7restTerm" , False)
-
+# fmt:  on
 
 def _get_sys_weights():
     blocks = []
@@ -557,6 +693,7 @@ def shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
 
 
 def modeling_blocks(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
+    shower_norm_blocks = shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b)
     return '''\
 Systematic: "tW_DRDS"
   Category: "Modeling"
@@ -754,36 +891,6 @@ Systematic: "tW_AR_FSR_2j2b"
   Type: HISTO
   Regions: reg2j2b
 
-Systematic: "ttbar_hdamp_1j1b"
-  Category: "Modeling"
-  Title: "ttbar hdamp 1j1b"
-  ReferenceSample: ttbar_AFII
-  Symmetrisation: ONESIDED
-  Samples: ttbar
-  Type: HISTO
-  Regions: reg1j1b
-  NtupleFilesUp: ttbar_410482_AFII_MC16a_nominal,ttbar_410482_AFII_MC16d_nominal,ttbar_410482_AFII_MC16e_nominal
-
-Systematic: "ttbar_hdamp_2j1b"
-  Category: "Modeling"
-  Title: "ttbar hdamp 2j1b"
-  ReferenceSample: ttbar_AFII
-  Symmetrisation: ONESIDED
-  Samples: ttbar
-  Type: HISTO
-  Regions: reg2j1b
-  NtupleFilesUp: ttbar_410482_AFII_MC16a_nominal,ttbar_410482_AFII_MC16d_nominal,ttbar_410482_AFII_MC16e_nominal
-
-Systematic: "ttbar_hdamp_2j2b"
-  Category: "Modeling"
-  Title: "ttbar hdamp 2j2b"
-  ReferenceSample: ttbar_AFII
-  Symmetrisation: ONESIDED
-  Samples: ttbar
-  Type: HISTO
-  Regions: reg2j2b
-  NtupleFilesUp: ttbar_410482_AFII_MC16a_nominal,ttbar_410482_AFII_MC16d_nominal,ttbar_410482_AFII_MC16e_nominal
-
 Systematic: "ttbar_AR_ISR_scale_muR_1j1b"
   Category: "Modeling"
   Title: "ttbar ISR Scale muR Variation 1j1b"
@@ -904,6 +1011,36 @@ Systematic: "ttbar_AR_FSR_2j2b"
   Type: HISTO
   Regions: reg2j2b
 
+Systematic: "ttbar_hdamp_1j1b"
+  Category: "Modeling"
+  Title: "ttbar hdamp 1j1b"
+  ReferenceSample: ttbar_AFII
+  Symmetrisation: ONESIDED
+  Samples: ttbar
+  Type: HISTO
+  Regions: reg1j1b
+  NtupleFilesUp: ttbar_410482_AFII_MC16a_nominal,ttbar_410482_AFII_MC16d_nominal,ttbar_410482_AFII_MC16e_nominal
+
+Systematic: "ttbar_hdamp_2j1b"
+  Category: "Modeling"
+  Title: "ttbar hdamp 2j1b"
+  ReferenceSample: ttbar_AFII
+  Symmetrisation: ONESIDED
+  Samples: ttbar
+  Type: HISTO
+  Regions: reg2j1b
+  NtupleFilesUp: ttbar_410482_AFII_MC16a_nominal,ttbar_410482_AFII_MC16d_nominal,ttbar_410482_AFII_MC16e_nominal
+
+Systematic: "ttbar_hdamp_2j2b"
+  Category: "Modeling"
+  Title: "ttbar hdamp 2j2b"
+  ReferenceSample: ttbar_AFII
+  Symmetrisation: ONESIDED
+  Samples: ttbar
+  Type: HISTO
+  Regions: reg2j2b
+  NtupleFilesUp: ttbar_410482_AFII_MC16a_nominal,ttbar_410482_AFII_MC16d_nominal,ttbar_410482_AFII_MC16e_nominal
+
 Systematic: "ttbar_ptreweight_1j1b"
   Category: "Modeling"
   Title: "ttbar pt reweight 1j1b"
@@ -930,4 +1067,4 @@ Systematic: "ttbar_ptreweight_2j2b"
   Samples: ttbar
   Type: HISTO
   Regions: reg2j2b
-'''.format(shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b))
+'''.format(shower_norm_blocks)

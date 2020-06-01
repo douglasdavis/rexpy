@@ -12,7 +12,9 @@ import click
 from pathlib2 import PosixPath
 
 # rexpy
+import rexpy.blocks as rpb
 from rexpy.blocks import (
+    top_blocks,
     modeling_blocks,
     SAMPLE_BLOCKS,
     NORMFACTOR_BLOCKS,
@@ -23,140 +25,6 @@ from rexpy.blocks import (
     SYS_ONESIDED_TREE_BLOCKS,
 )
 from rexpy.confparse import all_blocks, regions_from
-
-NTUP_DIR = "/atlasgpfs01/usatlas/data/ddavis/wtloop/WTA01_20200506"
-
-DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"
-DEF_1j1b_swmc = "reg1j1b == 1 && OS == 1 && mass_lep1jet1 < 155 && mass_lep2jet1 < 155"
-DEF_1j1b_vari = "bdtres00"
-DEF_1j1b_nbin = 12
-DEF_1j1b_xmin = 0.17
-DEF_1j1b_xmax = 0.76
-DEF_1j1b_bins = "{},{},{}".format(DEF_1j1b_nbin, DEF_1j1b_xmin, DEF_1j1b_xmax)
-
-DEF_2j1b_sels = "reg2j1b == 1 && OS == 1"
-DEF_2j1b_swmc = "reg2j1b == 1 && OS == 1 && mass_lep1jetb < 155 && mass_lep2jetb < 155"
-DEF_2j1b_vari = "bdtres00"
-DEF_2j1b_nbin = 12
-DEF_2j1b_xmin = 0.22
-DEF_2j1b_xmax = 0.85
-DEF_2j1b_bins = "{},{},{}".format(DEF_2j1b_nbin, DEF_2j1b_xmin, DEF_2j1b_xmax)
-
-DEF_2j2b_sels = "reg2j2b == 1 && OS == 1"
-DEF_2j2b_swmc = "reg2j2b == 1 && OS == 1 && minimaxmbl < 155"
-DEF_2j2b_vari = "bdtres00"
-DEF_2j2b_nbin = 12
-DEF_2j2b_xmin = 0.20
-DEF_2j2b_xmax = 0.90
-DEF_2j2b_bins = "{},{},{}".format(DEF_2j2b_nbin, DEF_2j2b_xmin, DEF_2j2b_xmax)
-
-
-def top(**kwargs):
-    params = dict(
-        job="tW",
-        fit="tW",
-        label="tW Dilepton",
-        ntuplepaths=NTUP_DIR,
-        dotables="TRUE",
-        systplots="TRUE",
-        fitblind="TRUE",
-        reg1j1b_selection=DEF_1j1b_sels,
-        reg1j1b_variable=DEF_1j1b_vari,
-        reg1j1b_binning=DEF_1j1b_bins,
-        reg2j1b_selection=DEF_2j1b_sels,
-        reg2j1b_variable=DEF_2j1b_vari,
-        reg2j1b_binning=DEF_2j1b_bins,
-        reg2j2b_selection=DEF_2j2b_sels,
-        reg2j2b_variable=DEF_2j2b_vari,
-        reg2j2b_binning=DEF_2j2b_bins,
-    )
-    for k in kwargs:
-        params[k] = kwargs[k]
-
-    return dedent(
-        """\
-    Job: "{job}"
-      Label: "{label}"
-      ReadFrom: NTUP
-      DebugLevel: 1
-      POI: "SigXsecOverSM"
-      PlotOptions: NOXERR,CHI2
-      MCstatThreshold: 0.001
-      SystPruningNorm: 0.0005
-      SystPruningShape: 0.001
-      NtuplePaths: "{ntuplepaths}"
-      NtupleName: "WtLoop_nominal"
-      HistoChecks: NOCRASH
-      DoPieChartPlot: FALSE
-      CmeLabel: "13 TeV"
-      DoSummaryPlot: FALSE
-      SummaryPlotRegions: reg1j1b,reg2j1b,reg2j2b
-      DoTables: {dotables}
-      SystCategoryTables: FALSE
-      SystControlPlots: {systplots}
-      SystDataPlots: {systplots}
-      LegendNColumns: 1
-      ImageFormat: "pdf"
-      Lumi: 138.965
-      LumiLabel: "139.0 fb^{{-1}}"
-      GetChi2: TRUE
-      UseATLASRoundingTxt: TRUE
-      UseATLASRoundingTex: TRUE
-      TableOptions: STANDALONE
-      RankingPlot: Systs
-      RankingMaxNP: 20
-      RatioYmin: 0.80
-      RatioYmax: 1.20
-      RatioYminPostFit: 0.90
-      RatioYmaxPostFit: 1.10
-      SplitHistoFiles: TRUE
-      CorrelationThreshold: 0.35
-
-    Fit: "{fit}"
-      NumCPU: 1
-      POIAsimov: 1
-      FitType: SPLUSB
-      FitRegion: CRSR
-      FitBlind: {fitblind}
-      UseMinos: all
-      GetGoodnessOfFit: TRUE
-      SaturatedModel: TRUE
-
-    Region: "reg1j1b"
-      VariableTitle: "BDT Classifier Response"
-      ShortLabel: 1j1b
-      Label: 1j1b
-      Selection: "{reg1j1b_selection}"
-      Type: SIGNAL
-      Variable: "{reg1j1b_variable}",{reg1j1b_binning}
-
-    Region: "reg2j1b"
-      VariableTitle: "BDT Classifier Response"
-      ShortLabel: 2j1b
-      Label: 2j1b
-      Selection: "{reg2j1b_selection}"
-      Type: SIGNAL
-      Variable: "{reg2j1b_variable}",{reg2j1b_binning}
-
-    Region: "reg2j2b"
-      VariableTitle: "BDT Classifier Response"
-      ShortLabel: 2j2b
-      Label: 2j2b
-      Selection: "{reg2j2b_selection}"
-      Type: SIGNAL
-      Variable: "{reg2j2b_variable}",{reg2j2b_binning}
-    """.format(
-            **params
-        )
-    )
-
-
-def const_sys_blocks(f):
-    print(SYS_MINOR_BLOCKS, file=f)
-    print(SYS_PDF_WEIGHT_BLOCKS, file=f)
-    print(SYS_WEIGHT_BLOCKS, file=f)
-    print(SYS_TWOSIDED_TREE_BLOCKS, file=f)
-    print(SYS_ONESIDED_TREE_BLOCKS, file=f)
 
 
 @click.group(context_settings=dict(max_content_width=92))
@@ -169,10 +37,10 @@ def cli():
 def simple_setup0(outname):
     """Generate a config from default settings, save to OUTNAME."""
     with open(outname, "w") as f:
-        print(top(), file=f)
+        print(top_blocks(), file=f)
         print(SAMPLE_BLOCKS, file=f)
         print(NORMFACTOR_BLOCKS, file=f)
-        print(modeling_blocks(NTUP_DIR, DEF_1j1b_sels, DEF_2j1b_sels, DEF_2j2b_sels), file=f)
+        print(modeling_blocks(rpb.NTUP_DIF, rpb.DEF_1j1b_sels, rpb.DEF_2j1b_sels, rpb.DEF_2j2b_sels), file=f)
         const_sys_blocks(f)
     return 0
 
@@ -181,10 +49,10 @@ def simple_setup0(outname):
 @click.argument("outname", type=click.Path(resolve_path=True))
 def simple_setup1(outname):
     """Generate a config from default settings using mass cuts, save to OUTNAME."""
-    preamble = top(
-        reg1j1b_selection=DEF_1j1b_swmc,
-        reg2j1b_selection=DEF_2j1b_swmc,
-        reg2j2b_selection=DEF_2j2b_swmc,
+    preamble = top_blocks(
+        reg1j1b_selection=rpb.DEF_1j1b_swmc,
+        reg2j1b_selection=rpb.DEF_2j1b_swmc,
+        reg2j2b_selection=rpb.DEF_2j2b_swmc,
         reg1j1b_variable="bdtres01",
         reg2j1b_variable="bdtres01",
         reg2j2b_variable="bdtres01",
@@ -194,47 +62,25 @@ def simple_setup1(outname):
         print(preamble, file=f)
         print(SAMPLE_BLOCKS, file=f)
         print(NORMFACTOR_BLOCKS, file=f)
-        print(modeling_blocks(NTUP_DIR, DEF_1j1b_swmc, DEF_2j1b_swmc, DEF_2j2b_swmc), file=f)
+        print(modeling_blocks(rpb.NTUP_DIF, rpb.DEF_1j1b_swmc, rpb.DEF_2j1b_swmc, rpb.DEF_2j2b_swmc), file=f)
         const_sys_blocks(f)
     return 0
 
 
 @cli.command("tunable")
 @click.argument("outname", type=click.Path(resolve_path=True))
-@click.option(
-    "--bin-1j1b", type=str, default=DEF_1j1b_bins, help="1j1b region binning settings"
-)
-@click.option(
-    "--bin-2j1b", type=str, default=DEF_2j1b_bins, help="2j1b region binning settings"
-)
-@click.option(
-    "--bin-2j2b", type=str, default=DEF_2j2b_bins, help="2j2b region binning settings"
-)
-@click.option(
-    "--var-1j1b", type=str, default=DEF_1j1b_vari, help="1j1b region variable setting"
-)
-@click.option(
-    "--var-2j1b", type=str, default=DEF_2j1b_vari, help="2j1b region variable setting"
-)
-@click.option(
-    "--var-2j2b", type=str, default=DEF_2j2b_vari, help="2j2b region variable setting"
-)
-@click.option(
-    "--sel-1j1b", type=str, default=DEF_1j1b_sels, help="1j1b region selection setting"
-)
-@click.option(
-    "--sel-2j1b", type=str, default=DEF_2j1b_sels, help="2j1b region selection setting"
-)
-@click.option(
-    "--sel-2j2b", type=str, default=DEF_2j2b_sels, help="2j2b region selection setting"
-)
+@click.option("--bin-1j1b", type=str, default=rpb.DEF_1j1b_bins, help="1j1b region binning settings")
+@click.option("--bin-2j1b", type=str, default=rpb.DEF_2j1b_bins, help="2j1b region binning settings")
+@click.option("--bin-2j2b", type=str, default=rpb.DEF_2j2b_bins, help="2j2b region binning settings")
+@click.option("--var-1j1b", type=str, default=rpb.DEF_1j1b_vari, help="1j1b region variable setting")
+@click.option("--var-2j1b", type=str, default=rpb.DEF_2j1b_vari, help="2j1b region variable setting")
+@click.option("--var-2j2b", type=str, default=rpb.DEF_2j2b_vari, help="2j2b region variable setting")
+@click.option("--sel-1j1b", type=str, default=rpb.DEF_1j1b_sels, help="1j1b region selection setting")
+@click.option("--sel-2j1b", type=str, default=rpb.DEF_2j1b_sels, help="2j1b region selection setting")
+@click.option("--sel-2j2b", type=str, default=rpb.DEF_2j2b_sels, help="2j2b region selection setting")
 @click.option("--skip-tables", is_flag=True, help="Don't produce tables")
 @click.option("--skip-syst-plots", is_flag=True, help="Don't produce red/blue plots")
-@click.option(
-    "--valplot",
-    type=click.Path(resolve_path=True, exists=True),
-    help="validation region plots",
-)
+@click.option("--valplot", type=click.Path(resolve_path=True, exists=True), help="validation region plots")
 def tunable(
     outname,
     bin_1j1b,
@@ -252,7 +98,7 @@ def tunable(
 ):
     """Generate a config with user defined binning, save to OUTNAME."""
     from rexpy.valplot import load_meta_table, blocks_for_all_regions, fix_systematics
-    preamble = top(
+    preamble = top_blocks(
         reg1j1b_binning=bin_1j1b,
         reg2j1b_binning=bin_2j1b,
         reg2j2b_binning=bin_2j2b,
@@ -273,7 +119,7 @@ def tunable(
             print("", file=f)
         print(SAMPLE_BLOCKS, file=f)
         print(NORMFACTOR_BLOCKS, file=f)
-        print(modeling_blocks(NTUP_DIR, sel_1j1b, sel_2j1b, sel_2j2b), file=f)
+        print(modeling_blocks(rpb.NTUP_DIF, sel_1j1b, sel_2j1b, sel_2j2b), file=f)
         const_sys_blocks(f)
     if valplot is not None:
         fix_systematics(outname)

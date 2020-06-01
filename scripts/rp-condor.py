@@ -46,9 +46,7 @@ def cli():
 
 @cli.command("ntup")
 @click.argument("config")
-@click.option(
-    "--quick", is_flag=True, help="generate a 'quick' submission (Lumi sys only)"
-)
+@click.option("--quick", is_flag=True, help="generate a 'quick' submission (Lumi sys only)")
 @click.option("--this-sys", type=str, help="do a single user defined systematic")
 def ntup(config, quick, this_sys):
     """Generate a condor submission script for the ntuple creation step of TRExFitter"""
@@ -158,9 +156,7 @@ def rank(config):
 @click.argument("config", type=click.Path(exists=True, resolve_path=True))
 @click.option("--dont-submit", is_flag=True, help="do not submit to condor")
 @click.option("--dont-fit", is_flag=True, help="only do n and d steps")
-@click.option(
-    "-s", "--systematic", type=str, multiple=True, help="only these systematics"
-)
+@click.option("-s", "--systematic", type=str, multiple=True, help="only these systematics")
 @click.option("-w", "--ws-suffix", type=str, help="extra workspace suffix")
 def complete(config, dont_submit, dont_fit, systematic, ws_suffix):
     """Run a complete set of trex-fitter stages ('n', then 'wf', then 'dp', then 'r')"""
@@ -176,9 +172,7 @@ def complete(config, dont_submit, dont_fit, systematic, ws_suffix):
     systematics = systematics_from(config, specific_sys=systematic)
     regions = regions_from(config)
 
-    dagman = pycondor.Dagman(
-        name="rx-condor_complete", submit=os.path.join(workspace, "sub")
-    )
+    dagman = pycondor.Dagman(name="rp-complete", submit=os.path.join(workspace, "sub"))
     standard_params = job_params(workspace, TREX_EXE)
 
     ntuple = pycondor.Job(name="ntuple", dag=dagman, **standard_params)
@@ -188,22 +182,19 @@ def complete(config, dont_submit, dont_fit, systematic, ws_suffix):
     else:
         ntuple.add_args(ntuple_arguments(config))
 
+    # fmt: off
     if dont_fit:
         draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
-        draw.add_arg("d {}".format(config))
-        # draw.add_args(["d {} Regions={}".format(config, r) for r in regions])
+        draw.add_arg(draw_argument(config, specific_sys=systematics if systematic else None))
         # now define the dependencies
         draw.add_parent(ntuple)
     else:
         # the fit step
         fit = pycondor.Job(name="fit", dag=dagman, **standard_params)
-        fit.add_arg(
-            fit_argument(config, specific_sys=systematics if systematic else None)
-        )
+        fit.add_arg(fit_argument(config, specific_sys=systematics if systematic else None))
         # the draw step
         draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
         draw.add_arg(draw_argument(config, specific_sys=systematics if systematic else None))
-        # draw.add_args(["dp {} Regions={}".format(config, r) for r in regions])
         # the rank (fit) step
         rank = pycondor.Job(name="rank", dag=dagman, **standard_params)
         rank.add_args(rank_arguments(config, specific_sys=systematics))
@@ -215,6 +206,7 @@ def complete(config, dont_submit, dont_fit, systematic, ws_suffix):
         rank.add_parent(draw)
         draw.add_parent(fit)
         fit.add_parent(ntuple)
+    # fmt: on
 
     orig_path = os.getcwd()
     os.chdir(workspace)
