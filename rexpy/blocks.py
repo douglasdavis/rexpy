@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 # stdlib
 from textwrap import dedent
 from collections import OrderedDict, namedtuple

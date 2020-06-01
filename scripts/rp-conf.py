@@ -40,8 +40,8 @@ def simple_setup0(outname):
         print(top_blocks(), file=f)
         print(SAMPLE_BLOCKS, file=f)
         print(NORMFACTOR_BLOCKS, file=f)
-        print(modeling_blocks(rpb.NTUP_DIF, rpb.DEF_1j1b_sels, rpb.DEF_2j1b_sels, rpb.DEF_2j2b_sels), file=f)
-        const_sys_blocks(f)
+        print(modeling_blocks(rpb.NTUP_DIR, rpb.DEF_1j1b_sels, rpb.DEF_2j1b_sels, rpb.DEF_2j2b_sels), file=f)
+        rpb.const_sys_blocks(f)
     return 0
 
 
@@ -62,8 +62,8 @@ def simple_setup1(outname):
         print(preamble, file=f)
         print(SAMPLE_BLOCKS, file=f)
         print(NORMFACTOR_BLOCKS, file=f)
-        print(modeling_blocks(rpb.NTUP_DIF, rpb.DEF_1j1b_swmc, rpb.DEF_2j1b_swmc, rpb.DEF_2j2b_swmc), file=f)
-        const_sys_blocks(f)
+        print(modeling_blocks(rpb.NTUP_DIR, rpb.DEF_1j1b_swmc, rpb.DEF_2j1b_swmc, rpb.DEF_2j2b_swmc), file=f)
+        rpb.const_sys_blocks(f)
     return 0
 
 
@@ -119,16 +119,15 @@ def tunable(
             print("", file=f)
         print(SAMPLE_BLOCKS, file=f)
         print(NORMFACTOR_BLOCKS, file=f)
-        print(modeling_blocks(rpb.NTUP_DIF, sel_1j1b, sel_2j1b, sel_2j2b), file=f)
-        const_sys_blocks(f)
+        print(modeling_blocks(rpb.NTUP_DIR, sel_1j1b, sel_2j1b, sel_2j2b), file=f)
+        rpb.const_sys_blocks(f)
     if valplot is not None:
         fix_systematics(outname)
     return 0
 
 
 @cli.command("rm-region")
-@click.argument("infile", type=click.Path(resolve_path=True))
-@click.argument("outfile", type=click.Path())
+@click.argument("config", type=click.Path(resolve_path=True))
 @click.option("-r", "--region", type=str, multiple=True)
 def rm_region(config, region):
     """Remove regions from a config file."""
@@ -156,7 +155,7 @@ def rm_region(config, region):
     blocks = all_blocks(config)
     for r in region:
         blocks = remove_region(blocks, r)
-    with open(outfile, "w") as f:
+    with open(config, "w") as f:
         print("\n\n".join(blocks), file=f)
 
 
