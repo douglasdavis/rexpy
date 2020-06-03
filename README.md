@@ -9,9 +9,8 @@ Setup
 -----
 
 Working in an ATLAS environment is not very vanilla, so we can't just
-install this with `pip` and move on with our lives
-(unfortunately). We're also stuck with Python 2 right now (sad). The
-`rp-init.sh` script tries to make this a little easier, CVMFS
+install this with `pip` and move on with our lives (unfortunately).
+The `rp-init.sh` script tries to make this a little easier, CVMFS
 installed with the standard LHC Computing Grid repositories are
 required; just run:
 
