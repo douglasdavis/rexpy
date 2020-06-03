@@ -2,8 +2,7 @@ from __future__ import print_function
 
 import os
 import yaml
-import six
-from pathlib2 import PosixPath
+from pathlib import PosixPath
 
 from rexpy.confparse import regions_from
 
@@ -155,7 +154,7 @@ def fix_systematics(config):
     config : str
         Path of the config file.
     """
-    whole = six.ensure_str(PosixPath(config).read_text())
+    whole = PosixPath(config).read_text()
     regions = regions_from(config)
     valplots = filter(lambda r: "VRP_" in r, regions)
     valplots_1j1b = [v for v in valplots if "1j1b" in v]

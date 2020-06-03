@@ -1,12 +1,14 @@
-from __future__ import print_function
-
 # stdlib
 from textwrap import dedent
 from collections import OrderedDict, namedtuple
 
+# rexpy
 from rexpy.shower import norm_uncertainties_tW, norm_uncertainties_ttbar
 
 
+######################################
+####### Default constants ############
+######################################
 NTUP_DIR = "/atlasgpfs01/usatlas/data/ddavis/wtloop/WTA01_20200506"
 
 DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"
@@ -32,6 +34,7 @@ DEF_2j2b_nbin = 12
 DEF_2j2b_xmin = 0.20
 DEF_2j2b_xmax = 0.90
 DEF_2j2b_bins = "{},{},{}".format(DEF_2j2b_nbin, DEF_2j2b_xmin, DEF_2j2b_xmax)
+######################################
 
 
 def top_blocks(**kwargs):
@@ -94,6 +97,7 @@ def top_blocks(**kwargs):
       RatioYmaxPostFit: 1.10
       SplitHistoFiles: TRUE
       CorrelationThreshold: 0.35
+      HEPDataFormat: TRUE
 
     Fit: "{fit}"
       NumCPU: 1
@@ -435,7 +439,7 @@ Sample: "Data"
 
 Sample: "tW"
   NtupleFiles: tW_DR_410648_FS_MC16a_nominal,tW_DR_410648_FS_MC16d_nominal,tW_DR_410649_FS_MC16d_nominal,tW_DR_410648_FS_MC16e_nominal,tW_DR_410649_FS_MC16e_nominal,tW_DR_410649_FS_MC16a_nominal
-  Title: "#it{tW}"
+  Title: "tW"
   TexTitle: "$tW$"
   FillColor: 862
   LineColor: 1
@@ -444,7 +448,7 @@ Sample: "tW"
 
 Sample: "ttbar"
   NtupleFiles: ttbar_410472_FS_MC16a_nominal,ttbar_410472_FS_MC16e_nominal,ttbar_410472_FS_MC16d_nominal
-  Title: "#it{t#bar{t}}"
+  Title: "Top pair"
   TexTitle: "$t\bar{t}$"
   FillColor: 634
   LineColor: 1
@@ -452,7 +456,7 @@ Sample: "ttbar"
   MCweight: "weight_nominal"
 
 Sample: "Zjets"
-  Title: "#it{Z}+jets"
+  Title: "Z+jets"
   TexTitle: "$Z+$jets"
   FillColor: 802
   LineColor: 1
@@ -485,14 +489,14 @@ NormFactor: "SigXsecOverSM"
   Nominal: 1
   Min: 0
   Samples: tW
-  Title: "#it{#mu}_{#it{tW}}"
+  Title: "mu_tW"
 
 NormFactor: "mu_ttbar"
   Max: 1.5
   Nominal: 1
   Min: 0.5
   Samples: ttbar
-  Title: "#it{#mu}_{#it{t#bar{t}}}"
+  Title: "mu_ttbar"
 '''
 
 SYS_MINOR_BLOCKS = '''\

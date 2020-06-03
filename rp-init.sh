@@ -5,10 +5,9 @@
 
 if [ "$(uname)" == "Darwin" ]; then
     setupPyenv
-    pyenv activate py2
 else
     setupATLAS -q
-    lsetup "root 6.18.04-x86_64-centos7-gcc8-opt" --quiet
+    lsetup "views LCG_96bpython3 x86_64-centos7-gcc8-opt"
 fi
 
 REXPY_DIR=$(realpath $(dirname "${BASH_SOURCE[0]}"))

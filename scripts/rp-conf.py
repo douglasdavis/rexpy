@@ -1,15 +1,11 @@
 #!/usr/bin/env python
 
-# future
-from __future__ import print_function
-
 # stdlib
 from textwrap import dedent
 
 # third party
-import six
 import click
-from pathlib2 import PosixPath
+from pathlib import PosixPath
 
 # rexpy
 import rexpy.blocks as rpb

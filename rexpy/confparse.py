@@ -1,9 +1,7 @@
 """A module for parsing TRExFitter configs and results"""
 
-from __future__ import print_function
-
-import six
-from pathlib2 import PosixPath
+# stdlib
+from pathlib import PosixPath
 
 
 def all_blocks(config, delimiter="\n\n"):
@@ -27,7 +25,7 @@ def all_blocks(config, delimiter="\n\n"):
     list(str)
         Configuration blocks.
     """
-    config_str = six.ensure_str(PosixPath(config).read_text())
+    config_str = PosixPath(config).read_text()
     return config_str.split(delimiter)
 
 

@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
-
 # stdlib
 import os
 import re
 import shutil
 import sys
+from pathlib import PosixPath
 
 # third party
 import click
-from pathlib2 import PosixPath
 
 # rexpy
 from rexpy.batch import job_params
