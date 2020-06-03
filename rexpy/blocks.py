@@ -1,6 +1,7 @@
 # stdlib
 from textwrap import dedent
 from collections import OrderedDict, namedtuple
+from pathlib import Path
 
 # rexpy
 from rexpy.shower import norm_uncertainties_tW, norm_uncertainties_ttbar
@@ -9,7 +10,11 @@ from rexpy.shower import norm_uncertainties_tW, norm_uncertainties_ttbar
 ######################################
 ####### Default constants ############
 ######################################
-NTUP_DIR = "/atlasgpfs01/usatlas/data/ddavis/wtloop/WTA01_20200506"
+NTUP_DIR = None
+if Path("/atlasgpfs01/usatlas/data/ddavis").exists():
+    NTUP_DIR = "/atlasgpfs01/usatlas/data/ddavis/wtloop/WTA01_20200506"
+else:
+    NTUP_DIR = "/home/ddavis/atlas/data/wtloop/WTA01_20200506"
 
 DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"
 DEF_1j1b_swmc = "reg1j1b == 1 && OS == 1 && mass_lep1jet1 < 155 && mass_lep2jet1 < 155"
