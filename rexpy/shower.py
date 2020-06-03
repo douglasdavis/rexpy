@@ -1,13 +1,15 @@
-from __future__ import print_function
-
 import logging
+log = logging.getLogger(__name__)
+
+try:
+    import ROOT
+    ROOT.gROOT.SetBatch()
+    ROOT.PyConfig.IgnoreCommandLineOptions = True
+except ImportError:
+    log.warn("ROOT was not imported; this module requires it.")
+
 from textwrap import dedent
 
-import ROOT
-ROOT.gROOT.SetBatch()
-ROOT.PyConfig.IgnoreCommandLineOptions = True
-
-log = logging.getLogger(__name__)
 
 def norm_uncertainties(
     ntup_dir, pp8_files, ph7_files, sel_1j1b, sel_2j1b, sel_2j2b,
