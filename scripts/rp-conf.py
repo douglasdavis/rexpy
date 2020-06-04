@@ -76,7 +76,7 @@ def simple_setup1(outname):
 @click.option("--sel-2j2b", type=str, default=rpb.DEF_2j2b_sels, help="2j2b region selection setting")
 @click.option("--skip-tables", is_flag=True, help="Don't produce tables")
 @click.option("--skip-syst-plots", is_flag=True, help="Don't produce red/blue plots")
-@click.option("--valplot", type=click.Path(resolve_path=True, exists=True), help="validation region plots")
+@click.option("--do-valplots", is_flag=True, help="validation region plots")
 def tunable(
     outname,
     bin_1j1b,
@@ -90,10 +90,11 @@ def tunable(
     sel_2j2b,
     skip_tables,
     skip_syst_plots,
-    valplot,
+    do_valplots,
 ):
     """Generate a config with user defined binning, save to OUTNAME."""
-    from rexpy.valplot import load_meta_table, blocks_for_all_regions, fix_systematics
+    import yaml
+    from rexpy.valplot import blocks_for_all_regions, fix_systematics
     preamble = top_blocks(
         reg1j1b_binning=bin_1j1b,
         reg2j1b_binning=bin_2j1b,
@@ -109,15 +110,18 @@ def tunable(
     )
     with open(outname, "w") as f:
         print(preamble, file=f)
-        if valplot is not None:
-            meta = load_meta_table(valplot)
+        if do_valplots:
+            import requests
+            meta_req = requests.get("https://cern.ch/ddavis/tdub_data/meta.yml")
+            # meta = load_meta_table(meta_req.content)
+            meta = yaml.full_load(meta_req.content)
             print(blocks_for_all_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b), file=f)
             print("", file=f)
         print(SAMPLE_BLOCKS, file=f)
         print(NORMFACTOR_BLOCKS, file=f)
         print(modeling_blocks(rpb.NTUP_DIR, sel_1j1b, sel_2j1b, sel_2j2b), file=f)
         rpb.const_sys_blocks(f)
-    if valplot is not None:
+    if do_valplots:
         fix_systematics(outname)
     return 0
 

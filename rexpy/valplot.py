@@ -1,10 +1,13 @@
-from __future__ import print_function
-
+# stdlib
+import logging
 import os
-import yaml
 from pathlib import PosixPath
 
+# rexpy
 from rexpy.confparse import regions_from
+
+
+log = logging.getLogger(__name__)
 
 
 BLOCK_TEMPLATE = """\
@@ -16,24 +19,6 @@ Region: "VRP_reg{region}_{var}"
   Label: "{region}"
   Variable: "{var}",{nbins},{xmin},{xmax}
   LogScale: {logscale}"""
-
-
-def load_meta_table(metafile):
-    """Generate table of metadata information.
-
-    Parmaters
-    ---------
-    metafile : str
-        Path to the file defining the metadata.
-
-    Returns
-    -------
-    dict
-        Metadata for plots in dict form.
-    """
-    with open(metafile, "r") as f:
-        metatable = yaml.load(f, Loader=yaml.Loader)
-    return metatable
 
 
 def block(region, selection, var, title, nbins, xmin, xmax, logscale):
@@ -111,6 +96,7 @@ def blocks_for_region(meta, region, selection):
             logscale,
         )
         blocks.append(bk)
+        log.info("Validation plot block created in %s: %s" % (region, var))
     return blocks
 
 
@@ -156,13 +142,19 @@ def fix_systematics(config):
     """
     whole = PosixPath(config).read_text()
     regions = regions_from(config)
-    valplots = filter(lambda r: "VRP_" in r, regions)
+    valplots = list(filter(lambda r: "VRP_" in r, regions))
     valplots_1j1b = [v for v in valplots if "1j1b" in v]
     valplots_2j1b = [v for v in valplots if "2j1b" in v]
     valplots_2j2b = [v for v in valplots if "2j2b" in v]
     valplots_1j1b = ",".join(valplots_1j1b)
     valplots_2j1b = ",".join(valplots_2j1b)
     valplots_2j2b = ",".join(valplots_2j2b)
+    log.info("replacing 'Regions: reg1j1b' with:")
+    log.info("'  Regions : reg1j1b,%s'" % valplots_1j1b)
+    log.info("replacing 'Regions: reg2j1b' with:")
+    log.info("'  Regions : reg2j1b,%s'" % valplots_2j1b)
+    log.info("replacing 'Regions: reg2j2b' with:")
+    log.info("'  Regions : reg2j2b,%s'" % valplots_2j2b)
     whole = whole.replace(
         "  Regions: reg1j1b", "  Regions: reg1j1b,{}".format(
             valplots_1j1b
