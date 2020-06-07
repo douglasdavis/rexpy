@@ -1,5 +1,5 @@
 # local
-src/tdub/version.py
+src/rexpy/version.py
 
 # macOS
 .DS_Store
