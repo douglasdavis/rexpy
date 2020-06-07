@@ -15,5 +15,5 @@ installed with the standard LHC Computing Grid repositories are
 required; just run:
 
 ```
-$ . rp-init.sh
+$ . scripts/rp-init.sh
 ```
