@@ -15,5 +15,5 @@ installed with the standard LHC Computing Grid repositories are
 required; just run:
 
 ```
-$ . scripts/rp-init.sh
+$ . src/atlas-init.sh
 ```

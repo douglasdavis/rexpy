@@ -13,8 +13,8 @@ fi
 
 # directories
 REXPY_DIR=$(realpath $(dirname "${BASH_SOURCE[0]}")/..)
-REXPY_SCRIPT_DIR=$REXPY_DIR/scripts
-REXPY_APP_DIR=$REXPY_DIR/app
+REXPY_SCRIPT_DIR=$REXPY_DIR/src/scripts
+REXPY_APP_DIR=$REXPY_DIR/src/app
 
 # executables
 export PATH=$PATH:$REXPY_SCRIPT_DIR:$REXPY_APP_DIR
