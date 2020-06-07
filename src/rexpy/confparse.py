@@ -11,8 +11,8 @@ def all_blocks(config, delimiter="\n\n"):
     expect exactly one blank line between all blocks, so the delimiter
     between two blocks should be exactly two new newlines.
 
-    Paramters
-    ---------
+    Parameters
+    ----------
     config : str
         Path of the config file.
     delimiter : str

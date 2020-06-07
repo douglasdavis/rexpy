@@ -1,3 +1,7 @@
+from .version import version
+
+__version__ = version
+
 import logging
 
 def setup_logging():
