@@ -1,5 +1,6 @@
 # local
 src/rexpy/version.py
+src/app/augment-tree-with-npy
 
 # macOS
 .DS_Store
