@@ -65,7 +65,7 @@ def do_without_masscuts():
                     r1j1b_min, r1j1b_max, r2j1b_min, r2j1b_max, r2j2b_min, r2j2b_max, var_without_masscuts,
                 )
         print(args)
-        subprocess.call("rx-conf-gen.py {} binmatrix_without_mass/{}".format(args, filename), shell=True)
+        subprocess.call("rp-conf.py {} binmatrix_without_masscuts/{}".format(args, filename), shell=True)
 
 
 def do_with_masscuts():
@@ -94,7 +94,7 @@ def do_with_masscuts():
                     r1j1b_min, r1j1b_max, r2j1b_min, r2j1b_max, r2j2b_min, r2j2b_max, var_with_masscuts,
                 )
         print(args)
-        subprocess.call("rx-conf-gen.py {} binmatrix_with_masscuts/{}".format(args, filename), shell=True)
+        subprocess.call("rp-conf.py {} binmatrix_with_masscuts/{}".format(args, filename), shell=True)
 
 
 if len(sys.argv) != 2:
