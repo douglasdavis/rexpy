@@ -11,8 +11,6 @@ import subprocess
 
 from rexpy.batch import job_params
 import rexpy.pycondor as pycondor
-from rexpy import setup_logging
-setup_logging()
 
 log = logging.getLogger("rx-augment-npy")
 
