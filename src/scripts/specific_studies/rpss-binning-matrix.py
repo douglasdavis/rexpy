@@ -28,7 +28,7 @@ r2j2b_min: [0.300, 0.450, 0.600]
 r2j2b_max: [0.775, 0.825]
 """
 matrix_without_masscuts = yaml.full_load(matrix_without_masscuts)
-var_without_masscuts = "bdtres02"
+var_without_masscuts = "bdtres03"
 
 matrix_with_masscuts = r"""
 r1j1b_min: [0.20, 0.25, 0.30]
@@ -51,13 +51,13 @@ def do_without_masscuts():
         matrix_without_masscuts.get("r2j2b_min"),
         matrix_without_masscuts.get("r2j2b_max")
     )
-    if not os.path.exists("binmatrix_without_masscuts02"):
-        os.mkdir("binmatrix_without_masscuts02")
+    if not os.path.exists("binmatrix_without_masscuts03"):
+        os.mkdir("binmatrix_without_masscuts03")
     for i, (r1j1b_min, r1j1b_max, r2j1b_min, r2j1b_max, r2j2b_min, r2j2b_max) in enumerate(itr):
         filename = "fit_{}-{}_{}-{}_{}-{}.conf".format(
             r1j1b_min, r1j1b_max, r2j1b_min, r2j1b_max, r2j2b_min, r2j2b_max
         )
-        args = ('tunable --var-1j1b bdtres02 --var-2j1b bdtres02 --var-2j2b bdtres02 '
+        args = ('tunable --var-1j1b bdtres03 --var-2j1b bdtres03 --var-2j2b bdtres03 '
                 '--bin-1j1b 12,{0},{1} --sel-1j1b "reg1j1b == 1 && OS == 1 && {6} > {0}" '
                 '--bin-2j1b 12,{2},{3} --sel-2j1b "reg2j1b == 1 && OS == 1 && {6} < {3}" '
                 '--bin-2j2b 12,{4},{5} --sel-2j2b "reg2j2b == 1 && OS == 1 && {6} > {4} && {6} < {5}" '
@@ -65,7 +65,7 @@ def do_without_masscuts():
                     r1j1b_min, r1j1b_max, r2j1b_min, r2j1b_max, r2j2b_min, r2j2b_max, var_without_masscuts,
                 )
         print(args)
-        subprocess.call("rp-conf.py {} binmatrix_without_masscuts02/{}".format(args, filename), shell=True)
+        subprocess.call("rp-conf.py {} binmatrix_without_masscuts03/{}".format(args, filename), shell=True)
 
 
 def do_with_masscuts():
