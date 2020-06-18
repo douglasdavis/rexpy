@@ -60,7 +60,7 @@ def block(region, selection, var, title, nbins, xmin, xmax, logscale):
     )
 
 
-def blocks_for_region(meta, region, selection):
+def blocks_for_region(meta, region, selection, is_preselection=False):
     """Create VRP blocks for a specific region and selection.
 
     Parameters
@@ -71,6 +71,8 @@ def blocks_for_region(meta, region, selection):
         Region as a string ("1j1b", "2j1b", "2j2b")
     selection : str
         Selection string for tree
+    is_preselection : bool
+        Use the preselection plotting definitions
 
     Returns
     -------
@@ -85,22 +87,32 @@ def blocks_for_region(meta, region, selection):
         logscale = "TRUE" if entry["log"] else "FALSE"
         unit = titles[var]["unit"]
         unit = " [{}]".format(unit) if unit else ""
+        if not is_preselection:
+            xmin = entry["xmin"]
+            xmax = entry["xmax"]
+        else:
+            xmin = entry["xmin_pre"]
+            xmax = entry["xmax_pre"]
+            if xmin is None:
+                xmin = entry["xmin"]
+            if xmax is None:
+                xmax = entry["xmax"]
         bk = block(
             region,
             selection,
             var,
             "{}{}".format(titles[var]["rex"], unit),
             entry["nbins"],
-            entry["xmin"],
-            entry["xmax"],
+            xmin,
+            xmax,
             logscale,
         )
         blocks.append(bk)
-        log.info("Validation plot block created in %s: %s" % (region, var))
+        log.info("Validation plot block created in %s: %s (%s, %s, %s)" % (region, var, entry["nbins"], xmin, xmax))
     return blocks
 
 
-def blocks_for_all_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b):
+def blocks_for_all_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b, is_preselection=False):
     """Shortcut function to get string for all region blocks.
 
     Parameters
@@ -113,15 +125,17 @@ def blocks_for_all_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b):
         Selection for 2j1b region
     sel_2j2b : str
         Selection for 2j2b region
+    is_preselection : bool
+        Use the preselection plotting definitions
 
     Returns
     -------
     str
         Joining of all blocks as a string
     """
-    b1j1b = blocks_for_region(meta, "1j1b", sel_1j1b)
-    b2j1b = blocks_for_region(meta, "2j1b", sel_2j1b)
-    b2j2b = blocks_for_region(meta, "2j2b", sel_2j2b)
+    b1j1b = blocks_for_region(meta, "1j1b", sel_1j1b, is_preselection)
+    b2j1b = blocks_for_region(meta, "2j1b", sel_2j1b, is_preselection)
+    b2j2b = blocks_for_region(meta, "2j2b", sel_2j2b, is_preselection)
     return "{}\n\n{}\n\n{}".format(
         "\n\n".join(b1j1b),
         "\n\n".join(b2j1b),
@@ -143,9 +157,9 @@ def fix_systematics(config):
     whole = PosixPath(config).read_text()
     regions = regions_from(config)
     valplots = list(filter(lambda r: "VRP_" in r, regions))
-    valplots_1j1b = [v for v in valplots if "1j1b" in v]
-    valplots_2j1b = [v for v in valplots if "2j1b" in v]
-    valplots_2j2b = [v for v in valplots if "2j2b" in v]
+    valplots_1j1b = sorted([v for v in valplots if "1j1b" in v], key=str.lower)
+    valplots_2j1b = sorted([v for v in valplots if "2j1b" in v], key=str.lower)
+    valplots_2j2b = sorted([v for v in valplots if "2j2b" in v], key=str.lower)
     valplots_1j1b = ",".join(valplots_1j1b)
     valplots_2j1b = ",".join(valplots_2j1b)
     valplots_2j2b = ",".join(valplots_2j2b)

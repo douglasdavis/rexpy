@@ -77,6 +77,8 @@ def simple_setup1(outname):
 @click.option("--skip-tables", is_flag=True, help="Don't produce tables")
 @click.option("--skip-syst-plots", is_flag=True, help="Don't produce red/blue plots")
 @click.option("--do-valplots", is_flag=True, help="validation region plots")
+@click.option("--is-preselection", is_flag=True, help="use preselection plotting definitions")
+@click.option("--fit-data", is_flag=True, help="Fit to data")
 def tunable(
     outname,
     bin_1j1b,
@@ -91,6 +93,8 @@ def tunable(
     skip_tables,
     skip_syst_plots,
     do_valplots,
+    is_preselection,
+    fit_data,
 ):
     """Generate a config with user defined binning, save to OUTNAME."""
     import yaml
@@ -107,6 +111,7 @@ def tunable(
         reg2j2b_selection=sel_2j2b,
         dotables="FALSE" if skip_tables else "TRUE",
         systplots="FALSE" if skip_syst_plots else "TRUE",
+        fitblind="FALSE" if fit_data else "TRUE",
     )
     with open(outname, "w") as f:
         print(preamble, file=f)
@@ -115,7 +120,12 @@ def tunable(
             meta_req = requests.get("https://cern.ch/ddavis/tdub_data/meta.yml")
             # meta = load_meta_table(meta_req.content)
             meta = yaml.full_load(meta_req.content)
-            print(blocks_for_all_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b), file=f)
+            print(
+                blocks_for_all_regions(
+                    meta, sel_1j1b, sel_2j1b, sel_2j2b, is_preselection=is_preselection
+                ),
+                file=f
+            )
             print("", file=f)
         print(SAMPLE_BLOCKS, file=f)
         print(NORMFACTOR_BLOCKS, file=f)
