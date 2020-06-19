@@ -1,0 +1,165 @@
+diff --git a/Root/Region.cc b/Root/Region.cc
+index a4cad21..fc50001 100644
+--- a/Root/Region.cc
++++ b/Root/Region.cc
+@@ -796,6 +796,11 @@ std::unique_ptr<TRExPlot> Region::DrawPreFit(const std::vector<int>& canvasSize,
+     //
+     if(fGetChi2 && TRExFitter::SHOWCHI2)  p->SetChi2KS(fChi2prob,-1,fChi2val,fNDF);
+ 
++    //
++    // Save chi2 info to an output file
++    //
++    SavePreFitChi2ToFile();
++
+     //
+     // Sets the last ingredients in the TRExPlot object
+     //
+@@ -1731,6 +1736,11 @@ std::unique_ptr<TRExPlot> Region::DrawPostFit(FitResults* fitRes,
+     //
+     if(fGetChi2 && TRExFitter::SHOWCHI2)  p->SetChi2KS(fChi2prob,-1,fChi2val,fNDF);
+ 
++    //
++    // save chi2 to file
++    //
++    SavePostFitChi2ToFile();
++
+     //
+     // 5) Finishes configuration of TRExPlot objects
+     //
+@@ -2673,3 +2683,23 @@ void Region::SavePreFitUncertaintyAndTotalMCObjects() {
+     originalDir->cd();
+     f->Close();
+ }
++
++void Region::SavePreFitChi2ToFile() {
++  auto chi2outfile = TString::Format("%s/Histograms/%s%s_preFit_Chi2.txt",
++                                     fFitName.c_str(), fName.c_str(), fSuffix.c_str());
++  std::ofstream chi2outfileos(chi2outfile);
++  chi2outfileos << "chi2: " << static_cast<float>(fChi2val) << "\n";
++  chi2outfileos << "ndof: " << static_cast<int>(fNDF) << "\n";
++  chi2outfileos << "probability: " << static_cast<float>(fChi2prob) << "\n";
++  chi2outfileos.close();
++}
++
++void Region::SavePostFitChi2ToFile() {
++  auto chi2outfile = TString::Format("%s/Histograms/%s%s_postFit_Chi2.txt",
++                                     fFitName.c_str(), fName.c_str(), fSuffix.c_str());
++  std::ofstream chi2outfileos(chi2outfile);
++  chi2outfileos << "chi2: " << static_cast<float>(fChi2val) << "\n";
++  chi2outfileos << "ndof: " << static_cast<int>(fNDF) << "\n";
++  chi2outfileos << "probability: " << static_cast<float>(fChi2prob) << "\n";
++  chi2outfileos.close();
++}
+diff --git a/TRExFitter/Region.h b/TRExFitter/Region.h
+index c2343d5..ab26993 100644
+--- a/TRExFitter/Region.h
++++ b/TRExFitter/Region.h
+@@ -57,6 +57,9 @@ public:
+     void BuildPreFitErrorHist();
+     void SavePreFitUncertaintyAndTotalMCObjects();
+     std::unique_ptr<TRExPlot> DrawPreFit(const std::vector<int>& canvasSize, std::string opt="");
++    void SavePreFitChi2ToFile();
++    void SavePostFitChi2ToFile();
++
+     double GetMultFactors( FitResults* fitRes,
+                            std::ofstream& pullTex,
+                            const int i /*sample*/,
+diff --git a/setup.sh b/setup.sh
+index 032395a..87e3207 100644
+--- a/setup.sh
++++ b/setup.sh
+@@ -1,88 +1,16 @@
+ #!bin/sh
+ 
+-function version_gt() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; }
+-
+-
+-if [ "${BASH_SOURCE[0]}" != "" ]; then
+-    # This should work in bash.
+-    _src=${BASH_SOURCE[0]}
+-elif [ "${ZSH_NAME}" != "" ]; then
+-    # And this in zsh.
+-    _src=${(%):-%x}
+-elif [ "${1}" != "" ]; then
+-    # If none of the above works, we take it from the command line.
+-    _src="${1/setup.sh/}/setup.sh"
+-else
+-    echo -e "\033[1;31mERROR:\033[0m Could not determine the base directory of TRExFitter, i.e. where \"setup.sh\" is located."
+-    echo -e "\033[1;31mERROR:\033[0m Can you give it to the source script as additional argument?"
+-    echo -e "\033[1;31mERROR:\033[0m For example: source ../setup.sh .."
+-    return 1
+-fi
+-
+-location="$(cd -P "$(dirname "${_src}")" && pwd)"
+-unset _src
+-
+-
+-# Setup ROOT and gcc
+-# added back by Michele
+-export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
+-source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh --quiet
+-if [ "${ROOTSYS}" = "" ]; then
+-    if [ "${1}" = "slc6" ]; then
+-	lsetup "root 6.18.00-x86_64-slc6-gcc8-opt" --quiet
+-    else
+-	lsetup "root 6.18.04-x86_64-centos7-gcc8-opt" --quiet
+-    fi
+-else
+-    root_version=`root-config --version`
+-    if version_gt 6.18 $root_version; then
+-	echo "ERROR root already loaded, but root version too old: $root_version"
+-    fi
+-fi
+-
+-if [ "${ROOTSYS}" = "" ]; then
+-   echo -e "\033[41;1;37m Error initializing ROOT. ROOT is not set up. Please check. \033[0m"
+-else
+-   echo -e "\033[42;1;37m ROOT has been set to: *${ROOTSYS}* \033[0m"
+-fi
+-
+-alias macro="root -l -b -q"
+-
+ if [[ "$location" != "" ]]
+ then
+-  export PATH=$PATH:$location
+-  # to be able to point to the confg schema
+-  export TREXFITTER_HOME=$location
++    export PATH=$PATH:$location
++    # to be able to point to the confg schema
++    export TREXFITTER_HOME=$location
+ else
+-  export PATH=$PATH:`pwd`
+-  # to be able to point to the confg schema
+-  export TREXFITTER_HOME=`pwd`
+-fi
+-
+-if [ ! -f $TREXFITTER_HOME/logo.txt ]; then
+-  echo -e "\033[1;31mWARNING:\033[0m \$TREXFITTER_HOME environmental variable not set properly"
+-  echo -e "\033[1;31mWARNING:\033[0m call this script with the path to the TRExFitter directory as an additional argument"
++    export PATH=$PATH:`pwd`
++    # to be able to point to the confg schema
++    export TREXFITTER_HOME=`pwd`
+ fi
+ 
+-# Check if the CommomSmoothing code exists
+-if [ ! "$(ls -A ${TREXFITTER_HOME}/CommonSystSmoothingTool)" ]; then
+-  echo -e "\033[1;31mERROR:\033[0m CommonSystSmoothingTool directory does not exist or is empty. "
+-  echo -e "\033[1;31mERROR:\033[0m You need to type 'git submodule init' (first time use) in the base directory of TRExFitter"
+-  echo -e "\033[1;31mERROR:\033[0m You need to type 'git submodule update' in the base directory of TRExFitter"
+-  return
+-fi
+-
+-# Check if the CommonStatTools code exists
+-if [ ! "$(ls -A ${TREXFITTER_HOME}/CommonStatTools)" ]; then
+-  echo -e "\033[1;31mERROR:\033[0m CommonStatTools directory does not exist or is empty. "
+-  echo -e "\033[1;31mERROR:\033[0m You need to type 'git submodule init' (first time use) in the base directory of TRExFitter"
+-  echo -e "\033[1;31mERROR:\033[0m Followed with 'git submodule update' in the base directory of TRExFitter"
+-  return
+-fi
+-
+-echo "Setting up cmake with: lsetup cmake"
+-lsetup cmake
+-
+ export PATH=${PATH}${PATH:+:}${TREXFITTER_HOME}/build/bin
+ alias trex-make='cd build/; make -j4; cd ../'
+ alias trex-clean='rm -rf build/'
