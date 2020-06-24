@@ -158,11 +158,11 @@ def rank(config):
 @click.option("-w", "--ws-suffix", type=str, help="extra workspace suffix")
 def complete(config, dont_submit, dont_fit, systematics, ws_suffix):
     """Run a complete set of trex-fitter stages ('n', then 'wf', then 'dp', then 'r')"""
-    config_path = PosixPath(config)
+    config_path = PosixPath(config).resolve()
     config_name = config_path.name
-    workspace = "rpcc_{}".format(config_path.stem)
+    workspace = (config_path.parent / "rpcc_{}".format(config_path.stem)).resolve()
     if ws_suffix:
-        workspace = "{}_{}".format(workspace, ws_suffix)
+        workspace = "{}__{}".format(workspace, ws_suffix)
     os.mkdir(workspace)
     shutil.copyfile(str(config_path), os.path.join(workspace, "fit.conf"))
     workspace = os.path.abspath(workspace)
