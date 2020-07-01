@@ -6,7 +6,7 @@ try:
     ROOT.gROOT.SetBatch()
     ROOT.PyConfig.IgnoreCommandLineOptions = True
 except ImportError:
-    log.warn("ROOT was not imported; this module requires it.")
+    log.warn("ROOT was not imported; some rexpy.shower module functions require it")
 
 from textwrap import dedent
 

@@ -169,5 +169,26 @@ def rm_region(config, region):
         print("\n\n".join(blocks), file=f)
 
 
+@cli.command("rm-syst")
+@click.argument("config", type=click.Path(resolve_path=True))
+@click.option("-s", "--syst", type=str, multiple=True)
+@click.option("-n", "--new-file", type=str)
+def rm_syst(config, syst, new_file):
+    """Remove systematics from a config file."""
+    ab = all_blocks(config)
+    to_drop = []
+    for s in syst:
+        itr = filter(lambda x: x.startswith(f'Systematic: "{s}"'), ab)
+        for i in itr:
+            to_drop.append(i)
+    for drop in to_drop:
+        ab.remove(drop)
+    ab = "\n\n".join(ab)
+
+    outf = config if new_file is None else new_file
+    with open(outf, "w") as f:
+        print(ab, file=f)
+
+
 if __name__ == "__main__":
     cli()
