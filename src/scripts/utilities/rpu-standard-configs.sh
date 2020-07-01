@@ -30,7 +30,7 @@ rp-conf.py tunable $OUTDIR/standard_presel_plots.conf \
            --sel-2j2b 'reg2j2b == 1 && OS == 1' \
            --fit-data \
            --skip-tables \
-           --skip-syst-plots \
+           --skip-sys-plots \
            --do-valplots \
            --is-preselection
 
@@ -47,7 +47,7 @@ rp-conf.py tunable $OUTDIR/standard_fitdata_allplots.conf \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
            --skip-tables \
-           --skip-syst-plots \
+           --skip-sys-plots \
            --do-valplots \
            --fit-data
 
@@ -60,6 +60,39 @@ rp-conf.py tunable $OUTDIR/standard_fitdata.conf \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
            --fit-data
+
+rp-conf.py tunable $OUTDIR/standard_fitdata_1516.conf \
+           --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
+           --bin-1j1b '12,0.35,0.76' \
+           --bin-2j1b '12,0.22,0.70' \
+           --bin-2j2b '12,0.45,0.775' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
+           --fit-data \
+           --only-1516
+
+rp-conf.py tunable $OUTDIR/standard_fitdata_17.conf \
+           --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
+           --bin-1j1b '12,0.35,0.76' \
+           --bin-2j1b '12,0.22,0.70' \
+           --bin-2j2b '12,0.45,0.775' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
+           --fit-data \
+           --only-17
+
+rp-conf.py tunable $OUTDIR/standard_fitdata_18.conf \
+           --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
+           --bin-1j1b '12,0.35,0.76' \
+           --bin-2j1b '12,0.22,0.70' \
+           --bin-2j2b '12,0.45,0.775' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
+           --fit-data \
+           --only-18
 
 rp-conf.py tunable $OUTDIR/standard_fitasimov.conf \
            --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \

@@ -20,8 +20,8 @@ from rexpy.blocks import (
     SYS_TWOSIDED_TREE_BLOCKS,
     SYS_ONESIDED_TREE_BLOCKS,
 )
-from rexpy.confparse import all_blocks, regions_from
-
+from rexpy.confparse import all_blocks, regions_from, drop_systematics
+from rexpy.helpers import selection_with_period
 
 @click.group(context_settings=dict(max_content_width=92))
 def cli():
@@ -74,11 +74,15 @@ def simple_setup1(outname):
 @click.option("--sel-1j1b", type=str, default=rpb.DEF_1j1b_sels, help="1j1b region selection setting")
 @click.option("--sel-2j1b", type=str, default=rpb.DEF_2j1b_sels, help="2j1b region selection setting")
 @click.option("--sel-2j2b", type=str, default=rpb.DEF_2j2b_sels, help="2j2b region selection setting")
+@click.option("--drop-sys", type=str, help="Drop a systematic")
 @click.option("--skip-tables", is_flag=True, help="Don't produce tables")
-@click.option("--skip-syst-plots", is_flag=True, help="Don't produce red/blue plots")
+@click.option("--skip-sys-plots", is_flag=True, help="Don't produce red/blue plots")
 @click.option("--do-valplots", is_flag=True, help="validation region plots")
 @click.option("--is-preselection", is_flag=True, help="use preselection plotting definitions")
 @click.option("--fit-data", is_flag=True, help="Fit to data")
+@click.option("--only-1516", is_flag=True, help="Fit only 15/16")
+@click.option("--only-17", is_flag=True, help="Fit only 17")
+@click.option("--only-18", is_flag=True, help="Fit only 18")
 def tunable(
     outname,
     bin_1j1b,
@@ -90,15 +94,22 @@ def tunable(
     sel_1j1b,
     sel_2j1b,
     sel_2j2b,
+    drop_sys,
     skip_tables,
-    skip_syst_plots,
+    skip_sys_plots,
     do_valplots,
     is_preselection,
     fit_data,
+    only_1516,
+    only_17,
+    only_18,
 ):
     """Generate a config with user defined binning, save to OUTNAME."""
     import yaml
     from rexpy.valplot import blocks_for_all_regions, fix_systematics
+    sel_1j1b = selection_with_period(sel_1j1b, only_1516, only_17, only_18)
+    sel_2j1b = selection_with_period(sel_2j1b, only_1516, only_17, only_18)
+    sel_2j2b = selection_with_period(sel_2j2b, only_1516, only_17, only_18)
     preamble = top_blocks(
         reg1j1b_binning=bin_1j1b,
         reg2j1b_binning=bin_2j1b,
@@ -110,7 +121,7 @@ def tunable(
         reg2j1b_selection=sel_2j1b,
         reg2j2b_selection=sel_2j2b,
         dotables="FALSE" if skip_tables else "TRUE",
-        systplots="FALSE" if skip_syst_plots else "TRUE",
+        systplots="FALSE" if skip_sys_plots else "TRUE",
         fitblind="FALSE" if fit_data else "TRUE",
     )
     with open(outname, "w") as f:
@@ -133,13 +144,20 @@ def tunable(
         rpb.const_sys_blocks(f)
     if do_valplots:
         fix_systematics(outname)
+
+    if drop_sys is not None:
+        new_conf = "\n\n".join(drop_systematics(all_blocks(outname), [drop_sys]))
+        with open(outname, "w") as outf:
+            print(new_conf, outf)
+
     return 0
 
 
 @cli.command("rm-region")
 @click.argument("config", type=click.Path(resolve_path=True))
 @click.option("-r", "--region", type=str, multiple=True)
-def rm_region(config, region):
+@click.option("-n", "--new-file", type=str)
+def rm_region(config, region, new_file):
     """Remove regions from a config file."""
     ##
     def remove_region(config_blocks, region):
@@ -165,29 +183,22 @@ def rm_region(config, region):
     blocks = all_blocks(config)
     for r in region:
         blocks = remove_region(blocks, r)
-    with open(config, "w") as f:
-        print("\n\n".join(blocks), file=f)
-
-
-@cli.command("rm-syst")
-@click.argument("config", type=click.Path(resolve_path=True))
-@click.option("-s", "--syst", type=str, multiple=True)
-@click.option("-n", "--new-file", type=str)
-def rm_syst(config, syst, new_file):
-    """Remove systematics from a config file."""
-    ab = all_blocks(config)
-    to_drop = []
-    for s in syst:
-        itr = filter(lambda x: x.startswith(f'Systematic: "{s}"'), ab)
-        for i in itr:
-            to_drop.append(i)
-    for drop in to_drop:
-        ab.remove(drop)
-    ab = "\n\n".join(ab)
 
     outf = config if new_file is None else new_file
     with open(outf, "w") as f:
-        print(ab, file=f)
+        print("\n\n".join(blocks), file=f)
+
+
+@cli.command("rm-sys")
+@click.argument("config", type=click.Path(resolve_path=True))
+@click.option("-s", "--sys", type=str, multiple=True)
+@click.option("-n", "--new-file", type=str)
+def rm_sys(config, sys, new_file):
+    """Remove systematics from a config file."""
+    new_conf = "\n\n".join(drop_systematics(all_blocks(config), sys))
+    outf = config if new_file is None else new_file
+    with open(outf, "w") as f:
+        print(new_conf, file=f)
 
 
 if __name__ == "__main__":

@@ -152,11 +152,14 @@ def rank(config):
 
 @cli.command("complete")
 @click.argument("config", type=click.Path(exists=True, resolve_path=True))
-@click.option("--dont-submit", is_flag=True, help="do not submit to condor")
-@click.option("--dont-fit", is_flag=True, help="only do n and d steps")
 @click.option("-s", "--systematics", type=str, help="only these systematics (comma separated)")
 @click.option("-w", "--ws-suffix", type=str, help="extra workspace suffix")
-def complete(config, dont_submit, dont_fit, systematics, ws_suffix):
+@click.option("--copy-histograms-from", type=click.Path(exists=True, resolve_path=True), help="Use existing histograms")
+@click.option("--dont-fit", is_flag=True, help="only do n and d steps")
+@click.option("--dont-rank", is_flag=True, help="Skip the ranking step")
+@click.option("--dont-draw", is_flag=True, help="Skip the plotting steps")
+@click.option("--dont-submit", is_flag=True, help="do not submit to condor")
+def complete(config, systematics, ws_suffix, copy_histograms_from, dont_fit, dont_rank, dont_draw, dont_submit):
     """Run a complete set of trex-fitter stages ('n', then 'wf', then 'dp', then 'r')"""
     config_path = PosixPath(config).resolve()
     config_name = config_path.name
@@ -175,37 +178,42 @@ def complete(config, dont_submit, dont_fit, systematics, ws_suffix):
     dagman = pycondor.Dagman(name="rp-complete", submit=os.path.join(workspace, "sub"))
     standard_params = job_params(workspace, TREX_EXE)
 
-    ntuple = pycondor.Job(name="ntuple", dag=dagman, **standard_params)
-
-    if systematics:
-        ntuple.add_args(ntuple_arguments(config, specific_sys=syslist))
+    if copy_histograms_from is None:
+        ntuple = pycondor.Job(name="ntuple", dag=dagman, **standard_params)
+        if systematics:
+            ntuple.add_args(ntuple_arguments(config, specific_sys=syslist))
+        else:
+            ntuple.add_args(ntuple_arguments(config))
     else:
-        ntuple.add_args(ntuple_arguments(config))
+        os.makedirs(PosixPath(workspace) / "tW" / "Histograms")
+        for entry in PosixPath(copy_histograms_from).glob("*histos.root"):
+            shutil.copyfile(entry, str(PosixPath(workspace) / "tW" / "Histograms" / PosixPath(entry).name))
 
     # fmt: off
     if dont_fit:
         draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
         draw.add_arg(draw_argument(config, specific_sys=syslist if systematics else None))
-        # now define the dependencies
-        draw.add_parent(ntuple)
+        if copy_histograms_from is not None:
+            draw.add_parent(ntuple)
     else:
         # the fit step
         fit = pycondor.Job(name="fit", dag=dagman, **standard_params)
         fit.add_arg(fit_argument(config, specific_sys=syslist if systematics else None))
+        if copy_histograms_from is None:
+            fit.add_parent(ntuple)
         # the draw step
-        draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
-        draw.add_arg(draw_argument(config, specific_sys=syslist if systematics else None))
-        # the rank (fit) step
-        rank = pycondor.Job(name="rank", dag=dagman, **standard_params)
-        rank.add_args(rank_arguments(config, specific_sys=syslist))
-        # the rank (plot) step
-        rank_draw = pycondor.Job(name="rank_draw", dag=dagman, **standard_params)
-        rank_draw.add_arg("r {} Ranking=plot".format(config))
-        # now define the dependencies starting with the last step and working upstream
-        rank_draw.add_parent(rank)
-        rank.add_parent(draw)
-        draw.add_parent(fit)
-        fit.add_parent(ntuple)
+        if not dont_draw:
+            draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
+            draw.add_arg(draw_argument(config, specific_sys=syslist if systematics else None))
+            draw.add_parent(fit)
+        # the rank step
+        if not dont_rank:
+            rank = pycondor.Job(name="rank", dag=dagman, **standard_params)
+            rank.add_args(rank_arguments(config, specific_sys=syslist))
+            rank.add_parent(fit)
+            rank_draw = pycondor.Job(name="rank_draw", dag=dagman, **standard_params)
+            rank_draw.add_arg("r {} Ranking=plot".format(config))
+            rank_draw.add_parent(rank)
     # fmt: on
 
     orig_path = os.getcwd()
