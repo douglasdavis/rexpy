@@ -211,6 +211,8 @@ def fit_argument(config, specific_sys=None, dont_fit_vr=True):
 def ntuple_arguments(config, specific_sys=None):
     """Get the set of trex-fitter executable arguments for ntupling.
 
+    Parameters
+    ----------
     config : str
         Path of the config file.
     specific_sys : iterable(str), optional
@@ -235,3 +237,29 @@ def ntuple_arguments(config, specific_sys=None):
     return [
         "n {} Regions={}:Systematics={}".format(config, r, systematics) for r in regions
     ]
+
+
+def drop_systematics(blocks, systematics):
+    """Drop a systematic from a set of blocks.
+
+    Parameters
+    ----------
+    blocks : list(str)
+        All TRExFitter blocks.
+    systematics : list(str)
+        Name of the systematic to drop.
+
+    Returns
+    -------
+    list(str)
+        Blocks without desired systematic.
+    """
+    result = blocks[:]
+    to_drop = []
+    for s in systematics:
+        itr = filter(lambda x: x.startswith(f'Systematic: "{s}"'), blocks)
+        for i in itr:
+            to_drop.append(i)
+    for drop in to_drop:
+        result.remove(drop)
+    return result
