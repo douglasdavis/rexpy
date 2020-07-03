@@ -17,6 +17,7 @@ to_remove=(
     ttbar_PS_1j1b
     ttbar_PS_2j1b
     ttbar_PS_2j2b
+    ttbar_PS_migration
     ttbar_AR_FSR_2j1b
     ttbar_AR_FSR_1j1b
     tW_DRDS
