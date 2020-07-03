@@ -37,7 +37,7 @@ to_remove=(
 [[ ! -d "rpcc_${filename}/tW/Histograms" ]] && "Existing histograms dir does not exist"
 
 for sys in "${to_remove[@]}"; do
-    newfile=$filename-without-$sys.$extension
+    newfile=$filename-sys-stab-test-$sys.$extension
     rp-conf.py rm-sys $1 -s $sys -n $newfile
     rp-condor.py complete $newfile --copy-histograms-from rpcc_${filename}/tW/Histograms --dont-draw --dont-rank
 done
