@@ -103,6 +103,32 @@ rp-conf.py tunable $OUTDIR/standard_fitasimov.conf \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775'
 
+rp-conf.py rm-region $OUTDIR/standard_fitasimov.conf \
+           -r reg2j1b \
+           -r reg2j2b \
+           -n $OUTDIR/standard_fitasimov_1j1b.conf
+
+rp-conf.py rm-region $OUTDIR/standard_fitasimov.conf \
+           -r reg2j2b \
+           -n $OUTDIR/standard_fitasimov_1j1b2j1b.conf
+
+rp-conf.py rm-region $OUTDIR/standard_fitasimov.conf \
+           -r reg2j1b \
+           -n $OUTDIR/standard_fitasimov_1j1b2j2b.conf
+
+rp-conf.py rm-region $OUTDIR/standard_fitdata.conf \
+           -r reg2j1b \
+           -r reg2j2b \
+           -n $OUTDIR/standard_fitdata_1j1b.conf
+
+rp-conf.py rm-region $OUTDIR/standard_fitdata.conf \
+           -r reg2j2b \
+           -n $OUTDIR/standard_fitdata_1j1b2j1b.conf
+
+rp-conf.py rm-region $OUTDIR/standard_fitdata.conf \
+           -r reg2j1b \
+           -n $OUTDIR/standard_fitdata_1j1b2j2b.conf
+
 if [[ "${SUBMIT}" == "1" ]]; then
     for c in $OUTDIR/*.conf; do
         rp-condor.py complete $c

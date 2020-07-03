@@ -8,19 +8,28 @@ extension="${filename##*.}"
 filename="${filename%.*}"
 trexexe=$(which trex-fitter)
 to_remove=(
+    ttbar_ptreweight_1j1b
     ttbar_ptreweight_2j1b
+    ttbar_ptreweight_2j2b
+    ttbar_hdamp_1j1b
+    ttbar_hdamp_2j1b
     ttbar_hdamp_2j2b
+    ttbar_PS_1j1b
+    ttbar_PS_2j1b
     ttbar_PS_2j2b
     ttbar_AR_FSR_2j1b
     ttbar_AR_FSR_1j1b
-    tW_PS_2j1b
-    tW_PS_1j1b
     tW_DRDS
+    tW_PS_1j1b
+    tW_PS_2j1b
+    tW_PS_2j2b
     MET_SoftTrk_Scale
     Jet_Pileup_RhoTopology
     Jet_JER_EffectiveNP_7restTerm
     Jet_JER_EffNP_1
     Jet_JER_DataVsMC
+    Jet_Flavor_Response
+    Jet_Flavor_Composition
     B_ev_B_0
 )
 
