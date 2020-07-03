@@ -92,6 +92,10 @@ def sys_stab_test():
         errs_up.append(math.sqrt(sys_up ** 2 + nom_up ** 2))
         errs_down.append(math.sqrt(sys_down ** 2 + nom_down ** 2))
 
+    systematics, deltas, errs_up, errs_down = (
+        list(t) for t in zip(*sorted(zip(systematics, deltas, errs_up, errs_down)))
+    )
+
     for n, d, up, down in zip(systematics, deltas, errs_up, errs_down):
         print(n, d, up, down)
 
