@@ -7,6 +7,7 @@ import os
 import click
 import numpy as np
 import matplotlib as mpl
+
 mpl.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -42,19 +43,28 @@ def get_B0(fit_file):
 
 
 def make_plot(fig, ax, nom, nom_down, nom_up, xvals, xerlo, xerhi, yvals, ylabs):
-    ax.fill_betweenx([-50, 500], nom_down, nom_up,
-                     color="gray", alpha=0.5, label="Main Fit Uncertainty")
+    ax.fill_betweenx(
+        [-50, 500], nom_down, nom_up, color="gray", alpha=0.5, label="Main Fit Uncertainty"
+    )
     ax.set_xlabel(r"$\Delta \mu = \mu_{tW}^{\mathrm{nominal}} - \mu_{tW}^{\mathrm{test}}$")
     for xv, yv in zip(xvals, yvals):
         t = f"{xv:1.3f}"
-        ax.text(xv, yv+0.075, t, ha="center", va="bottom", size=10)
+        ax.text(xv, yv + 0.075, t, ha="center", va="bottom", size=10)
     ax.set_yticks(yvals)
     ax.set_yticklabels(ylabs)
     ax.set_ylim([0.0, len(yvals) + 1])
-    ax.errorbar(xvals, yvals, xerr=[abs(xerlo), xerhi], label="Individual tests",
-                fmt="ko", lw=2, elinewidth=2.25, capsize=3.5)
+    ax.errorbar(
+        xvals,
+        yvals,
+        xerr=[abs(xerlo), xerhi],
+        label="Individual tests",
+        fmt="ko",
+        lw=2,
+        elinewidth=2.25,
+        capsize=3.5,
+    )
     ax.grid(color="black", alpha=0.15)
-    ax.legend(bbox_to_anchor=(0, 1.02, 1, .102), loc="lower left")
+    ax.legend(bbox_to_anchor=(0, 1.02, 1, 0.102), loc="lower left")
     return fig, ax
 
 
@@ -66,7 +76,7 @@ def cli():
 @cli.command("sys-stab-test")
 def sys_stab_test():
     """Plot delta(mu) for some removed systematics stability tests"""
-    tests = glob.glob("./*without-**/tW/Fits/tW.txt")
+    tests = glob.glob("./*sys-stab-test-**/tW/Fits/tW.txt")
     nominal_file = "./rpcc_standard_fitdata/tW/Fits/tW.txt"
 
     nom_central, nom_up, nom_down = get_mu(nominal_file)
@@ -75,7 +85,7 @@ def sys_stab_test():
     errs_down = []
     systematics = []
     for test in tests:
-        systematic = test.split("/")[-4].split("-without-")[-1]
+        systematic = test.split("/")[-4].split("-sys-stab-test-")[-1]
         sys_central, sys_up, sys_down = get_mu(test)
         systematics.append(systematic)
         deltas.append(nom_central - sys_central)
@@ -90,12 +100,11 @@ def sys_stab_test():
     xerhi = np.array(errs_up)
     yvals = np.arange(1, len(xvals) + 1)
     ylabs = [
-        sys.
-        replace("_", " ").
-        replace("Effective", "Eff").
-        replace("tW", r"$tW$").
-        replace("ptreweight", r"$p_\mathrm{T}$ reweight").
-        replace("ttbar", r"$t\bar{t}$")
+        sys.replace("_", " ")
+        .replace("Effective", "Eff")
+        .replace("tW", r"$tW$")
+        .replace("ptreweight", r"$p_\mathrm{T}$ reweight")
+        .replace("ttbar", r"$t\bar{t}$")
         for sys in systematics
     ]
 
@@ -142,11 +151,12 @@ def camp_stab_test():
     ax.set_xticks([-0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4])
     fig.savefig("camp_stability_test.pdf")
 
+
 @cli.command("region-stab-test")
 def region_stab_test():
     """Plot delta(mu) for some different region setups."""
-    nominal   = "rpcc_standard_fitdata/tW/Fits/tW.txt"
-    f1j1b     = "rpcc_standard_fitdata_1j1b/tW/Fits/tW.txt"
+    nominal = "rpcc_standard_fitdata/tW/Fits/tW.txt"
+    f1j1b = "rpcc_standard_fitdata_1j1b/tW/Fits/tW.txt"
     f1j1b2j1b = "rpcc_standard_fitdata_1j1b2j1b/tW/Fits/tW.txt"
     f1j1b2j2b = "rpcc_standard_fitdata_1j1b2j2b/tW/Fits/tW.txt"
     nom_central, nom_up, nom_down = get_mu(nominal)
@@ -205,20 +215,19 @@ def year_b0_test():
     fig, ax = plt.subplots(figsize=(5.0, 2.0 + (len(centrals) - 1) * 0.315))
     ax.set_title(r"Zeroth $b$-tagging B eigenvector NP")
     ax.set_xlim([-2.25, 2.25])
-    ax.fill_betweenx([-50, 500], -2, 2,
-                     color="yellow", alpha=0.8)
-    ax.fill_betweenx([-50, 500], -1, 1,
-                     color="green", alpha=0.8)
+    ax.fill_betweenx([-50, 500], -2, 2, color="yellow", alpha=0.8)
+    ax.fill_betweenx([-50, 500], -1, 1, color="green", alpha=0.8)
     ax.set_xlabel(r"$(\hat{\theta} - \theta_0)/\Delta\theta$")
     ax.set_yticks(yvals)
     ax.set_yticklabels(ylabs)
     ax.set_ylim([0.0, len(yvals) + 1])
-    ax.errorbar(xvals, yvals, xerr=[abs(xerlo), xerhi],
-                fmt="ko", lw=2, elinewidth=2.25, capsize=3.5)
+    ax.errorbar(
+        xvals, yvals, xerr=[abs(xerlo), xerhi], fmt="ko", lw=2, elinewidth=2.25, capsize=3.5
+    )
 
     for xv, yv in zip(xvals, yvals):
         t = f"{xv:1.3f}"
-        ax.text(xv, yv+0.075, t, ha="center", va="bottom", size=10)
+        ax.text(xv, yv + 0.075, t, ha="center", va="bottom", size=10)
 
     ax.grid(color="black", alpha=0.15)
     fig.subplots_adjust(left=0.20, right=0.95, bottom=0.2, top=0.8)
@@ -227,5 +236,5 @@ def year_b0_test():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()
