@@ -142,6 +142,40 @@ def camp_stab_test():
     ax.set_xticks([-0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4])
     fig.savefig("camp_stability_test.pdf")
 
+@cli.command("region-stab-test")
+def region_stab_test():
+    """Plot delta(mu) for some different region setups."""
+    nominal   = "rpcc_standard_fitdata/tW/Fits/tW.txt"
+    f1j1b     = "rpcc_standard_fitdata_1j1b/tW/Fits/tW.txt"
+    f1j1b2j1b = "rpcc_standard_fitdata_1j1b2j1b/tW/Fits/tW.txt"
+    f1j1b2j2b = "rpcc_standard_fitdata_1j1b2j2b/tW/Fits/tW.txt"
+    nom_central, nom_up, nom_down = get_mu(nominal)
+    deltas = []
+    errs_up = []
+    errs_down = []
+    years = ["1j1b only", "1j1b + 2j1b", "1j1b + 2j2b"]
+    for d in [f1j1b, f1j1b2j1b, f1j1b2j2b]:
+        y_central, y_up, y_down = get_mu(d)
+        deltas.append(nom_central - y_central)
+        errs_up.append(math.sqrt(y_up ** 2 + nom_up ** 2))
+        errs_down.append(math.sqrt(y_down ** 2 + nom_down ** 2))
+
+    for n, d, up, down in zip(years, deltas, errs_up, errs_down):
+        print(n, d, up, down)
+
+    xvals = np.array(deltas)
+    xerlo = np.array(errs_down)
+    xerhi = np.array(errs_up)
+    yvals = np.arange(1, len(xvals) + 1)
+    ylabs = years
+
+    fig, ax = plt.subplots(figsize=(5.2, 2.0 + len(xvals) * 0.315))
+    fig.subplots_adjust(left=0.35, right=0.95, top=0.8, bottom=0.2)
+    make_plot(fig, ax, nom_central, nom_down, nom_up, xvals, xerlo, xerhi, yvals, ylabs)
+    ax.set_xlim([-0.45, 0.45])
+    ax.set_xticks([-0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4])
+    fig.savefig("regions_stability_test.pdf")
+
 
 @cli.command("year-b0-test")
 def year_b0_test():
