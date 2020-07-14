@@ -34,6 +34,21 @@ rp-conf.py tunable $OUTDIR/standard_presel_plots.conf \
            --do-valplots \
            --is-preselection
 
+rp-conf.py tunable $OUTDIR/standard_presel_fit.conf \
+           --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1' \
+           --fit-data \
+           --is-preselection
+
+rp-conf.py tunable $OUTDIR/standard_presel_asimov.conf \
+           --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1' \
+           --is-preselection
+
 # --bin-1j1b '12,0.35,0.76' \
 # --bin-2j1b '12,0.22,0.70' \
 # --bin-2j2b '12,0.45,0.775' \
