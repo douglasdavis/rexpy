@@ -74,6 +74,7 @@ def simple_setup1(outname):
 @click.option("--sel-1j1b", type=str, default=rpb.DEF_1j1b_sels, help="1j1b region selection setting")
 @click.option("--sel-2j1b", type=str, default=rpb.DEF_2j1b_sels, help="2j1b region selection setting")
 @click.option("--sel-2j2b", type=str, default=rpb.DEF_2j2b_sels, help="2j2b region selection setting")
+@click.option("--herwig-version", type=click.Choice(["704", "713"]), default="713", help="ttbar Herwig version")
 @click.option("--drop-sys", type=str, help="Drop a systematic")
 @click.option("--skip-tables", is_flag=True, help="Don't produce tables")
 @click.option("--skip-sys-plots", is_flag=True, help="Don't produce red/blue plots")
@@ -94,6 +95,7 @@ def tunable(
     sel_1j1b,
     sel_2j1b,
     sel_2j2b,
+    herwig_version,
     drop_sys,
     skip_tables,
     skip_sys_plots,
@@ -140,7 +142,7 @@ def tunable(
             print("", file=f)
         print(SAMPLE_BLOCKS, file=f)
         print(NORMFACTOR_BLOCKS, file=f)
-        print(modeling_blocks(rpb.NTUP_DIR, sel_1j1b, sel_2j1b, sel_2j2b), file=f)
+        print(modeling_blocks(rpb.NTUP_DIR, sel_1j1b, sel_2j1b, sel_2j2b, herwig_version), file=f)
         rpb.const_sys_blocks(f)
     if do_valplots:
         fix_systematics(outname)

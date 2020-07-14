@@ -79,6 +79,7 @@ def norm_uncertainties_ttbar(
     sel_1j1b="OS==1 && reg1j1b==1",
     sel_2j1b="OS==1 && reg2j1b==1",
     sel_2j2b="OS==1 && reg2j2b==1",
+    herwig_dsid="410558",
 ):
     pp8_files = (
         "ttbar_410472_AFII_MC16a_nominal,"
@@ -86,9 +87,9 @@ def norm_uncertainties_ttbar(
         "ttbar_410472_AFII_MC16e_nominal"
     )
     ph7_files = (
-        "ttbar_411234_AFII_MC16a_nominal,"
-        "ttbar_411234_AFII_MC16d_nominal,"
-        "ttbar_411234_AFII_MC16e_nominal"
+        f"ttbar_{herwig_dsid}_AFII_MC16a_nominal,"
+        f"ttbar_{herwig_dsid}_AFII_MC16d_nominal,"
+        f"ttbar_{herwig_dsid}_AFII_MC16e_nominal"
     )
     return norm_uncertainties(
         ntup_dir, pp8_files, ph7_files, sel_1j1b, sel_2j1b, sel_2j2b

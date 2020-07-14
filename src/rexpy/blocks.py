@@ -649,9 +649,9 @@ def tW_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
     )
 
 
-def ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
+def ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_dsid):
     overall, m1j1b, m2j1b, m2j2b = norm_uncertainties_ttbar(
-        ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b
+        ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_dsid,
     )
     return dedent(
         """\
@@ -697,14 +697,20 @@ def ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
     )
 
 
-def shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
-    tW = tW_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b)
-    ttbar = ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b)
-    return "{}\n\n{}".format(tW, ttbar)
+def herwig_version_to_dsid(herwig_version):
+    if herwig_version == "704":
+        return "410558"
+    elif herwig_version == "713":
+        return "411234"
+    else:
+        raise ValueError("Bad Herwig version")
 
 
-def modeling_blocks(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
-    shower_norm_blocks = shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b)
+def modeling_blocks(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_version):
+    herwig_dsid = herwig_version_to_dsid(herwig_version)
+    tW_norms = tW_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b)
+    ttbar_norms = ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_dsid)
+    shower_norm_blocks = "{}\n\n{}".format(tW_norms, ttbar_norms)
     return '''\
 Systematic: "tW_DRDS"
   Category: "Modeling"
@@ -714,7 +720,7 @@ Systematic: "tW_DRDS"
   Type: HISTO
   NtupleFilesUp: tW_DS_410657_FS_MC16d_nominal,tW_DS_410657_FS_MC16e_nominal,tW_DS_410657_FS_MC16a_nominal,tW_DS_410656_FS_MC16e_nominal,tW_DS_410656_FS_MC16a_nominal,tW_DS_410656_FS_MC16d_nominal
 
-{0}
+{shower_norm_blocks}
 
 Systematic: "tW_PS_1j1b"
   Category: "Modeling"
@@ -758,7 +764,7 @@ Systematic: "ttbar_PS_1j1b"
   Samples: ttbar
   Type: HISTO
   Regions: reg1j1b
-  NtupleFilesUp: ttbar_411234_AFII_MC16a_nominal,ttbar_411234_AFII_MC16d_nominal,ttbar_411234_AFII_MC16e_nominal
+  NtupleFilesUp: ttbar_{herwig_dsid}_AFII_MC16a_nominal,ttbar_{herwig_dsid}_AFII_MC16d_nominal,ttbar_{herwig_dsid}_AFII_MC16e_nominal
 
 Systematic: "ttbar_PS_2j1b"
   Category: "Modeling"
@@ -769,7 +775,7 @@ Systematic: "ttbar_PS_2j1b"
   Samples: ttbar
   Type: HISTO
   Regions: reg2j1b
-  NtupleFilesUp: ttbar_411234_AFII_MC16a_nominal,ttbar_411234_AFII_MC16d_nominal,ttbar_411234_AFII_MC16e_nominal
+  NtupleFilesUp: ttbar_{herwig_dsid}_AFII_MC16a_nominal,ttbar_{herwig_dsid}_AFII_MC16d_nominal,ttbar_{herwig_dsid}_AFII_MC16e_nominal
 
 Systematic: "ttbar_PS_2j2b"
   Category: "Modeling"
@@ -780,7 +786,7 @@ Systematic: "ttbar_PS_2j2b"
   Samples: ttbar
   Type: HISTO
   Regions: reg2j2b
-  NtupleFilesUp: ttbar_411234_AFII_MC16a_nominal,ttbar_411234_AFII_MC16d_nominal,ttbar_411234_AFII_MC16e_nominal
+  NtupleFilesUp: ttbar_{herwig_dsid}_AFII_MC16a_nominal,ttbar_{herwig_dsid}_AFII_MC16d_nominal,ttbar_{herwig_dsid}_AFII_MC16e_nominal
 
 Systematic: "tW_AR_ISR_scale_muR_1j1b"
   Category: "Modeling"
@@ -1078,4 +1084,4 @@ Systematic: "ttbar_ptreweight_2j2b"
   Samples: ttbar
   Type: HISTO
   Regions: reg2j2b
-'''.format(shower_norm_blocks)
+'''.format(shower_norm_blocks=shower_norm_blocks, herwig_dsid=herwig_dsid)
