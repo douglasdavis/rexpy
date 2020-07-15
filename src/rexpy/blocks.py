@@ -14,7 +14,7 @@ NTUP_DIR = None
 if Path("/atlasgpfs01/usatlas/data/ddavis").exists():
     NTUP_DIR = "/atlasgpfs01/usatlas/data/ddavis/wtloop/WTA01_20200506"
 else:
-    NTUP_DIR = "/home/ddavis/atlas/data/wtloop/WTA01_20200506"
+    NTUP_DIR = "/ddd/atlas/data/wtloop/WTA01_20200506"
 
 DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"
 DEF_1j1b_swmc = "reg1j1b == 1 && OS == 1 && mass_lep1jet1 < 155 && mass_lep2jet1 < 155"
