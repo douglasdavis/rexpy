@@ -160,43 +160,43 @@ NTSysTree1s = namedtuple("SysTree1s" , "branch category smoothing title tiny")
 SYS_WEIGHTS = OrderedDict()
 SYS_WEIGHTS["JVT"]          = NTSysWeight("weight_sys_jvt_UP"                          , "weight_sys_jvt_DOWN"                          , "Instrumental" , "40", "JVT"                 , False)
 SYS_WEIGHTS["Pileup"]       = NTSysWeight("weight_sys_pileup_UP"                       , "weight_sys_pileup_DOWN"                       , "Instrumental" , "40", "Pileup"              , False)
-SYS_WEIGHTS["EL_Trig"]      = NTSysWeight("weight_sys_leptonSF_EL_SF_Trigger_UP"       , "weight_sys_leptonSF_EL_SF_Trigger_DOWN"       , "WeightLepSFs" , "40", "Electron Trig"       , False)
-SYS_WEIGHTS["EL_Reco"]      = NTSysWeight("weight_sys_leptonSF_EL_SF_Reco_UP"          , "weight_sys_leptonSF_EL_SF_Reco_DOWN"          , "WeightLepSFs" , "40", "Electron Reco"       , False)
-SYS_WEIGHTS["EL_ID"]        = NTSysWeight("weight_sys_leptonSF_EL_SF_ID_UP"            , "weight_sys_leptonSF_EL_SF_ID_DOWN"            , "WeightLepSFs" , "40", "Electron ID"         , False)
-SYS_WEIGHTS["EL_Isol"]      = NTSysWeight("weight_sys_leptonSF_EL_SF_Isol_UP"          , "weight_sys_leptonSF_EL_SF_Isol_DOWN"          , "WeightLepSFs" , "40", "Electron Isol"       , False)
-SYS_WEIGHTS["MU_TrigStat"]  = NTSysWeight("weight_sys_leptonSF_MU_SF_Trigger_STAT_UP"  , "weight_sys_leptonSF_MU_SF_Trigger_STAT_DOWN"  , "WeightLepSFs" , "40", "Muon Trig Stat"      , False)
-SYS_WEIGHTS["MU_TrigSyst"]  = NTSysWeight("weight_sys_leptonSF_MU_SF_Trigger_SYST_UP"  , "weight_sys_leptonSF_MU_SF_Trigger_SYST_DOWN"  , "WeightLepSFs" , "40", "Muon Trig Syst"      , False)
-SYS_WEIGHTS["MU_IDStat"]    = NTSysWeight("weight_sys_leptonSF_MU_SF_ID_STAT_UP"       , "weight_sys_leptonSF_MU_SF_ID_STAT_DOWN"       , "WeightLepSFs" , "40", "Muon ID Stat"        , False)
-SYS_WEIGHTS["MU_IDSyst"]    = NTSysWeight("weight_sys_leptonSF_MU_SF_ID_SYST_UP"       , "weight_sys_leptonSF_MU_SF_ID_SYST_DOWN"       , "WeightLepSFs" , "40", "Muon ID Syst"        , False)
-SYS_WEIGHTS["MU_IDStatLPT"] = NTSysWeight("weight_sys_leptonSF_MU_SF_ID_STAT_LOWPT_UP" , "weight_sys_leptonSF_MU_SF_ID_STAT_LOWPT_DOWN" , "WeightLepSFs" , "40", "Muon ID Stat Low PT" , False)
-SYS_WEIGHTS["MU_IDSystLPT"] = NTSysWeight("weight_sys_leptonSF_MU_SF_ID_SYST_LOWPT_UP" , "weight_sys_leptonSF_MU_SF_ID_SYST_LOWPT_DOWN" , "WeightLepSFs" , "40", "Muon ID Syst Low PT" , False)
-SYS_WEIGHTS["MU_IsolStat"]  = NTSysWeight("weight_sys_leptonSF_MU_SF_Isol_STAT_UP"     , "weight_sys_leptonSF_MU_SF_Isol_STAT_DOWN"     , "WeightLepSFs" , "40", "Muon Isol Stat"      , False)
-SYS_WEIGHTS["MU_IsolSyst"]  = NTSysWeight("weight_sys_leptonSF_MU_SF_Isol_SYST_UP"     , "weight_sys_leptonSF_MU_SF_Isol_SYST_DOWN"     , "WeightLepSFs" , "40", "Muon Isol Syst"      , False)
-SYS_WEIGHTS["MU_TTVAStat"]  = NTSysWeight("weight_sys_leptonSF_MU_SF_TTVA_STAT_UP"     , "weight_sys_leptonSF_MU_SF_TTVA_STAT_DOWN"     , "WeightLepSFs" , "40", "Muon TTVA Stat"      , False)
-SYS_WEIGHTS["MU_TTVASyst"]  = NTSysWeight("weight_sys_leptonSF_MU_SF_TTVA_SYST_UP"     , "weight_sys_leptonSF_MU_SF_TTVA_SYST_DOWN"     , "WeightLepSFs" , "40", "Muon TTVA Syst"      , False)
+SYS_WEIGHTS["EL_Trig"]      = NTSysWeight("weight_sys_leptonSF_EL_SF_Trigger_UP"       , "weight_sys_leptonSF_EL_SF_Trigger_DOWN"       , "Electrons" , "40", "Electron Trig"       , False)
+SYS_WEIGHTS["EL_Reco"]      = NTSysWeight("weight_sys_leptonSF_EL_SF_Reco_UP"          , "weight_sys_leptonSF_EL_SF_Reco_DOWN"          , "Electrons" , "40", "Electron Reco"       , False)
+SYS_WEIGHTS["EL_ID"]        = NTSysWeight("weight_sys_leptonSF_EL_SF_ID_UP"            , "weight_sys_leptonSF_EL_SF_ID_DOWN"            , "Electrons" , "40", "Electron ID"         , False)
+SYS_WEIGHTS["EL_Isol"]      = NTSysWeight("weight_sys_leptonSF_EL_SF_Isol_UP"          , "weight_sys_leptonSF_EL_SF_Isol_DOWN"          , "Electrons" , "40", "Electron Isol"       , False)
+SYS_WEIGHTS["MU_TrigStat"]  = NTSysWeight("weight_sys_leptonSF_MU_SF_Trigger_STAT_UP"  , "weight_sys_leptonSF_MU_SF_Trigger_STAT_DOWN"  , "Muons" , "40", "Muon Trig Stat"      , False)
+SYS_WEIGHTS["MU_TrigSyst"]  = NTSysWeight("weight_sys_leptonSF_MU_SF_Trigger_SYST_UP"  , "weight_sys_leptonSF_MU_SF_Trigger_SYST_DOWN"  , "Muons" , "40", "Muon Trig Syst"      , False)
+SYS_WEIGHTS["MU_IDStat"]    = NTSysWeight("weight_sys_leptonSF_MU_SF_ID_STAT_UP"       , "weight_sys_leptonSF_MU_SF_ID_STAT_DOWN"       , "Muons" , "40", "Muon ID Stat"        , False)
+SYS_WEIGHTS["MU_IDSyst"]    = NTSysWeight("weight_sys_leptonSF_MU_SF_ID_SYST_UP"       , "weight_sys_leptonSF_MU_SF_ID_SYST_DOWN"       , "Muons" , "40", "Muon ID Syst"        , False)
+SYS_WEIGHTS["MU_IDStatLPT"] = NTSysWeight("weight_sys_leptonSF_MU_SF_ID_STAT_LOWPT_UP" , "weight_sys_leptonSF_MU_SF_ID_STAT_LOWPT_DOWN" , "Muons" , "40", "Muon ID Stat Low PT" , False)
+SYS_WEIGHTS["MU_IDSystLPT"] = NTSysWeight("weight_sys_leptonSF_MU_SF_ID_SYST_LOWPT_UP" , "weight_sys_leptonSF_MU_SF_ID_SYST_LOWPT_DOWN" , "Muons" , "40", "Muon ID Syst Low PT" , False)
+SYS_WEIGHTS["MU_IsolStat"]  = NTSysWeight("weight_sys_leptonSF_MU_SF_Isol_STAT_UP"     , "weight_sys_leptonSF_MU_SF_Isol_STAT_DOWN"     , "Muons" , "40", "Muon Isol Stat"      , False)
+SYS_WEIGHTS["MU_IsolSyst"]  = NTSysWeight("weight_sys_leptonSF_MU_SF_Isol_SYST_UP"     , "weight_sys_leptonSF_MU_SF_Isol_SYST_DOWN"     , "Muons" , "40", "Muon Isol Syst"      , False)
+SYS_WEIGHTS["MU_TTVAStat"]  = NTSysWeight("weight_sys_leptonSF_MU_SF_TTVA_STAT_UP"     , "weight_sys_leptonSF_MU_SF_TTVA_STAT_DOWN"     , "Muons" , "40", "Muon TTVA Stat"      , False)
+SYS_WEIGHTS["MU_TTVASyst"]  = NTSysWeight("weight_sys_leptonSF_MU_SF_TTVA_SYST_UP"     , "weight_sys_leptonSF_MU_SF_TTVA_SYST_DOWN"     , "Muons" , "40", "Muon TTVA Syst"      , False)
 
 
-SYS_WEIGHTS["B_ev_B_0"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_0_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_0_down", "WeightFT_B", "40", "b-tag ev B0", False)
-SYS_WEIGHTS["B_ev_B_1"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_1_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_1_down", "WeightFT_B", "40", "b-tag ev B1", False)
-SYS_WEIGHTS["B_ev_B_2"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_2_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_2_down", "WeightFT_B", "40", "b-tag ev B2", False)
-SYS_WEIGHTS["B_ev_B_3"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_3_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_3_down", "WeightFT_B", "40", "b-tag ev B3", False)
-SYS_WEIGHTS["B_ev_B_4"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_4_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_4_down", "WeightFT_B", "40", "b-tag ev B4", False)
-SYS_WEIGHTS["B_ev_B_5"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_5_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_5_down", "WeightFT_B", "40", "b-tag ev B5", False)
-SYS_WEIGHTS["B_ev_B_6"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_6_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_6_down", "WeightFT_B", "40", "b-tag ev B6", False)
-SYS_WEIGHTS["B_ev_B_7"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_7_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_7_down", "WeightFT_B", "40", "b-tag ev B7", False)
-SYS_WEIGHTS["B_ev_B_8"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_8_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_8_down", "WeightFT_B", "40", "b-tag ev B8", False)
-SYS_WEIGHTS["B_ev_C_0"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_C_0_up", "weight_sys_bTagSF_DL1r_77_eigenvars_C_0_down", "WeightFT_C", "40", "b-tag ev C0", False)
-SYS_WEIGHTS["B_ev_C_1"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_C_1_up", "weight_sys_bTagSF_DL1r_77_eigenvars_C_1_down", "WeightFT_C", "40", "b-tag ev C1", False)
-SYS_WEIGHTS["B_ev_C_2"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_C_2_up", "weight_sys_bTagSF_DL1r_77_eigenvars_C_2_down", "WeightFT_C", "40", "b-tag ev C2", False)
-SYS_WEIGHTS["B_ev_C_3"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_C_3_up", "weight_sys_bTagSF_DL1r_77_eigenvars_C_3_down", "WeightFT_C", "40", "b-tag ev C3", False)
-SYS_WEIGHTS["B_ev_C_4"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_C_4_up", "weight_sys_bTagSF_DL1r_77_eigenvars_C_4_down", "WeightFT_C", "40", "b-tag ev C4", False)
-SYS_WEIGHTS["B_ev_L_0"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_Light_0_up", "weight_sys_bTagSF_DL1r_77_eigenvars_Light_0_down", "WeightFT_L", "40", "b-tag ev L0", False)
-SYS_WEIGHTS["B_ev_L_1"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_Light_1_up", "weight_sys_bTagSF_DL1r_77_eigenvars_Light_1_down", "WeightFT_L", "40", "b-tag ev L1", False)
-SYS_WEIGHTS["B_ev_L_2"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_Light_2_up", "weight_sys_bTagSF_DL1r_77_eigenvars_Light_2_down", "WeightFT_L", "40", "b-tag ev L2", False)
-SYS_WEIGHTS["B_ev_L_3"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_Light_3_up", "weight_sys_bTagSF_DL1r_77_eigenvars_Light_3_down", "WeightFT_L", "40", "b-tag ev L3", False)
-SYS_WEIGHTS["B_ev_L_4"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_Light_4_up", "weight_sys_bTagSF_DL1r_77_eigenvars_Light_4_down", "WeightFT_L", "40", "b-tag ev L4", False)
-SYS_WEIGHTS["B_ev_extrap"]   = NTSysWeight("weight_sys_bTagSF_DL1r_77_extrapolation_up", "weight_sys_bTagSF_DL1r_77_extrapolation_down", "WeightFT_Extrap", "40", "b-tag extrap", False)
-SYS_WEIGHTS["B_ev_extrapfc"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_extrapolation_from_charm_up", "weight_sys_bTagSF_DL1r_77_extrapolation_from_charm_down", "WeightFT_ExtrapFromCharm", "40", "b-tag extrap from charm", False)
+SYS_WEIGHTS["B_ev_B_0"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_0_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_0_down", "FlavorTagging", "40", "b-tag ev B0", False)
+SYS_WEIGHTS["B_ev_B_1"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_1_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_1_down", "FlavorTagging", "40", "b-tag ev B1", False)
+SYS_WEIGHTS["B_ev_B_2"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_2_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_2_down", "FlavorTagging", "40", "b-tag ev B2", False)
+SYS_WEIGHTS["B_ev_B_3"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_3_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_3_down", "FlavorTagging", "40", "b-tag ev B3", False)
+SYS_WEIGHTS["B_ev_B_4"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_4_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_4_down", "FlavorTagging", "40", "b-tag ev B4", False)
+SYS_WEIGHTS["B_ev_B_5"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_5_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_5_down", "FlavorTagging", "40", "b-tag ev B5", False)
+SYS_WEIGHTS["B_ev_B_6"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_6_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_6_down", "FlavorTagging", "40", "b-tag ev B6", False)
+SYS_WEIGHTS["B_ev_B_7"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_7_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_7_down", "FlavorTagging", "40", "b-tag ev B7", False)
+SYS_WEIGHTS["B_ev_B_8"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_B_8_up", "weight_sys_bTagSF_DL1r_77_eigenvars_B_8_down", "FlavorTagging", "40", "b-tag ev B8", False)
+SYS_WEIGHTS["B_ev_C_0"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_C_0_up", "weight_sys_bTagSF_DL1r_77_eigenvars_C_0_down", "FlavorTagging", "40", "b-tag ev C0", False)
+SYS_WEIGHTS["B_ev_C_1"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_C_1_up", "weight_sys_bTagSF_DL1r_77_eigenvars_C_1_down", "FlavorTagging", "40", "b-tag ev C1", False)
+SYS_WEIGHTS["B_ev_C_2"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_C_2_up", "weight_sys_bTagSF_DL1r_77_eigenvars_C_2_down", "FlavorTagging", "40", "b-tag ev C2", False)
+SYS_WEIGHTS["B_ev_C_3"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_C_3_up", "weight_sys_bTagSF_DL1r_77_eigenvars_C_3_down", "FlavorTagging", "40", "b-tag ev C3", False)
+SYS_WEIGHTS["B_ev_C_4"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_C_4_up", "weight_sys_bTagSF_DL1r_77_eigenvars_C_4_down", "FlavorTagging", "40", "b-tag ev C4", False)
+SYS_WEIGHTS["B_ev_L_0"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_Light_0_up", "weight_sys_bTagSF_DL1r_77_eigenvars_Light_0_down", "FlavorTagging", "40", "b-tag ev L0", False)
+SYS_WEIGHTS["B_ev_L_1"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_Light_1_up", "weight_sys_bTagSF_DL1r_77_eigenvars_Light_1_down", "FlavorTagging", "40", "b-tag ev L1", False)
+SYS_WEIGHTS["B_ev_L_2"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_Light_2_up", "weight_sys_bTagSF_DL1r_77_eigenvars_Light_2_down", "FlavorTagging", "40", "b-tag ev L2", False)
+SYS_WEIGHTS["B_ev_L_3"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_Light_3_up", "weight_sys_bTagSF_DL1r_77_eigenvars_Light_3_down", "FlavorTagging", "40", "b-tag ev L3", False)
+SYS_WEIGHTS["B_ev_L_4"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_eigenvars_Light_4_up", "weight_sys_bTagSF_DL1r_77_eigenvars_Light_4_down", "FlavorTagging", "40", "b-tag ev L4", False)
+SYS_WEIGHTS["B_ev_extrap"]   = NTSysWeight("weight_sys_bTagSF_DL1r_77_extrapolation_up", "weight_sys_bTagSF_DL1r_77_extrapolation_down", "FlavorTagging", "40", "b-tag extrap", False)
+SYS_WEIGHTS["B_ev_extrapfc"] = NTSysWeight("weight_sys_bTagSF_DL1r_77_extrapolation_from_charm_up", "weight_sys_bTagSF_DL1r_77_extrapolation_from_charm_down", "FlavorTagging", "40", "b-tag extrap from charm", False)
 
 
 PDF_WEIGHTS = OrderedDict()
@@ -233,8 +233,8 @@ PDF_WEIGHTS["PDFset90930"] = NTSysPDF("weight_sys_PDFset_90930", "PDF", "40", "P
 
 
 SYS_TREES_TWOSIDED = OrderedDict()
-SYS_TREES_TWOSIDED["EG_RES_ALL"                        ] = NTSysTree2s("EG_RESOLUTION_ALL__1up"                                             , "EG_RESOLUTION_ALL__1down"                                             , "LeptonInstrum" , "40", "EGamma Resolution"          , False)
-SYS_TREES_TWOSIDED["EG_SCALE_ALL"                      ] = NTSysTree2s("EG_SCALE_ALL__1up"                                                  , "EG_SCALE_ALL__1down"                                                  , "LeptonInstrum" , "40", "EGamma Scale"               , False)
+SYS_TREES_TWOSIDED["EG_RES_ALL"                        ] = NTSysTree2s("EG_RESOLUTION_ALL__1up"                                             , "EG_RESOLUTION_ALL__1down"                                             , "Electrons" , "40", "EGamma Resolution"          , False)
+SYS_TREES_TWOSIDED["EG_SCALE_ALL"                      ] = NTSysTree2s("EG_SCALE_ALL__1up"                                                  , "EG_SCALE_ALL__1down"                                                  , "Electrons" , "40", "EGamma Scale"               , False)
 SYS_TREES_TWOSIDED["Jet_BJES_Response"                 ] = NTSysTree2s("CategoryReduction_JET_BJES_Response__1up"                           , "CategoryReduction_JET_BJES_Response__1down"                           , "Jets"   , "40", "Jet BJES Response"                 , False)
 SYS_TREES_TWOSIDED["Jet_EffectiveNP_Detector1"         ] = NTSysTree2s("CategoryReduction_JET_EffectiveNP_Detector1__1up"                   , "CategoryReduction_JET_EffectiveNP_Detector1__1down"                   , "Jets"   , "40", "Jet EffectiveNP Detector1"         , False)
 SYS_TREES_TWOSIDED["Jet_EffectiveNP_Detector2"         ] = NTSysTree2s("CategoryReduction_JET_EffectiveNP_Detector2__1up"                   , "CategoryReduction_JET_EffectiveNP_Detector2__1down"                   , "Jets"   , "40", "Jet EffectiveNP Detector2"         , False)
@@ -266,11 +266,11 @@ SYS_TREES_TWOSIDED["Jet_Pileup_RhoTopology"            ] = NTSysTree2s("Category
 SYS_TREES_TWOSIDED["Jet_PunchThrough_MC16"             ] = NTSysTree2s("CategoryReduction_JET_PunchThrough_MC16__1up"                       , "CategoryReduction_JET_PunchThrough_MC16__1down"                       , "Jets"   , "40", "Jet PunchThrough MC16"             , False)
 SYS_TREES_TWOSIDED["Jet_SingleParticle_HighPt"         ] = NTSysTree2s("CategoryReduction_JET_SingleParticle_HighPt__1up"                   , "CategoryReduction_JET_SingleParticle_HighPt__1down"                   , "Jets"   , "40", "Jet SingleParticle HighPt"         , False)
 SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"                 ] = NTSysTree2s("MET_SoftTrk_ScaleUp"                                                , "MET_SoftTrk_ScaleDown"                                                , "MET"    , "40", "MET SoftTrk Scale"                 , False)
-SYS_TREES_TWOSIDED["MUON_ID"                           ] = NTSysTree2s("MUON_ID__1up"                                                       , "MUON_ID__1down"                                                       , "LeptonInstrum"   , "40", "Muon ID"                  , False)
-SYS_TREES_TWOSIDED["MUON_MS"                           ] = NTSysTree2s("MUON_MS__1up"                                                       , "MUON_MS__1down"                                                       , "LeptonInstrum"   , "40", "Muon MS"                  , False)
-SYS_TREES_TWOSIDED["MUON_SAGITTA_RESBIAS"              ] = NTSysTree2s("MUON_SAGITTA_RESBIAS__1up"                                          , "MUON_SAGITTA_RESBIAS__1down"                                          , "LeptonInstrum"   , "40", "Muon Sagitta Resbias"     , False)
-SYS_TREES_TWOSIDED["MUON_SAGITTA_RHO"                  ] = NTSysTree2s("MUON_SAGITTA_RHO__1up"                                              , "MUON_SAGITTA_RHO__1down"                                              , "LeptonInstrum"   , "40", "Muon Sagitta Rho"         , False)
-SYS_TREES_TWOSIDED["MUON_SCALE"                        ] = NTSysTree2s("MUON_SCALE__1up"                                                    , "MUON_SCALE__1down"                                                    , "LeptonInstrum"   , "40", "Muon Scale"               , False)
+SYS_TREES_TWOSIDED["MUON_ID"                           ] = NTSysTree2s("MUON_ID__1up"                                                       , "MUON_ID__1down"                                                       , "Muons"   , "40", "Muon ID"                  , False)
+SYS_TREES_TWOSIDED["MUON_MS"                           ] = NTSysTree2s("MUON_MS__1up"                                                       , "MUON_MS__1down"                                                       , "Muons"   , "40", "Muon MS"                  , False)
+SYS_TREES_TWOSIDED["MUON_SAGITTA_RESBIAS"              ] = NTSysTree2s("MUON_SAGITTA_RESBIAS__1up"                                          , "MUON_SAGITTA_RESBIAS__1down"                                          , "Muons"   , "40", "Muon Sagitta Resbias"     , False)
+SYS_TREES_TWOSIDED["MUON_SAGITTA_RHO"                  ] = NTSysTree2s("MUON_SAGITTA_RHO__1up"                                              , "MUON_SAGITTA_RHO__1down"                                              , "Muons"   , "40", "Muon Sagitta Rho"         , False)
+SYS_TREES_TWOSIDED["MUON_SCALE"                        ] = NTSysTree2s("MUON_SCALE__1up"                                                    , "MUON_SCALE__1down"                                                    , "Muons"   , "40", "Muon Scale"               , False)
 
 SYS_TREES_ONESIDED = OrderedDict()
 SYS_TREES_ONESIDED["MET_SoftTrk_ResoPara"          ] = NTSysTree1s("MET_SoftTrk_ResoPara"                                    , "MET"   , "40", "MET SoftTrk ResoPara"      , False)
@@ -512,7 +512,7 @@ Systematic: "Norm_Diboson_1j1b"
   Samples: Diboson
   OverallUp: 0.22
   OverallDown: -0.22
-  Category: "Norms"
+  Category: "MinorBkgNorms"
 
 Systematic: "Norm_Diboson_2j1b"
   Type: OVERALL
@@ -521,7 +521,7 @@ Systematic: "Norm_Diboson_2j1b"
   Samples: Diboson
   OverallUp: 0.22
   OverallDown: -0.22
-  Category: "Norms"
+  Category: "MinorBkgNorms"
 
 Systematic: "Norm_Diboson_2j2b"
   Type: OVERALL
@@ -530,7 +530,7 @@ Systematic: "Norm_Diboson_2j2b"
   Samples: Diboson
   OverallUp: 0.13
   OverallDown: -0.13
-  Category: "Norms"
+  Category: "MinorBkgNorms"
 
 Systematic: "Norm_Zjets_1j1b"
   Type: OVERALL
@@ -539,7 +539,7 @@ Systematic: "Norm_Zjets_1j1b"
   Samples: Zjets
   OverallUp: 0.11
   OverallDown: -0.11
-  Category: "Norms"
+  Category: "MinorBkgNorms"
 
 Systematic: "Norm_Zjets_2j1b"
   Type: OVERALL
@@ -548,7 +548,7 @@ Systematic: "Norm_Zjets_2j1b"
   Samples: Zjets
   OverallUp: 0.11
   OverallDown: -0.11
-  Category: "Norms"
+  Category: "MinorBkgNorms"
 
 Systematic: "Norm_Zjets_2j2b"
   Type: OVERALL
@@ -557,7 +557,7 @@ Systematic: "Norm_Zjets_2j2b"
   Samples: Zjets
   OverallUp: 0.17
   OverallDown: -0.17
-  Category: "Norms"
+  Category: "MinorBkgNorms"
 
 Systematic: "Norm_MCNP_1j1b"
   Type: OVERALL
@@ -566,7 +566,7 @@ Systematic: "Norm_MCNP_1j1b"
   Samples: MCNP
   OverallUp: 0.5
   OverallDown: -0.5
-  Category: "Norms"
+  Category: "MinorBkgNorms"
 
 Systematic: "Norm_MCNP_2j1b"
   Type: OVERALL
@@ -575,7 +575,7 @@ Systematic: "Norm_MCNP_2j1b"
   Samples: MCNP
   OverallUp: 0.5
   OverallDown: -0.5
-  Category: "Norms"
+  Category: "MinorBkgNorms"
 
 Systematic: "Norm_MCNP_2j2b"
   Type: OVERALL
@@ -584,11 +584,11 @@ Systematic: "Norm_MCNP_2j2b"
   Samples: MCNP
   OverallUp: 0.5
   OverallDown: -0.5
-  Category: "Norms"
+  Category: "MinorBkgNorms"
 
 Systematic: "Lumi"
   OverallDown: -0.017
-  Category: Instrumental
+  Category: "Luminosity"
   OverallUp: 0.017
   Title: "Lumi"
   Samples: tW,ttbar
@@ -608,7 +608,7 @@ def tW_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
     return dedent(
         """\
     Systematic: "tW_PS_norm"
-      Category: "Modeling"
+      Category: "SignalModel"
       Title: "tW Parton Shower Norm"
       Type: OVERALL
       OverallUp: {0}
@@ -616,7 +616,7 @@ def tW_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
       Samples: tW
 
     Systematic: "tW_PS_migration"
-      Category: "Modeling"
+      Category: "SignalModel"
       Title: "tW Parton Shower Migration"
       NuisanceParameter: "tW_PS_migration"
       Type: OVERALL
@@ -626,7 +626,7 @@ def tW_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
       Regions: reg1j1b
 
     Systematic: "tW_PS_migration"
-      Category: "Modeling"
+      Category: "SignalModel"
       Title: "tW Parton Shower Migration"
       NuisanceParameter: "tW_PS_migration"
       Type: OVERALL
@@ -636,7 +636,7 @@ def tW_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
       Regions: reg2j1b
 
     Systematic: "tW_PS_migration"
-      Category: "Modeling"
+      Category: "SignalModel"
       Title: "tW Parton Shower Migration"
       NuisanceParameter: "tW_PS_migration"
       Type: OVERALL
@@ -656,7 +656,7 @@ def ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_dsid):
     return dedent(
         """\
     Systematic: "ttbar_PS_norm"
-      Category: "Modeling"
+      Category: "BackgroundModel"
       Title: "ttbar Parton Shower Norm"
       Type: OVERALL
       OverallUp: {0}
@@ -664,7 +664,7 @@ def ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_dsid):
       Samples: ttbar
 
     Systematic: "ttbar_PS_migration"
-      Category: "Modeling"
+      Category: "BackgroundModel"
       Title: "ttbar Parton Shower Migration"
       NuisanceParameter: "ttbar_PS_migration"
       Type: OVERALL
@@ -674,7 +674,7 @@ def ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_dsid):
       Regions: reg1j1b
 
     Systematic: "ttbar_PS_migration"
-      Category: "Modeling"
+      Category: "BackgroundModel"
       Title: "ttbar Parton Shower Migration"
       NuisanceParameter: "ttbar_PS_migration"
       Type: OVERALL
@@ -684,7 +684,7 @@ def ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_dsid):
       Regions: reg2j1b
 
     Systematic: "ttbar_PS_migration"
-      Category: "Modeling"
+      Category: "BackgroundModel"
       Title: "ttbar Parton Shower Migration"
       NuisanceParameter: "ttbar_PS_migration"
       Type: OVERALL
@@ -713,7 +713,7 @@ def modeling_blocks(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_version):
     shower_norm_blocks = "{}\n\n{}".format(tW_norms, ttbar_norms)
     return '''\
 Systematic: "tW_DRDS"
-  Category: "Modeling"
+  Category: "SignalModel"
   Symmetrisation: ONESIDED
   Samples: tW
   Title: "tW DR vs DS"
@@ -723,7 +723,7 @@ Systematic: "tW_DRDS"
 {shower_norm_blocks}
 
 Systematic: "tW_PS_1j1b"
-  Category: "Modeling"
+  Category: "SignalModel"
   Title: "tW Parton Shower Shape 1j1b"
   ReferenceSample: tW_AFII
   Symmetrisation: ONESIDED
@@ -734,7 +734,7 @@ Systematic: "tW_PS_1j1b"
   NtupleFilesUp: tW_DR_411038_AFII_MC16a_nominal,tW_DR_411038_AFII_MC16d_nominal,tW_DR_411039_AFII_MC16a_nominal,tW_DR_411039_AFII_MC16d_nominal,tW_DR_411038_AFII_MC16e_nominal,tW_DR_411039_AFII_MC16e_nominal
 
 Systematic: "tW_PS_2j1b"
-  Category: "Modeling"
+  Category: "SignalModel"
   Title: "tW Parton Shower Shape 2j1b"
   ReferenceSample: tW_AFII
   Symmetrisation: ONESIDED
@@ -745,7 +745,7 @@ Systematic: "tW_PS_2j1b"
   NtupleFilesUp: tW_DR_411038_AFII_MC16a_nominal,tW_DR_411038_AFII_MC16d_nominal,tW_DR_411039_AFII_MC16a_nominal,tW_DR_411039_AFII_MC16d_nominal,tW_DR_411038_AFII_MC16e_nominal,tW_DR_411039_AFII_MC16e_nominal
 
 Systematic: "tW_PS_2j2b"
-  Category: "Modeling"
+  Category: "SignalModel"
   Title: "tW Parton Shower Shape 2j2b"
   ReferenceSample: tW_AFII
   Symmetrisation: ONESIDED
@@ -756,7 +756,7 @@ Systematic: "tW_PS_2j2b"
   NtupleFilesUp: tW_DR_411038_AFII_MC16a_nominal,tW_DR_411038_AFII_MC16d_nominal,tW_DR_411039_AFII_MC16a_nominal,tW_DR_411039_AFII_MC16d_nominal,tW_DR_411038_AFII_MC16e_nominal,tW_DR_411039_AFII_MC16e_nominal
 
 Systematic: "ttbar_PS_1j1b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar Parton Shower Shape 1j1b"
   ReferenceSample: ttbar_AFII
   Symmetrisation: ONESIDED
@@ -767,7 +767,7 @@ Systematic: "ttbar_PS_1j1b"
   NtupleFilesUp: ttbar_{herwig_dsid}_AFII_MC16a_nominal,ttbar_{herwig_dsid}_AFII_MC16d_nominal,ttbar_{herwig_dsid}_AFII_MC16e_nominal
 
 Systematic: "ttbar_PS_2j1b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar Parton Shower Shape 2j1b"
   ReferenceSample: ttbar_AFII
   Symmetrisation: ONESIDED
@@ -778,7 +778,7 @@ Systematic: "ttbar_PS_2j1b"
   NtupleFilesUp: ttbar_{herwig_dsid}_AFII_MC16a_nominal,ttbar_{herwig_dsid}_AFII_MC16d_nominal,ttbar_{herwig_dsid}_AFII_MC16e_nominal
 
 Systematic: "ttbar_PS_2j2b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar Parton Shower Shape 2j2b"
   ReferenceSample: ttbar_AFII
   Symmetrisation: ONESIDED
@@ -789,7 +789,7 @@ Systematic: "ttbar_PS_2j2b"
   NtupleFilesUp: ttbar_{herwig_dsid}_AFII_MC16a_nominal,ttbar_{herwig_dsid}_AFII_MC16d_nominal,ttbar_{herwig_dsid}_AFII_MC16e_nominal
 
 Systematic: "tW_AR_ISR_scale_muR_1j1b"
-  Category: "Modeling"
+  Category: "SignalModel"
   Title: "tW ISR Scale muR Variation 1j1b"
   WeightUp: "weight_sys_scale_muR_20"
   WeightDown: "weight_sys_scale_muR_05"
@@ -799,7 +799,7 @@ Systematic: "tW_AR_ISR_scale_muR_1j1b"
   Regions: reg1j1b
 
 Systematic: "tW_AR_ISR_scale_muR_2j1b"
-  Category: "Modeling"
+  Category: "SignalModel"
   Title: "tW ISR Scale muR Variation 2j1b"
   WeightUp: "weight_sys_scale_muR_20"
   WeightDown: "weight_sys_scale_muR_05"
@@ -809,7 +809,7 @@ Systematic: "tW_AR_ISR_scale_muR_2j1b"
   Regions: reg2j1b
 
 Systematic: "tW_AR_ISR_scale_muR_2j2b"
-  Category: "Modeling"
+  Category: "SignalModel"
   Title: "tW ISR Scale muR Variation 2j2b"
   WeightUp: "weight_sys_scale_muR_20"
   WeightDown: "weight_sys_scale_muR_05"
@@ -819,7 +819,7 @@ Systematic: "tW_AR_ISR_scale_muR_2j2b"
   Regions: reg2j2b
 
 Systematic: "tW_AR_ISR_scale_muF_1j1b"
-  Category: "Modeling"
+  Category: "SignalModel"
   Title: "tW ISR Scale muF Variation 1j1b"
   WeightUp: "weight_sys_scale_muF_20"
   WeightDown: "weight_sys_scale_muF_05"
@@ -829,7 +829,7 @@ Systematic: "tW_AR_ISR_scale_muF_1j1b"
   Regions: reg1j1b
 
 Systematic: "tW_AR_ISR_scale_muF_2j1b"
-  Category: "Modeling"
+  Category: "SignalModel"
   Title: "tW ISR Scale muF Variation 2j1b"
   WeightUp: "weight_sys_scale_muF_20"
   WeightDown: "weight_sys_scale_muF_05"
@@ -839,7 +839,7 @@ Systematic: "tW_AR_ISR_scale_muF_2j1b"
   Regions: reg2j1b
 
 Systematic: "tW_AR_ISR_scale_muF_2j2b"
-  Category: "Modeling"
+  Category: "SignalModel"
   Title: "tW ISR Scale muF Variation 2j2b"
   WeightUp: "weight_sys_scale_muF_20"
   WeightDown: "weight_sys_scale_muF_05"
@@ -849,7 +849,7 @@ Systematic: "tW_AR_ISR_scale_muF_2j2b"
   Regions: reg2j2b
 
 Systematic: "tW_AR_ISR_A14_1j1b"
-  Category: "Modeling"
+  Category: "SignalModel"
   Title: "tW ISR A14 1j1b"
   WeightUp: "weight_sys_isr_alphaS_Var3cUp"
   WeightDown: "weight_sys_isr_alphaS_Var3cDown"
@@ -859,7 +859,7 @@ Systematic: "tW_AR_ISR_A14_1j1b"
   Regions: reg1j1b
 
 Systematic: "tW_AR_ISR_A14_2j1b"
-  Category: "Modeling"
+  Category: "SignalModel"
   Title: "tW ISR A14 2j1b"
   WeightUp: "weight_sys_isr_alphaS_Var3cUp"
   WeightDown: "weight_sys_isr_alphaS_Var3cDown"
@@ -869,7 +869,7 @@ Systematic: "tW_AR_ISR_A14_2j1b"
   Regions: reg2j1b
 
 Systematic: "tW_AR_ISR_A14_2j2b"
-  Category: "Modeling"
+  Category: "SignalModel"
   Title: "tW ISR A14 2j2b"
   WeightUp: "weight_sys_isr_alphaS_Var3cUp"
   WeightDown: "weight_sys_isr_alphaS_Var3cDown"
@@ -879,7 +879,7 @@ Systematic: "tW_AR_ISR_A14_2j2b"
   Regions: reg2j2b
 
 Systematic: "tW_AR_FSR_1j1b"
-  Category: "Modeling"
+  Category: "SignalModel"
   Title: "tW FSR 1j1b"
   WeightUp: "weight_sys_fsr_muR_20"
   WeightDown: "weight_sys_fsr_muR_05"
@@ -889,7 +889,7 @@ Systematic: "tW_AR_FSR_1j1b"
   Regions: reg1j1b
 
 Systematic: "tW_AR_FSR_2j1b"
-  Category: "Modeling"
+  Category: "SignalModel"
   Title: "tW FSR 2j1b"
   WeightUp: "weight_sys_fsr_muR_20"
   WeightDown: "weight_sys_fsr_muR_05"
@@ -899,7 +899,7 @@ Systematic: "tW_AR_FSR_2j1b"
   Regions: reg2j1b
 
 Systematic: "tW_AR_FSR_2j2b"
-  Category: "Modeling"
+  Category: "SignalModel"
   Title: "tW FSR 2j2b"
   WeightUp: "weight_sys_fsr_muR_20"
   WeightDown: "weight_sys_fsr_muR_05"
@@ -909,7 +909,7 @@ Systematic: "tW_AR_FSR_2j2b"
   Regions: reg2j2b
 
 Systematic: "ttbar_AR_ISR_scale_muR_1j1b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar ISR Scale muR Variation 1j1b"
   WeightUp: "weight_sys_scale_muR_20"
   WeightDown: "weight_sys_scale_muR_05"
@@ -919,7 +919,7 @@ Systematic: "ttbar_AR_ISR_scale_muR_1j1b"
   Regions: reg1j1b
 
 Systematic: "ttbar_AR_ISR_scale_muR_2j1b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar ISR Scale muR Variation 2j1b"
   WeightUp: "weight_sys_scale_muR_20"
   WeightDown: "weight_sys_scale_muR_05"
@@ -929,7 +929,7 @@ Systematic: "ttbar_AR_ISR_scale_muR_2j1b"
   Regions: reg2j1b
 
 Systematic: "ttbar_AR_ISR_scale_muR_2j2b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar ISR Scale muR Variation 2j2b"
   WeightUp: "weight_sys_scale_muR_20"
   WeightDown: "weight_sys_scale_muR_05"
@@ -939,7 +939,7 @@ Systematic: "ttbar_AR_ISR_scale_muR_2j2b"
   Regions: reg2j2b
 
 Systematic: "ttbar_AR_ISR_scale_muF_1j1b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar ISR Scale muF Variation 1j1b"
   WeightUp: "weight_sys_scale_muF_20"
   WeightDown: "weight_sys_scale_muF_05"
@@ -949,7 +949,7 @@ Systematic: "ttbar_AR_ISR_scale_muF_1j1b"
   Regions: reg1j1b
 
 Systematic: "ttbar_AR_ISR_scale_muF_2j1b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar ISR Scale muF Variation 2j1b"
   WeightUp: "weight_sys_scale_muF_20"
   WeightDown: "weight_sys_scale_muF_05"
@@ -959,7 +959,7 @@ Systematic: "ttbar_AR_ISR_scale_muF_2j1b"
   Regions: reg2j1b
 
 Systematic: "ttbar_AR_ISR_scale_muF_2j2b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar ISR Scale muF Variation 2j2b"
   WeightUp: "weight_sys_scale_muF_20"
   WeightDown: "weight_sys_scale_muF_05"
@@ -969,7 +969,7 @@ Systematic: "ttbar_AR_ISR_scale_muF_2j2b"
   Regions: reg2j2b
 
 Systematic: "ttbar_AR_ISR_A14_1j1b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar ISR A14 1j1b"
   WeightUp: "weight_sys_isr_alphaS_Var3cUp"
   WeightDown: "weight_sys_isr_alphaS_Var3cDown"
@@ -979,7 +979,7 @@ Systematic: "ttbar_AR_ISR_A14_1j1b"
   Regions: reg1j1b
 
 Systematic: "ttbar_AR_ISR_A14_2j1b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar ISR A14 2j1b"
   WeightUp: "weight_sys_isr_alphaS_Var3cUp"
   WeightDown: "weight_sys_isr_alphaS_Var3cDown"
@@ -989,7 +989,7 @@ Systematic: "ttbar_AR_ISR_A14_2j1b"
   Regions: reg2j1b
 
 Systematic: "ttbar_AR_ISR_A14_2j2b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar ISR A14 2j2b"
   WeightUp: "weight_sys_isr_alphaS_Var3cUp"
   WeightDown: "weight_sys_isr_alphaS_Var3cDown"
@@ -999,7 +999,7 @@ Systematic: "ttbar_AR_ISR_A14_2j2b"
   Regions: reg2j2b
 
 Systematic: "ttbar_AR_FSR_1j1b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar FSR 1j1b"
   WeightUp: "weight_sys_fsr_muR_20"
   WeightDown: "weight_sys_fsr_muR_05"
@@ -1009,7 +1009,7 @@ Systematic: "ttbar_AR_FSR_1j1b"
   Regions: reg1j1b
 
 Systematic: "ttbar_AR_FSR_2j1b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar FSR 2j1b"
   WeightUp: "weight_sys_fsr_muR_20"
   WeightDown: "weight_sys_fsr_muR_05"
@@ -1019,7 +1019,7 @@ Systematic: "ttbar_AR_FSR_2j1b"
   Regions: reg2j1b
 
 Systematic: "ttbar_AR_FSR_2j2b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar FSR 2j2b"
   WeightUp: "weight_sys_fsr_muR_20"
   WeightDown: "weight_sys_fsr_muR_05"
@@ -1029,7 +1029,7 @@ Systematic: "ttbar_AR_FSR_2j2b"
   Regions: reg2j2b
 
 Systematic: "ttbar_hdamp_1j1b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar hdamp 1j1b"
   ReferenceSample: ttbar_AFII
   Symmetrisation: ONESIDED
@@ -1039,7 +1039,7 @@ Systematic: "ttbar_hdamp_1j1b"
   NtupleFilesUp: ttbar_410482_AFII_MC16a_nominal,ttbar_410482_AFII_MC16d_nominal,ttbar_410482_AFII_MC16e_nominal
 
 Systematic: "ttbar_hdamp_2j1b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar hdamp 2j1b"
   ReferenceSample: ttbar_AFII
   Symmetrisation: ONESIDED
@@ -1049,7 +1049,7 @@ Systematic: "ttbar_hdamp_2j1b"
   NtupleFilesUp: ttbar_410482_AFII_MC16a_nominal,ttbar_410482_AFII_MC16d_nominal,ttbar_410482_AFII_MC16e_nominal
 
 Systematic: "ttbar_hdamp_2j2b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar hdamp 2j2b"
   ReferenceSample: ttbar_AFII
   Symmetrisation: ONESIDED
@@ -1059,7 +1059,7 @@ Systematic: "ttbar_hdamp_2j2b"
   NtupleFilesUp: ttbar_410482_AFII_MC16a_nominal,ttbar_410482_AFII_MC16d_nominal,ttbar_410482_AFII_MC16e_nominal
 
 Systematic: "ttbar_ptreweight_1j1b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar pt reweight 1j1b"
   WeightUp: "weight_sys_noreweight"
   Symmetrisation: ONESIDED
@@ -1068,7 +1068,7 @@ Systematic: "ttbar_ptreweight_1j1b"
   Regions: reg1j1b
 
 Systematic: "ttbar_ptreweight_2j1b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar pt reweight 2j1b"
   WeightUp: "weight_sys_noreweight"
   Symmetrisation: ONESIDED
@@ -1077,7 +1077,7 @@ Systematic: "ttbar_ptreweight_2j1b"
   Regions: reg2j1b
 
 Systematic: "ttbar_ptreweight_2j2b"
-  Category: "Modeling"
+  Category: "BackgroundModel"
   Title: "ttbar pt reweight 2j2b"
   WeightUp: "weight_sys_noreweight"
   Symmetrisation: ONESIDED
