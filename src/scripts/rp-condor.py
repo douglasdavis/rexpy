@@ -20,6 +20,7 @@ from rexpy.confparse import (
     fit_argument,
     rank_arguments,
     ntuple_arguments,
+    grouped_impact_arguments,
 )
 
 TREX_EXE = os.popen("which trex-fitter").read().strip()
@@ -214,6 +215,12 @@ def complete(config, systematics, ws_suffix, copy_histograms_from, dont_fit, don
             rank_draw = pycondor.Job(name="rank_draw", dag=dagman, **standard_params)
             rank_draw.add_arg("r {} Ranking=plot".format(config))
             rank_draw.add_parent(rank)
+            group = pycondor.Job(name="group", dag=dagman, **standard_params)
+            group.add_args(grouped_impact_arguments(config))
+            group.add_parent(fit)
+            group_combine = pycondor.Job(name="group_combine", dag=dagman, **standard_params)
+            group_combine.add_arg("i {} GroupedImpact=combine".format(config))
+            group_combine.add_parent(group)
     # fmt: on
 
     orig_path = os.getcwd()

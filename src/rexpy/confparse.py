@@ -81,6 +81,33 @@ def top_block_titles(config, block_type):
         )
 
 
+def sub_block_values(config, key):
+    """Extract set of values associated with a sub block key
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+    key : str
+        Sub block key (e.g. "SubCategory")
+
+    Returns
+    -------
+    set(str)
+        Unique values of the given key
+    """
+    with open(config, "r") as f:
+        return set(
+            map(
+                lambda line: line.split(": ")[1].replace('"', "").strip(),
+                filter(
+                    lambda line: str(line).startswith("  %s: " % key),
+                    f.readlines(),
+                ),
+            )
+        )
+
+
 def systematics_from(config, specific_sys=None):
     """Get list of relevant systematics.
 
@@ -149,6 +176,24 @@ def rank_arguments(config, specific_sys=None):
     """
     systematics = systematics_from(config, specific_sys=specific_sys)
     return ["r {} Ranking={}".format(config, sys) for sys in systematics]
+
+
+def grouped_impact_arguments(config):
+    """Get a set of trex-fitter executable arguments for grouped impact.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+
+    Returns
+    -------
+    list(str)
+        The list of trex-fitter arguments
+    """
+    groups = sub_block_values(config, "SubCategory")
+    groups = list(groups) + ["Gammas", "FullSyst"]
+    return ["i {} GroupedImpact={}".format(config, g) for g in groups]
 
 
 def draw_argument(config, specific_sys=None):

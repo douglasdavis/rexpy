@@ -76,8 +76,8 @@ def simple_setup1(outname):
 @click.option("--sel-2j2b", type=str, default=rpb.DEF_2j2b_sels, help="2j2b region selection setting")
 @click.option("--herwig-version", type=click.Choice(["704", "713"]), default="713", help="ttbar Herwig version")
 @click.option("--drop-sys", type=str, help="Drop a systematic")
-@click.option("--skip-tables", is_flag=True, help="Don't produce tables")
-@click.option("--skip-sys-plots", is_flag=True, help="Don't produce red/blue plots")
+@click.option("--do-tables", is_flag=True, help="Don't produce tables")
+@click.option("--do-sys-plots", is_flag=True, help="Don't produce red/blue plots")
 @click.option("--do-valplots", is_flag=True, help="validation region plots")
 @click.option("--is-preselection", is_flag=True, help="use preselection plotting definitions")
 @click.option("--fit-data", is_flag=True, help="Fit to data")
@@ -97,8 +97,8 @@ def tunable(
     sel_2j2b,
     herwig_version,
     drop_sys,
-    skip_tables,
-    skip_sys_plots,
+    do_tables,
+    do_sys_plots,
     do_valplots,
     is_preselection,
     fit_data,
@@ -122,8 +122,8 @@ def tunable(
         reg1j1b_selection=sel_1j1b,
         reg2j1b_selection=sel_2j1b,
         reg2j2b_selection=sel_2j2b,
-        dotables="FALSE" if skip_tables else "TRUE",
-        systplots="FALSE" if skip_sys_plots else "TRUE",
+        dotables="TRUE" if do_tables else "FALSE",
+        systplots="TRUE" if do_sys_plots else "FALSE",
         fitblind="FALSE" if fit_data else "TRUE",
     )
     with open(outname, "w") as f:
