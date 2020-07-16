@@ -23,37 +23,7 @@ echo "Saving configs to: ${OUTDIR}"
 [[ "${SUBMIT}" == "1" ]] && echo "Submitting"
 mkdir -p $OUTDIR
 
-rp-conf.py tunable $OUTDIR/standard_presel_plots.conf \
-           --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1' \
-           --fit-data \
-           --skip-tables \
-           --skip-sys-plots \
-           --do-valplots \
-           --is-preselection
-
-rp-conf.py tunable $OUTDIR/standard_presel_fit.conf \
-           --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1' \
-           --fit-data \
-           --is-preselection
-
-rp-conf.py tunable $OUTDIR/standard_presel_asimov.conf \
-           --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1' \
-           --is-preselection
-
-# --bin-1j1b '12,0.35,0.76' \
-# --bin-2j1b '12,0.22,0.70' \
-# --bin-2j2b '12,0.45,0.775' \
-
-rp-conf.py tunable $OUTDIR/standard_fitdata_allplots.conf \
+rp-conf.py tunable $OUTDIR/main_data_allplots.conf \
            --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
            --bin-1j1b '12,0.35,0.76' \
            --bin-2j1b '12,0.22,0.70' \
@@ -61,12 +31,10 @@ rp-conf.py tunable $OUTDIR/standard_fitdata_allplots.conf \
            --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
-           --skip-tables \
-           --skip-sys-plots \
            --do-valplots \
            --fit-data
 
-rp-conf.py tunable $OUTDIR/standard_fitdata.conf \
+rp-conf.py tunable $OUTDIR/main_data.conf \
            --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
            --bin-1j1b '12,0.35,0.76' \
            --bin-2j1b '12,0.22,0.70' \
@@ -74,9 +42,10 @@ rp-conf.py tunable $OUTDIR/standard_fitdata.conf \
            --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
-           --fit-data
+           --fit-data \
+           --do-tables
 
-rp-conf.py tunable $OUTDIR/standard_fitdata_1516.conf \
+rp-conf.py tunable $OUTDIR/main_data_1516.conf \
            --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
            --bin-1j1b '12,0.35,0.76' \
            --bin-2j1b '12,0.22,0.70' \
@@ -87,7 +56,7 @@ rp-conf.py tunable $OUTDIR/standard_fitdata_1516.conf \
            --fit-data \
            --only-1516
 
-rp-conf.py tunable $OUTDIR/standard_fitdata_17.conf \
+rp-conf.py tunable $OUTDIR/main_data_17.conf \
            --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
            --bin-1j1b '12,0.35,0.76' \
            --bin-2j1b '12,0.22,0.70' \
@@ -98,7 +67,7 @@ rp-conf.py tunable $OUTDIR/standard_fitdata_17.conf \
            --fit-data \
            --only-17
 
-rp-conf.py tunable $OUTDIR/standard_fitdata_18.conf \
+rp-conf.py tunable $OUTDIR/main_data_18.conf \
            --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
            --bin-1j1b '12,0.35,0.76' \
            --bin-2j1b '12,0.22,0.70' \
@@ -109,40 +78,66 @@ rp-conf.py tunable $OUTDIR/standard_fitdata_18.conf \
            --fit-data \
            --only-18
 
-rp-conf.py tunable $OUTDIR/standard_fitasimov.conf \
+rp-conf.py tunable $OUTDIR/main_asimov.conf \
            --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
            --bin-1j1b '12,0.35,0.76' \
            --bin-2j1b '12,0.22,0.70' \
            --bin-2j2b '12,0.45,0.775' \
            --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775'
+           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
+           --do-sys-plots \
+           --do-tables
 
-rp-conf.py rm-region $OUTDIR/standard_fitasimov.conf \
+rp-conf.py rm-region $OUTDIR/main_asimov.conf \
            -r reg2j1b \
            -r reg2j2b \
-           -n $OUTDIR/standard_fitasimov_1j1b.conf
+           -n $OUTDIR/main_asimov_1j1b.conf
 
-rp-conf.py rm-region $OUTDIR/standard_fitasimov.conf \
+rp-conf.py rm-region $OUTDIR/main_asimov.conf \
            -r reg2j2b \
-           -n $OUTDIR/standard_fitasimov_1j1b2j1b.conf
+           -n $OUTDIR/main_asimov_1j1b2j1b.conf
 
-rp-conf.py rm-region $OUTDIR/standard_fitasimov.conf \
+rp-conf.py rm-region $OUTDIR/main_asimov.conf \
            -r reg2j1b \
-           -n $OUTDIR/standard_fitasimov_1j1b2j2b.conf
+           -n $OUTDIR/main_asimov_1j1b2j2b.conf
 
-rp-conf.py rm-region $OUTDIR/standard_fitdata.conf \
+rp-conf.py rm-region $OUTDIR/main_data.conf \
            -r reg2j1b \
            -r reg2j2b \
-           -n $OUTDIR/standard_fitdata_1j1b.conf
+           -n $OUTDIR/main_data_1j1b.conf
 
-rp-conf.py rm-region $OUTDIR/standard_fitdata.conf \
+rp-conf.py rm-region $OUTDIR/main_data.conf \
            -r reg2j2b \
-           -n $OUTDIR/standard_fitdata_1j1b2j1b.conf
+           -n $OUTDIR/main_data_1j1b2j1b.conf
 
-rp-conf.py rm-region $OUTDIR/standard_fitdata.conf \
+rp-conf.py rm-region $OUTDIR/main_data.conf \
            -r reg2j1b \
-           -n $OUTDIR/standard_fitdata_1j1b2j2b.conf
+           -n $OUTDIR/main_data_1j1b2j2b.conf
+
+rp-conf.py tunable $OUTDIR/presel_plots.conf \
+           --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1' \
+           --fit-data \
+           --do-valplots \
+           --is-preselection
+
+rp-conf.py tunable $OUTDIR/presel_fit.conf \
+           --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1' \
+           --fit-data \
+           --is-preselection
+
+rp-conf.py tunable $OUTDIR/presel_asimov.conf \
+           --var-1j1b 'bdtres03' --var-2j1b 'bdtres03' --var-2j2b 'bdtres03' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1' \
+           --is-preselection
 
 if [[ "${SUBMIT}" == "1" ]]; then
     for c in $OUTDIR/*.conf; do
