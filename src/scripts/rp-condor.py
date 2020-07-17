@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # stdlib
+import logging
 import os
 import re
 import shutil
@@ -36,6 +37,8 @@ Error           = logs/job.err.{1}.$(cluster).$(process)
 Log             = logs/job.log.{1}.$(cluster).$(process)
 request_memory  = 2.0G
 """
+
+log = logging.getLogger("rp-condor")
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -180,6 +183,7 @@ def complete(config, systematics, ws_suffix, copy_histograms_from, dont_fit, don
     standard_params = job_params(workspace, TREX_EXE)
 
     if copy_histograms_from is None:
+        log.info("Will run ntuple step")
         ntuple = pycondor.Job(name="ntuple", dag=dagman, **standard_params)
         if systematics:
             ntuple.add_args(ntuple_arguments(config, specific_sys=syslist))
@@ -192,35 +196,41 @@ def complete(config, systematics, ws_suffix, copy_histograms_from, dont_fit, don
 
     # fmt: off
     if dont_fit:
+        log.info("Will run drawing steps")
         draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
         draw.add_arg(draw_argument(config, specific_sys=syslist if systematics else None))
         if copy_histograms_from is not None:
             draw.add_parent(ntuple)
     else:
         # the fit step
+        log.info("Will run fit step")
         fit = pycondor.Job(name="fit", dag=dagman, **standard_params)
         fit.add_arg(fit_argument(config, specific_sys=syslist if systematics else None))
         if copy_histograms_from is None:
             fit.add_parent(ntuple)
         # the draw step
         if not dont_draw:
+            log.info("Will run drawing steps")
             draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
             draw.add_arg(draw_argument(config, specific_sys=syslist if systematics else None))
             draw.add_parent(fit)
         # the rank step
         if not dont_rank:
+            log.info("Will run ranking step")
             rank = pycondor.Job(name="rank", dag=dagman, **standard_params)
             rank.add_args(rank_arguments(config, specific_sys=syslist))
             rank.add_parent(fit)
             rank_draw = pycondor.Job(name="rank_draw", dag=dagman, **standard_params)
             rank_draw.add_arg("r {} Ranking=plot".format(config))
             rank_draw.add_parent(rank)
-            group = pycondor.Job(name="group", dag=dagman, **standard_params)
-            group.add_args(grouped_impact_arguments(config))
-            group.add_parent(fit)
-            group_combine = pycondor.Job(name="group_combine", dag=dagman, **standard_params)
-            group_combine.add_arg("i {} GroupedImpact=combine".format(config))
-            group_combine.add_parent(group)
+            if systematics is None:
+                log.info("Will run impact step")
+                group = pycondor.Job(name="group", dag=dagman, **standard_params)
+                group.add_args(grouped_impact_arguments(config))
+                group.add_parent(fit)
+                group_combine = pycondor.Job(name="group_combine", dag=dagman, **standard_params)
+                group_combine.add_arg("i {} GroupedImpact=combine".format(config))
+                group_combine.add_parent(group)
     # fmt: on
 
     orig_path = os.getcwd()
