@@ -8,7 +8,7 @@ if [ "$(uname)" == "Darwin" ]; then
     pyenv activate rexpy
 else
     setupATLAS -q
-    lsetup "views LCG_97apython3 x86_64-centos7-gcc9-opt"
+    lsetup "views LCG_97apython3_ATLAS_1 x86_64-centos7-gcc8-opt"
 fi
 
 # directories

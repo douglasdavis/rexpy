@@ -1,0 +1,134 @@
+diff --git a/Root/Region.cc b/Root/Region.cc
+index 10c9253..ffe9a2e 100644
+--- a/Root/Region.cc
++++ b/Root/Region.cc
+@@ -787,6 +787,11 @@ std::shared_ptr<TRExPlot> Region::DrawPreFit(const std::vector<int>& canvasSize,
+     //
+     if(fGetChi2 && TRExFitter::SHOWCHI2)  p->SetChi2KS(fChi2prob,-1,fChi2val,fNDF);
+ 
++    //
++    // Save chi2 info to an output file
++    //
++    if (fGetChi2) SavePreFitChi2ToFile();
++
+     //
+     // Sets the last ingredients in the TRExPlot object
+     //
+@@ -1740,6 +1745,11 @@ std::shared_ptr<TRExPlot> Region::DrawPostFit(FitResults* fitRes,
+     //
+     if(fGetChi2 && TRExFitter::SHOWCHI2)  p->SetChi2KS(fChi2prob,-1,fChi2val,fNDF);
+ 
++    //
++    // save chi2 to file
++    //
++    if (fGetChi2) SavePostFitChi2ToFile();
++
+     //
+     // 5) Finishes configuration of TRExPlot objects
+     //
+@@ -2687,3 +2697,23 @@ void Region::SavePreFitUncertaintyAndTotalMCObjects() {
+     originalDir->cd();
+     f->Close();
+ }
++
++void Region::SavePreFitChi2ToFile() {
++  auto chi2outfile = TString::Format("%s/Histograms/%s%s_preFit_Chi2.txt",
++                                     fFitName.c_str(), fName.c_str(), fSuffix.c_str());
++  std::ofstream chi2outfileos(chi2outfile);
++  chi2outfileos << "chi2: " << static_cast<float>(fChi2val) << "\n";
++  chi2outfileos << "ndof: " << static_cast<int>(fNDF) << "\n";
++  chi2outfileos << "probability: " << static_cast<float>(fChi2prob) << "\n";
++  chi2outfileos.close();
++}
++
++void Region::SavePostFitChi2ToFile() {
++  auto chi2outfile = TString::Format("%s/Histograms/%s%s_postFit_Chi2.txt",
++                                     fFitName.c_str(), fName.c_str(), fSuffix.c_str());
++  std::ofstream chi2outfileos(chi2outfile);
++  chi2outfileos << "chi2: " << static_cast<float>(fChi2val) << "\n";
++  chi2outfileos << "ndof: " << static_cast<int>(fNDF) << "\n";
++  chi2outfileos << "probability: " << static_cast<float>(fChi2prob) << "\n";
++  chi2outfileos.close();
++}
+diff --git a/TRExFitter/Region.h b/TRExFitter/Region.h
+index 55d6811..c4dbfd3 100644
+--- a/TRExFitter/Region.h
++++ b/TRExFitter/Region.h
+@@ -57,6 +57,8 @@ public:
+     void BuildPreFitErrorHist();
+     void SavePreFitUncertaintyAndTotalMCObjects();
+     std::shared_ptr<TRExPlot> DrawPreFit(const std::vector<int>& canvasSize, std::string opt="");
++    void SavePreFitChi2ToFile();
++    void SavePostFitChi2ToFile();
+     double GetMultFactors( FitResults* fitRes,
+                            std::ofstream& pullTex,
+                            const int i /*sample*/,
+@@ -303,7 +305,7 @@ public:
+ private:
+ 
+     bool fAutomaticDropBins;
+-    
++
+     std::pair<double,int> GetChi2Test( TH1* h_data, TH1* h_nominal, std::vector< std::shared_ptr<TH1> > h_up, std::vector< std::string > fSystNames, CorrelationMatrix *matrix=nullptr );
+ };
+ 
+diff --git a/setup.sh b/setup.sh
+index 60fbc4d..9fdeb1c 100644
+--- a/setup.sh
++++ b/setup.sh
+@@ -22,24 +22,6 @@ fi
+ location="$(cd -P "$(dirname "${_src}")" && pwd)"
+ unset _src
+ 
+-
+-# Setup ROOT and gcc
+-# added back by Michele
+-export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
+-source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh --quiet
+-if [ "${ROOTSYS}" = "" ]; then
+-    if [ "${1}" = "slc6" ]; then
+-	lsetup "root 6.18.00-x86_64-slc6-gcc8-opt" --quiet
+-    else
+-	lsetup "root 6.20.06-x86_64-centos7-gcc8-opt" --quiet
+-    fi
+-else
+-    root_version=`root-config --version`
+-    if version_gt 6.20 $root_version; then
+-	echo "ERROR root already loaded, but root version too old: $root_version"
+-    fi
+-fi
+-
+ if [ "${ROOTSYS}" = "" ]; then
+    echo -e "\033[41;1;37m Error initializing ROOT. ROOT is not set up. Please check. \033[0m"
+ else
+@@ -59,30 +41,6 @@ else
+   export TREXFITTER_HOME=`pwd`
+ fi
+ 
+-if [ ! -f $TREXFITTER_HOME/logo.txt ]; then
+-  echo -e "\033[1;31mWARNING:\033[0m \$TREXFITTER_HOME environmental variable not set properly"
+-  echo -e "\033[1;31mWARNING:\033[0m call this script with the path to the TRExFitter directory as an additional argument"
+-fi
+-
+-# Check if the CommomSmoothing code exists
+-if [ ! "$(ls -A ${TREXFITTER_HOME}/CommonSystSmoothingTool)" ]; then
+-  echo -e "\033[1;31mERROR:\033[0m CommonSystSmoothingTool directory does not exist or is empty. "
+-  echo -e "\033[1;31mERROR:\033[0m You need to type 'git submodule init' (first time use) in the base directory of TRExFitter"
+-  echo -e "\033[1;31mERROR:\033[0m You need to type 'git submodule update' in the base directory of TRExFitter"
+-  return
+-fi
+-
+-# Check if the CommonStatTools code exists
+-if [ ! "$(ls -A ${TREXFITTER_HOME}/CommonStatTools)" ]; then
+-  echo -e "\033[1;31mERROR:\033[0m CommonStatTools directory does not exist or is empty. "
+-  echo -e "\033[1;31mERROR:\033[0m You need to type 'git submodule init' (first time use) in the base directory of TRExFitter"
+-  echo -e "\033[1;31mERROR:\033[0m Followed with 'git submodule update' in the base directory of TRExFitter"
+-  return
+-fi
+-
+-echo "Setting up cmake with: lsetup cmake"
+-lsetup cmake
+-
+ export PATH=${PATH}${PATH:+:}${TREXFITTER_HOME}/build/bin
+ alias trex-make='cd build/; make -j4; cd ../'
+ alias trex-clean='rm -rf build/'
