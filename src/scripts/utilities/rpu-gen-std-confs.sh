@@ -77,6 +77,20 @@ rp-conf.py tunable $OUTDIR/main_asimov.conf \
            --do-sys-plots \
            --do-tables
 
+rp-conf.py tunable $OUTDIR/main_asimov_singlebin2j2b.conf \
+           --var-1j1b $FITVAR \
+           --var-2j1b $FITVAR \
+           --var-2j2b $FITVAR \
+           --bin-1j1b '12,0.35,0.76' \
+           --bin-2j1b '12,0.22,0.70' \
+           --bin-2j2b '1,0.0,1.0' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
+           --herwig-version $SHOWER \
+           --do-sys-plots \
+           --do-tables
+
 rp-conf.py tunable $OUTDIR/main_data_allplots.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
