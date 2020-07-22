@@ -60,6 +60,7 @@ def top_blocks(**kwargs):
         reg2j2b_selection=DEF_2j2b_sels,
         reg2j2b_variable=DEF_2j2b_vari,
         reg2j2b_binning=DEF_2j2b_bins,
+        spr="reg1j1b,reg2j1b,reg2j2b",
     )
     for k in kwargs:
         params[k] = kwargs[k]
@@ -81,7 +82,7 @@ def top_blocks(**kwargs):
       DoPieChartPlot: FALSE
       CmeLabel: "13 TeV"
       DoSummaryPlot: FALSE
-      SummaryPlotRegions: reg1j1b,reg2j1b,reg2j2b
+      SummaryPlotRegions: {spr}
       DoTables: {dotables}
       SystCategoryTables: FALSE
       SystControlPlots: {systplots}
@@ -618,7 +619,7 @@ SYS_TWOSIDED_TREE_BLOCKS = _get_twosided_trees()
 SYS_ONESIDED_TREE_BLOCKS = _get_onesided_trees()
 
 
-def tW_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
+def tW_shower_norms(ntup_dir, sel_1j1b=None, sel_2j1b=None, sel_2j2b=None):
     overall, m1j1b, m2j1b, m2j2b = norm_uncertainties_tW(
         ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b
     )
@@ -670,7 +671,7 @@ def tW_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b):
     )
 
 
-def ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_dsid):
+def ttbar_shower_norms(ntup_dir, sel_1j1b=None, sel_2j1b=None, sel_2j2b=None, herwig_dsid="410558"):
     overall, m1j1b, m2j1b, m2j2b = norm_uncertainties_ttbar(
         ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_dsid,
     )
@@ -731,7 +732,7 @@ def herwig_version_to_dsid(herwig_version):
         raise ValueError("Bad Herwig version")
 
 
-def modeling_blocks(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_version):
+def modeling_blocks(ntup_dir, sel_1j1b=None, sel_2j1b=None, sel_2j2b=None, herwig_version="410558"):
     herwig_dsid = herwig_version_to_dsid(herwig_version)
     tW_norms = tW_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b)
     ttbar_norms = ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_dsid)

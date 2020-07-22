@@ -308,3 +308,31 @@ def drop_systematics(blocks, systematics):
     for drop in to_drop:
         result.remove(drop)
     return result
+
+
+def drop_region(blocks, region):
+    """Drop a region from a set of blocks.
+
+    Parameters
+    ----------
+    blocks : list(str)
+        All TRExFitter blocks.
+    region : str
+        Region to drop.
+
+    Returns
+    -------
+    list(str)
+        Blocks without dropped region.
+    """
+    new_blocks = []
+    for block in blocks:
+        if block.startswith("Region:"):
+            if region in block:
+                continue
+        if block.startswith("Systematic:"):
+            if region in block:
+                continue
+        new_blocks.append(block)
+    new_blocks[0] = new_blocks[0].replace("SummaryPlotRegions: reg1j1b,reg2j1b,reg2j2b\n  ", "")
+    return new_blocks

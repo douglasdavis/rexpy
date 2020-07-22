@@ -38,7 +38,7 @@ Log             = logs/job.log.{1}.$(cluster).$(process)
 request_memory  = 2.0G
 """
 
-log = logging.getLogger("rp-condor")
+log = logging.getLogger("rp-condor.py")
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
