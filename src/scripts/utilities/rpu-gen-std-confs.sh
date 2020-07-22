@@ -88,8 +88,7 @@ rp-conf.py tunable $OUTDIR/main_asimov_singlebin2j2b.conf \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
            --herwig-version $SHOWER \
-           --do-sys-plots \
-           --do-tables
+           --do-sys-plots
 
 rp-conf.py tunable $OUTDIR/main_data_allplots.conf \
            --var-1j1b $FITVAR \
