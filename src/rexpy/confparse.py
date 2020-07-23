@@ -253,6 +253,29 @@ def fit_argument(config, specific_sys=None, dont_fit_vr=True):
         return "wf {} {}:Systematics={}".format(config, region_arg, systematics)
 
 
+def ntuple_arguments_granular(config, fitname="tW"):
+    regions = regions_from(config)
+    systematics = systematics_from(config)
+    region_hupdate_files = {r: [] for r in regions}
+    args = []
+    for r in regions:
+        for s in systematics:
+            if "1j1b" in s and "1j1b" not in r:
+                continue
+            if "2j1b" in s and "2j1b" not in r:
+                continue
+            if "2j2b" in s and "2j2b" not in r:
+                continue
+            args.append(f"n {config} Regions={r}:Systematics={s}:SaveSuffix=_{s}")
+            region_hupdate_files[r].append(f"{fitname}/Histograms/{fitname}_{r}_histos_{s}.root")
+    updates  = []
+    for k, v in region_hupdate_files.items():
+        a1 = f"{fitname}/Histograms/{fitname}_{k}_histos.root"
+        a2 = " ".join(v)
+        updates.append(f"{a1} {a2}")
+    return args, updates
+
+
 def ntuple_arguments(config, specific_sys=None):
     """Get the set of trex-fitter executable arguments for ntupling.
 

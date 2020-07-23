@@ -21,10 +21,12 @@ from rexpy.confparse import (
     fit_argument,
     rank_arguments,
     ntuple_arguments,
+    ntuple_arguments_granular,
     grouped_impact_arguments,
 )
 
 TREX_EXE = os.popen("which trex-fitter").read().strip()
+HUPDATE_EXE = os.popen("which hupdate.exe").read().strip()
 CONTEXT_SETTINGS = {"max_content_width": 92}
 BNL_CONDOR_HEADER = """
 Universe        = vanilla
@@ -163,8 +165,19 @@ def rank(config):
 @click.option("--dont-rank", is_flag=True, help="Skip the ranking step")
 @click.option("--dont-draw", is_flag=True, help="Skip the plotting steps")
 @click.option("--dont-submit", is_flag=True, help="do not submit to condor")
-def complete(config, systematics, ws_suffix, copy_histograms_from, dont_fit, dont_rank, dont_draw, dont_submit):
-    """Run a complete set of trex-fitter stages ('n', then 'wf', then 'dp', then 'r')"""
+@click.option("--granular-ntup", is_flag=True, help="do granular ntuple step")
+def complete(
+    config,
+    systematics,
+    ws_suffix,
+    copy_histograms_from,
+    dont_fit,
+    dont_rank,
+    dont_draw,
+    dont_submit,
+    granular_ntup,
+):
+    """Run a complete set of trex-fitter stages ('n'; 'wf'; 'dp'; 'r'; 'i')"""
     config_path = PosixPath(config).resolve()
     config_name = config_path.name
     workspace = (config_path.parent / "rpcc_{}".format(config_path.stem)).resolve()
@@ -181,14 +194,24 @@ def complete(config, systematics, ws_suffix, copy_histograms_from, dont_fit, don
 
     dagman = pycondor.Dagman(name="rp-complete", submit=os.path.join(workspace, "sub"))
     standard_params = job_params(workspace, TREX_EXE)
+    hupdate_params = job_params(workspace, HUPDATE_EXE)
 
     if copy_histograms_from is None:
         log.info("Will run ntuple step")
-        ntuple = pycondor.Job(name="ntuple", dag=dagman, **standard_params)
         if systematics:
+            ntuple = pycondor.Job(name="ntuple", dag=dagman, **standard_params)
             ntuple.add_args(ntuple_arguments(config, specific_sys=syslist))
         else:
-            ntuple.add_args(ntuple_arguments(config))
+            if granular_ntup:
+                a0, a1 = ntuple_arguments_granular(config)
+                ntuple0 = pycondor.Job(name="ntuple0", dag=dagman, **standard_params)
+                ntuple0.add_args(a0)
+                ntuple = pycondor.Job(name="ntuple", dag=dagman, **hupdate_params)
+                ntuple.add_args(a1)
+                ntuple.add_parent(ntuple0)
+            else:
+                ntuple = pycondor.Job(name="ntuple", dag=dagman, **standard_params)
+                ntuple.add_args(ntuple_arguments(config))
     else:
         os.makedirs(PosixPath(workspace) / "tW" / "Histograms")
         for entry in PosixPath(copy_histograms_from).glob("*histos.root"):
