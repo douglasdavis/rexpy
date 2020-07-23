@@ -146,7 +146,6 @@ rp-conf.py tunable $OUTDIR/main_asimov_1j1b2j2b.conf \
            --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
            --herwig-version $SHOWER \
-           --fit-data \
            --drop-2j1b
 
 rp-conf.py tunable $OUTDIR/main_data_1j1b.conf \
@@ -241,6 +240,7 @@ rp-conf.py tunable $OUTDIR/main_data_only18.conf \
            --only-18
 
 rp-conf.py tunable $OUTDIR/presel_data_plots.conf \
+           --is-preselection \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -249,10 +249,10 @@ rp-conf.py tunable $OUTDIR/presel_data_plots.conf \
            --sel-2j2b 'reg2j2b == 1 && OS == 1' \
            --herwig-version $SHOWER \
            --fit-data \
-           --do-valplots \
-           --is-preselection
+           --do-valplots
 
 rp-conf.py tunable $OUTDIR/presel_data.conf \
+           --is-preselection \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -261,11 +261,10 @@ rp-conf.py tunable $OUTDIR/presel_data.conf \
            --sel-2j2b 'reg2j2b == 1 && OS == 1' \
            --herwig-version $SHOWER \
            --fit-data \
-           --is-preselection \
-           --do-sys-plots \
            --do-tables
 
 rp-conf.py tunable $OUTDIR/presel_asimov.conf \
+           --is-preselection \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -273,4 +272,5 @@ rp-conf.py tunable $OUTDIR/presel_asimov.conf \
            --sel-2j1b 'reg2j1b == 1 && OS == 1' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1' \
            --herwig-version $SHOWER \
-           --is-preselection
+           --do-sys-plots \
+           --do-tables
