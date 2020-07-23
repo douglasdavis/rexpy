@@ -63,6 +63,20 @@ rp-conf.py tunable $OUTDIR/main_data.conf \
            --fit-data \
            --do-tables
 
+rp-conf.py tunable $OUTDIR/main_data_plots.conf \
+           --var-1j1b $FITVAR \
+           --var-2j1b $FITVAR \
+           --var-2j2b $FITVAR \
+           --bin-1j1b '12,0.35,0.76' \
+           --bin-2j1b '12,0.22,0.70' \
+           --bin-2j2b '12,0.45,0.775' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
+           --herwig-version $SHOWER \
+           --fit-data \
+           --do-valplots
+
 rp-conf.py tunable $OUTDIR/main_asimov.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
@@ -89,20 +103,6 @@ rp-conf.py tunable $OUTDIR/main_asimov_singlebin2j2b.conf \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
            --herwig-version $SHOWER \
            --do-sys-plots
-
-rp-conf.py tunable $OUTDIR/main_data_allplots.conf \
-           --var-1j1b $FITVAR \
-           --var-2j1b $FITVAR \
-           --var-2j2b $FITVAR \
-           --bin-1j1b '12,0.35,0.76' \
-           --bin-2j1b '12,0.22,0.70' \
-           --bin-2j2b '12,0.45,0.775' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
-           --herwig-version $SHOWER \
-           --do-valplots \
-           --fit-data
 
 rp-conf.py tunable $OUTDIR/main_asimov_1j1b.conf \
            --var-1j1b $FITVAR \
