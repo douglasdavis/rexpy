@@ -4,7 +4,10 @@ import os
 import pathlib
 import shutil
 
-from rexpy.confparse import regions_from
+from rexpy.confparse import regions_from, systematics_from
+from rexpy.helpers import trex_fitter_exe
+
+TREX_EXE = trex_fitter_exe()
 
 def job_params(wkspace, executable, **kwargs):
     """Turn a set of keyword arguments into a condor preamble.
@@ -58,13 +61,18 @@ def _run_dp_step(args):
     return p.wait()
 
 
-def parallel_n_step(config):
+def _run_r_step(args):
+    p = subprocess.Popen(f"{args[0]} r {args[1]} Ranking={args[2]}", shell=True)
+    return p.wait()
+
+
+def parallel_n_step(config, regions=None):
     curdir = os.getcwd()
-    trex_exe = os.popen("which trex-fitter").read().strip()
     run_dir = pathlib.PosixPath(config).resolve().parent
     os.chdir(run_dir)
-    regions = regions_from(config)
-    args = [(trex_exe, config, region) for region in regions]
+    if regions is None:
+        regions = regions_from(config)
+    args = [(TREX_EXE, config, region) for region in regions]
     pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
     pool.map(_run_n_step, args)
     os.chdir(curdir)
@@ -73,10 +81,22 @@ def parallel_n_step(config):
 
 def wfdp_step(config):
     curdir = os.getcwd()
-    trex_exe = os.popen("which trex-fitter").read().strip()
     run_dir = pathlib.PosixPath(config).resolve().parent
     os.chdir(run_dir)
-    _run_wf_step((trex_exe, config))
-    _run_dp_step((trex_exe, config))
+    _run_wf_step((TREX_EXE, config))
+    _run_dp_step((TREX_EXE, config))
+    os.chdir(curdir)
+    return 0
+
+
+def parallel_r_step(config, systematics=None):
+    curdir = os.getcwd()
+    run_dir = pathlib.PosixPath(config).resolve().parent
+    os.chdir(run_dir)
+    if systematics is None:
+        systematics = systematics_from(config)
+    args = [(TREX_EXE, config, sys) for sys in systematics]
+    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
+    pool.map(_run_r_step, args)
     os.chdir(curdir)
     return 0

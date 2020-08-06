@@ -166,6 +166,7 @@ def rank(config):
 @click.option("--dont-draw", is_flag=True, help="Skip the plotting steps")
 @click.option("--dont-submit", is_flag=True, help="do not submit to condor")
 @click.option("--granular-ntup", is_flag=True, help="do granular ntuple step")
+@click.option("--actually-local", is_flag=True, help="do steps locally")
 def complete(
     config,
     systematics,
@@ -176,6 +177,7 @@ def complete(
     dont_draw,
     dont_submit,
     granular_ntup,
+    actually_local,
 ):
     """Run a complete set of trex-fitter stages ('n'; 'wf'; 'dp'; 'r'; 'i')"""
     config_path = PosixPath(config).resolve()
@@ -263,6 +265,13 @@ def complete(
     else:
         dagman.build_submit()
     os.chdir(orig_path)
+
+    if dont_submit and actually_local:
+        import rexpy.batch as rpb
+        f = str(PosixPath(workspace) / "fit.conf")
+        rpb.parallel_n_step(f)
+        rpb.wfdp_step(f)
+        rpb.parallel_r_step(f)
 
     return 0
 
