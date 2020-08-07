@@ -25,8 +25,8 @@ from rexpy.confparse import (
     grouped_impact_arguments,
 )
 
-TREX_EXE = os.popen("which trex-fitter").read().strip()
-HUPDATE_EXE = os.popen("which hupdate.exe").read().strip()
+TREX_EXE = shutil.which("trex-fitter")
+HUPDATE_EXE = shutil.which("hupdate.exe")
 CONTEXT_SETTINGS = {"max_content_width": 92}
 BNL_CONDOR_HEADER = """
 Universe        = vanilla

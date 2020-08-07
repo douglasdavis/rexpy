@@ -1,5 +1,6 @@
 import os
 
+
 def get_fit_parameter(workspace, fit_name="tW", parameter_name="SigXsecOverSM"):
     """Get a value from the fit.
 

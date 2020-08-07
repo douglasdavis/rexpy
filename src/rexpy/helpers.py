@@ -1,10 +1,3 @@
-import os
-
-
-def trex_fitter_exe():
-    return os.popen("which trex-fitter").read().strip()
-
-
 def selection_with_period(raw, only_1516=False, only_17=False, only_18=False):
     """Augment a selection to require a specific data taking period.
 

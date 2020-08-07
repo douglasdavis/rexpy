@@ -74,8 +74,7 @@ def top_block_titles(config, block_type):
             map(
                 lambda line: line.split(": ")[1].replace('"', "").strip(),
                 filter(
-                    lambda line: str(line).startswith("%s: " % block_type),
-                    f.readlines(),
+                    lambda line: str(line).startswith("%s: " % block_type), f.readlines(),
                 ),
             )
         )
@@ -100,10 +99,7 @@ def sub_block_values(config, key):
         return set(
             map(
                 lambda line: line.split(": ")[1].replace('"', "").strip(),
-                filter(
-                    lambda line: str(line).startswith("  %s: " % key),
-                    f.readlines(),
-                ),
+                filter(lambda line: str(line).startswith("  %s: " % key), f.readlines(),),
             )
         )
 
@@ -267,8 +263,10 @@ def ntuple_arguments_granular(config, fitname="tW"):
             if "2j2b" in s and "2j2b" not in r:
                 continue
             args.append(f"n {config} Regions={r}:Systematics={s}:SaveSuffix=_{s}")
-            region_hupdate_files[r].append(f"{fitname}/Histograms/{fitname}_{r}_histos_{s}.root")
-    updates  = []
+            region_hupdate_files[r].append(
+                f"{fitname}/Histograms/{fitname}_{r}_histos_{s}.root"
+            )
+    updates = []
     for k, v in region_hupdate_files.items():
         a1 = f"{fitname}/Histograms/{fitname}_{k}_histos.root"
         a2 = " ".join(v)
@@ -357,5 +355,7 @@ def drop_region(blocks, region):
             if region in block:
                 continue
         new_blocks.append(block)
-    new_blocks[0] = new_blocks[0].replace("SummaryPlotRegions: reg1j1b,reg2j1b,reg2j2b\n  ", "")
+    new_blocks[0] = new_blocks[0].replace(
+        "SummaryPlotRegions: reg1j1b,reg2j1b,reg2j2b\n  ", ""
+    )
     return new_blocks

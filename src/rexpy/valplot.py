@@ -108,7 +108,10 @@ def blocks_for_region(meta, region, selection, is_preselection=False):
             logscale,
         )
         blocks.append(bk)
-        log.info("Validation plot block created in %s: %s (%s, %s, %s)" % (region, var, entry["nbins"], xmin, xmax))
+        log.info(
+            "Validation plot block created in %s: %s (%s, %s, %s)"
+            % (region, var, entry["nbins"], xmin, xmax)
+        )
     return blocks
 
 
@@ -137,9 +140,7 @@ def blocks_for_all_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b, is_preselection=F
     b2j1b = blocks_for_region(meta, "2j1b", sel_2j1b, is_preselection)
     b2j2b = blocks_for_region(meta, "2j2b", sel_2j2b, is_preselection)
     return "{}\n\n{}\n\n{}".format(
-        "\n\n".join(b1j1b),
-        "\n\n".join(b2j1b),
-        "\n\n".join(b2j2b)
+        "\n\n".join(b1j1b), "\n\n".join(b2j1b), "\n\n".join(b2j2b)
     )
 
 
@@ -169,18 +170,10 @@ def fix_systematics(config):
     log.info("'  Regions : reg2j1b,%s'" % valplots_2j1b)
     log.info("replacing 'Regions: reg2j2b' with:")
     log.info("'  Regions : reg2j2b,%s'" % valplots_2j2b)
-    whole = whole.replace(
-        "  Regions: reg1j1b", "  Regions: reg1j1b,{}".format(
-            valplots_1j1b
-        )
-    ).replace(
-        "  Regions: reg2j1b", "  Regions: reg2j1b,{}".format(
-            valplots_2j1b
-        )
-    ).replace(
-        "  Regions: reg2j2b", "  Regions: reg2j2b,{}".format(
-            valplots_2j2b
-        )
+    whole = (
+        whole.replace("  Regions: reg1j1b", "  Regions: reg1j1b,{}".format(valplots_1j1b))
+        .replace("  Regions: reg2j1b", "  Regions: reg2j1b,{}".format(valplots_2j1b))
+        .replace("  Regions: reg2j2b", "  Regions: reg2j2b,{}".format(valplots_2j2b))
     )
     os.remove(config)
     with open(config, "w") as f:

@@ -5,9 +5,9 @@ import pathlib
 import shutil
 
 from rexpy.confparse import regions_from, systematics_from, grouped_impact_arguments
-from rexpy.helpers import trex_fitter_exe
 
-TREX_EXE = trex_fitter_exe()
+
+TREX_EXE = shutil.which("trex-fitter")
 
 
 def job_params(wkspace, executable, **kwargs):
@@ -43,7 +43,7 @@ def job_params(wkspace, executable, **kwargs):
         submit=os.path.join(wkspace, "sub"),
         error=os.path.join(wkspace, "err"),
         output=os.path.join(wkspace, "out"),
-        log=os.path.join(wkspace, "log")
+        log=os.path.join(wkspace, "log"),
     )
 
 
@@ -60,6 +60,7 @@ def _run_wf_step(args):
 def _run_dp_step(args):
     p = subprocess.Popen(f"{args[0]} dp {args[1]}", shell=True)
     return p.wait()
+
 
 def _run_r_draw_step(args):
     p = subprocess.Popen(f"{args[0]} r {args[1]} Ranking=plot", shell=True)
