@@ -250,6 +250,23 @@ def fit_argument(config, specific_sys=None, dont_fit_vr=True):
 
 
 def ntuple_arguments_granular(config, fitname="tW"):
+    """Get the set of granular trex-fitter ntupling instructions
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+    fitname : str
+        Name of the fit.
+
+    Returns
+    -------
+    list(str)
+        trex-fitter n step arguments.
+    list(str)
+        hupdate.exe execution instructions.
+
+    """
     regions = regions_from(config)
     systematics = systematics_from(config)
     region_hupdate_files = {r: [] for r in regions}

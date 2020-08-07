@@ -8,4 +8,7 @@ rexpy
 
    api_batch
    api_confparse
+   api_helpers
+   api_resparse
    api_shower
+   api_valplot

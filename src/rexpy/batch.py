@@ -82,6 +82,16 @@ def _run_i_combine_step(args):
 
 
 def parallel_n_step(config, regions=None):
+    """Parallelize the ntuple step via multiprocessing.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+    regions : list(str), optional
+        Manually define regions.
+
+    """
     curdir = os.getcwd()
     run_dir = pathlib.PosixPath(config).resolve().parent
     os.chdir(run_dir)
@@ -91,20 +101,36 @@ def parallel_n_step(config, regions=None):
     pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
     pool.map(_run_n_step, args)
     os.chdir(curdir)
-    return 0
 
 
 def wfdp_step(config):
+    """Execute the wftp steps.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+
+    """
     curdir = os.getcwd()
     run_dir = pathlib.PosixPath(config).resolve().parent
     os.chdir(run_dir)
     _run_wf_step((TREX_EXE, config))
     _run_dp_step((TREX_EXE, config))
     os.chdir(curdir)
-    return 0
 
 
 def parallel_r_step(config, systematics=None):
+    """Parallelize the impart ranking step via multiprocessing.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+    systematics : list(str), optional
+        Manually define the systematics.
+
+    """
     curdir = os.getcwd()
     run_dir = pathlib.PosixPath(config).resolve().parent
     os.chdir(run_dir)
@@ -114,10 +140,17 @@ def parallel_r_step(config, systematics=None):
     pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
     pool.map(_run_r_step, args)
     os.chdir(curdir)
-    return 0
 
 
 def r_draw_step(config):
+    """Execute the ranking plot drawing step.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+
+    """
     curdir = os.getcwd()
     run_dir = pathlib.PosixPath(config).resolve().parent
     os.chdir(run_dir)
@@ -126,6 +159,14 @@ def r_draw_step(config):
 
 
 def parallel_i_step(config):
+    """Parallelize the grouped impact step via multiprocessing.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+
+    """
     curdir = os.getcwd()
     run_dir = pathlib.PosixPath(config).resolve().parent
     os.chdir(run_dir)
@@ -135,10 +176,17 @@ def parallel_i_step(config):
     pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
     pool.map(_run_i_step, args)
     os.chdir(curdir)
-    return 0
 
 
 def i_combine_step(config):
+    """Execute the grouped impact combine step.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+
+    """
     curdir = os.getcwd()
     run_dir = pathlib.PosixPath(config).resolve().parent
     os.chdir(run_dir)

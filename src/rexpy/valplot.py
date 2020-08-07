@@ -24,8 +24,8 @@ Region: "VRP_reg{region}_{var}"
 def block(region, selection, var, title, nbins, xmin, xmax, logscale):
     """Generate a VRP block.
 
-    Paramters
-    ---------
+    Parameters
+    ----------
     region : str
         Main region.
     selection : str
