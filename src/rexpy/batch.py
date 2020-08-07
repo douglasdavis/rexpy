@@ -4,10 +4,11 @@ import os
 import pathlib
 import shutil
 
-from rexpy.confparse import regions_from, systematics_from
+from rexpy.confparse import regions_from, systematics_from, grouped_impact_arguments
 from rexpy.helpers import trex_fitter_exe
 
 TREX_EXE = trex_fitter_exe()
+
 
 def job_params(wkspace, executable, **kwargs):
     """Turn a set of keyword arguments into a condor preamble.
@@ -60,9 +61,22 @@ def _run_dp_step(args):
     p = subprocess.Popen(f"{args[0]} dp {args[1]}", shell=True)
     return p.wait()
 
+def _run_r_draw_step(args):
+    p = subprocess.Popen(f"{args[0]} r {args[1]} Ranking=plot", shell=True)
+
 
 def _run_r_step(args):
     p = subprocess.Popen(f"{args[0]} r {args[1]} Ranking={args[2]}", shell=True)
+    return p.wait()
+
+
+def _run_i_step(args):
+    p = subprocess.Popen(f"{args[0]} i {args[1]} GroupedImpact={args[2]}", shell=True)
+    return p.wait()
+
+
+def _run_i_combine_step(args):
+    p = subprocess.Popen(f"{args[0]} i {args[1]} GroupedImpact=combine", shell=True)
     return p.wait()
 
 
@@ -100,3 +114,32 @@ def parallel_r_step(config, systematics=None):
     pool.map(_run_r_step, args)
     os.chdir(curdir)
     return 0
+
+
+def r_draw_step(config):
+    curdir = os.getcwd()
+    run_dir = pathlib.PosixPath(config).resolve().parent
+    os.chdir(run_dir)
+    _run_r_draw_step((TREX_EXE, config))
+    os.chdir(curdir)
+
+
+def parallel_i_step(config):
+    curdir = os.getcwd()
+    run_dir = pathlib.PosixPath(config).resolve().parent
+    os.chdir(run_dir)
+    args = grouped_impact_arguments(config)
+    groups = [a.split()[-1].split("=")[-1] for a in args]
+    args = [(TREX_EXE, config, g) for g in groups]
+    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
+    pool.map(_run_i_step, args)
+    os.chdir(curdir)
+    return 0
+
+
+def i_combine_step(config):
+    curdir = os.getcwd()
+    run_dir = pathlib.PosixPath(config).resolve().parent
+    os.chdir(run_dir)
+    _run_i_combine_step((TREX_EXE, config))
+    os.chdir(curdir)

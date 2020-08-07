@@ -272,6 +272,9 @@ def complete(
         rpb.parallel_n_step(f)
         rpb.wfdp_step(f)
         rpb.parallel_r_step(f)
+        rpb.r_draw_step(f)
+        rpb.parallel_i_step(f)
+        rpb.i_combine_step(f)
 
     return 0
 
