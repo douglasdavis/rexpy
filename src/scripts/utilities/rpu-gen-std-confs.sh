@@ -49,7 +49,7 @@ echo "Fit variable: ${FITVAR}"
 echo "Showering version: ${SHOWER}"
 mkdir -p $OUTDIR
 
-rp-conf.py tunable $OUTDIR/main_data.conf \
+rp-conf.py generate $OUTDIR/main_data.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -63,7 +63,7 @@ rp-conf.py tunable $OUTDIR/main_data.conf \
            --fit-data \
            --do-tables
 
-rp-conf.py tunable $OUTDIR/main_data_plots.conf \
+rp-conf.py generate $OUTDIR/main_data_plots.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -77,7 +77,7 @@ rp-conf.py tunable $OUTDIR/main_data_plots.conf \
            --fit-data \
            --do-valplots
 
-rp-conf.py tunable $OUTDIR/main_asimov.conf \
+rp-conf.py generate $OUTDIR/main_asimov.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -91,7 +91,7 @@ rp-conf.py tunable $OUTDIR/main_asimov.conf \
            --do-sys-plots \
            --do-tables
 
-rp-conf.py tunable $OUTDIR/main_asimov_singlebin2j2b.conf \
+rp-conf.py generate $OUTDIR/main_asimov_singlebin2j2b.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -104,7 +104,7 @@ rp-conf.py tunable $OUTDIR/main_asimov_singlebin2j2b.conf \
            --herwig-version $SHOWER \
            --do-sys-plots
 
-rp-conf.py tunable $OUTDIR/main_asimov_1j1b.conf \
+rp-conf.py generate $OUTDIR/main_asimov_1j1b.conf \
            --var-1j1b $FITVAR \
            --bin-1j1b '12,0.35,0.76' \
            --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
@@ -112,7 +112,7 @@ rp-conf.py tunable $OUTDIR/main_asimov_1j1b.conf \
            --drop-2j1b \
            --drop-2j2b
 
-rp-conf.py tunable $OUTDIR/main_asimov_2j1b.conf \
+rp-conf.py generate $OUTDIR/main_asimov_2j1b.conf \
            --var-2j1b $FITVAR \
            --bin-2j1b '12,0.22,0.70' \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
@@ -120,7 +120,7 @@ rp-conf.py tunable $OUTDIR/main_asimov_2j1b.conf \
            --drop-1j1b \
            --drop-2j2b
 
-rp-conf.py tunable $OUTDIR/main_asimov_2j2b.conf \
+rp-conf.py generate $OUTDIR/main_asimov_2j2b.conf \
            --var-2j2b $FITVAR \
            --bin-2j2b '12,0.45,0.775' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
@@ -128,7 +128,7 @@ rp-conf.py tunable $OUTDIR/main_asimov_2j2b.conf \
            --drop-1j1b \
            --drop-2j1b
 
-rp-conf.py tunable $OUTDIR/main_asimov_1j1b2j1b.conf \
+rp-conf.py generate $OUTDIR/main_asimov_1j1b2j1b.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --bin-1j1b '12,0.35,0.76' \
@@ -138,7 +138,7 @@ rp-conf.py tunable $OUTDIR/main_asimov_1j1b2j1b.conf \
            --herwig-version $SHOWER \
            --drop-2j2b
 
-rp-conf.py tunable $OUTDIR/main_asimov_1j1b2j2b.conf \
+rp-conf.py generate $OUTDIR/main_asimov_1j1b2j2b.conf \
            --var-1j1b $FITVAR \
            --var-2j2b $FITVAR \
            --bin-1j1b '12,0.35,0.76' \
@@ -148,7 +148,7 @@ rp-conf.py tunable $OUTDIR/main_asimov_1j1b2j2b.conf \
            --herwig-version $SHOWER \
            --drop-2j1b
 
-rp-conf.py tunable $OUTDIR/main_data_1j1b.conf \
+rp-conf.py generate $OUTDIR/main_data_1j1b.conf \
            --var-1j1b $FITVAR \
            --bin-1j1b '12,0.35,0.76' \
            --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
@@ -157,7 +157,7 @@ rp-conf.py tunable $OUTDIR/main_data_1j1b.conf \
            --drop-2j1b \
            --drop-2j2b
 
-rp-conf.py tunable $OUTDIR/main_data_2j1b.conf \
+rp-conf.py generate $OUTDIR/main_data_2j1b.conf \
            --var-2j1b $FITVAR \
            --bin-2j1b '12,0.22,0.70' \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
@@ -166,7 +166,7 @@ rp-conf.py tunable $OUTDIR/main_data_2j1b.conf \
            --drop-1j1b \
            --drop-2j2b
 
-rp-conf.py tunable $OUTDIR/main_data_2j2b.conf \
+rp-conf.py generate $OUTDIR/main_data_2j2b.conf \
            --var-2j2b $FITVAR \
            --bin-2j2b '12,0.45,0.775' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
@@ -175,7 +175,7 @@ rp-conf.py tunable $OUTDIR/main_data_2j2b.conf \
            --drop-1j1b \
            --drop-2j1b
 
-rp-conf.py tunable $OUTDIR/main_data_1j1b2j1b.conf \
+rp-conf.py generate $OUTDIR/main_data_1j1b2j1b.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --bin-1j1b '12,0.35,0.76' \
@@ -186,7 +186,7 @@ rp-conf.py tunable $OUTDIR/main_data_1j1b2j1b.conf \
            --fit-data \
            --drop-2j2b
 
-rp-conf.py tunable $OUTDIR/main_data_1j1b2j2b.conf \
+rp-conf.py generate $OUTDIR/main_data_1j1b2j2b.conf \
            --var-1j1b $FITVAR \
            --var-2j2b $FITVAR \
            --bin-1j1b '12,0.35,0.76' \
@@ -197,7 +197,7 @@ rp-conf.py tunable $OUTDIR/main_data_1j1b2j2b.conf \
            --fit-data \
            --drop-2j1b
 
-rp-conf.py tunable $OUTDIR/main_data_only1516.conf \
+rp-conf.py generate $OUTDIR/main_data_only1516.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -211,7 +211,7 @@ rp-conf.py tunable $OUTDIR/main_data_only1516.conf \
            --fit-data \
            --only-1516
 
-rp-conf.py tunable $OUTDIR/main_data_only17.conf \
+rp-conf.py generate $OUTDIR/main_data_only17.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -225,7 +225,7 @@ rp-conf.py tunable $OUTDIR/main_data_only17.conf \
            --fit-data \
            --only-17
 
-rp-conf.py tunable $OUTDIR/main_data_only18.conf \
+rp-conf.py generate $OUTDIR/main_data_only18.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -239,7 +239,7 @@ rp-conf.py tunable $OUTDIR/main_data_only18.conf \
            --fit-data \
            --only-18
 
-rp-conf.py tunable $OUTDIR/presel_data_plots.conf \
+rp-conf.py generate $OUTDIR/presel_data_plots.conf \
            --is-preselection \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
@@ -251,7 +251,7 @@ rp-conf.py tunable $OUTDIR/presel_data_plots.conf \
            --fit-data \
            --do-valplots
 
-rp-conf.py tunable $OUTDIR/presel_data.conf \
+rp-conf.py generate $OUTDIR/presel_data.conf \
            --is-preselection \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
@@ -263,7 +263,7 @@ rp-conf.py tunable $OUTDIR/presel_data.conf \
            --fit-data \
            --do-tables
 
-rp-conf.py tunable $OUTDIR/presel_asimov.conf \
+rp-conf.py generate $OUTDIR/presel_asimov.conf \
            --is-preselection \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \

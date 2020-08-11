@@ -198,6 +198,10 @@ def complete(
     standard_params = job_params(workspace, TREX_EXE)
     hupdate_params = job_params(workspace, HUPDATE_EXE)
 
+    # never submit if we do local.
+    if actually_local:
+        dont_submit = True
+
     if copy_histograms_from is None:
         log.info("Will run ntuple step")
         if systematics:
@@ -266,7 +270,7 @@ def complete(
         dagman.build_submit()
     os.chdir(orig_path)
 
-    if dont_submit and actually_local:
+    if actually_local:
         import rexpy.batch as rpb
         f = str(PosixPath(workspace) / "fit.conf")
         rpb.parallel_n_step(f)

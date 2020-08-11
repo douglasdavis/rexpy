@@ -10,19 +10,11 @@ from pathlib import PosixPath
 
 # rexpy
 import rexpy.blocks as rpb
-from rexpy.blocks import (
-    top_blocks,
-    modeling_blocks,
-    SAMPLE_BLOCKS,
-    NORMFACTOR_BLOCKS,
-    SYS_MINOR_BLOCKS,
-    SYS_WEIGHT_BLOCKS,
-    SYS_PDF_WEIGHT_BLOCKS,
-    SYS_TWOSIDED_TREE_BLOCKS,
-    SYS_ONESIDED_TREE_BLOCKS,
-)
-from rexpy.confparse import all_blocks, regions_from, drop_systematics, drop_region
-from rexpy.helpers import selection_with_period
+import rexpy.confparse as rpc
+import rexpy.helpers as rph
+import rexpy.valplot as rpv
+import rexpy.simpconf as rps
+
 
 log = logging.getLogger("rp-conf.py")
 
@@ -32,53 +24,18 @@ def cli():
     pass
 
 
-@cli.command("simple-setup0")
+@cli.command("generate")
 @click.argument("outname", type=click.Path(resolve_path=True))
-def simple_setup0(outname):
-    """Generate a config from default settings, save to OUTNAME."""
-    with open(outname, "w") as f:
-        print(top_blocks(), file=f)
-        print(SAMPLE_BLOCKS, file=f)
-        print(NORMFACTOR_BLOCKS, file=f)
-        print(modeling_blocks(rpb.NTUP_DIR, rpb.DEF_1j1b_sels, rpb.DEF_2j1b_sels, rpb.DEF_2j2b_sels), file=f)
-        rpb.const_sys_blocks(f)
-    return 0
-
-
-@cli.command("simple-setup1")
-@click.argument("outname", type=click.Path(resolve_path=True))
-def simple_setup1(outname):
-    """Generate a config from default settings using mass cuts, save to OUTNAME."""
-    preamble = top_blocks(
-        reg1j1b_selection=rpb.DEF_1j1b_swmc,
-        reg2j1b_selection=rpb.DEF_2j1b_swmc,
-        reg2j2b_selection=rpb.DEF_2j2b_swmc,
-        reg1j1b_variable="bdtres01",
-        reg2j1b_variable="bdtres01",
-        reg2j2b_variable="bdtres01",
-        reg1j1b_binning="12,0.17,0.745",
-    )
-    with open(outname, "w") as f:
-        print(preamble, file=f)
-        print(SAMPLE_BLOCKS, file=f)
-        print(NORMFACTOR_BLOCKS, file=f)
-        print(modeling_blocks(rpb.NTUP_DIR, rpb.DEF_1j1b_swmc, rpb.DEF_2j1b_swmc, rpb.DEF_2j2b_swmc), file=f)
-        rpb.const_sys_blocks(f)
-    return 0
-
-
-@cli.command("tunable")
-@click.argument("outname", type=click.Path(resolve_path=True))
-@click.option("--bin-1j1b", type=str, default=rpb.DEF_1j1b_bins, help="1j1b region binning settings.")
-@click.option("--bin-2j1b", type=str, default=rpb.DEF_2j1b_bins, help="2j1b region binning settings.")
-@click.option("--bin-2j2b", type=str, default=rpb.DEF_2j2b_bins, help="2j2b region binning settings.")
-@click.option("--var-1j1b", type=str, default=rpb.DEF_1j1b_vari, help="1j1b region variable setting.")
-@click.option("--var-2j1b", type=str, default=rpb.DEF_2j1b_vari, help="2j1b region variable setting.")
-@click.option("--var-2j2b", type=str, default=rpb.DEF_2j2b_vari, help="2j2b region variable setting.")
-@click.option("--sel-1j1b", type=str, default=rpb.DEF_1j1b_sels, help="1j1b region selection setting.")
-@click.option("--sel-2j1b", type=str, default=rpb.DEF_2j1b_sels, help="2j1b region selection setting.")
-@click.option("--sel-2j2b", type=str, default=rpb.DEF_2j2b_sels, help="2j2b region selection setting.")
-@click.option("--herwig-version", type=click.Choice(["704", "713"]), default="713", help="ttbar Herwig version.")
+@click.option("--bin-1j1b", type=str, default=rps.DEF_1j1b_bins, help="1j1b region binning settings.")
+@click.option("--bin-2j1b", type=str, default=rps.DEF_2j1b_bins, help="2j1b region binning settings.")
+@click.option("--bin-2j2b", type=str, default=rps.DEF_2j2b_bins, help="2j2b region binning settings.")
+@click.option("--var-1j1b", type=str, default=rps.DEF_1j1b_vari, help="1j1b region variable setting.")
+@click.option("--var-2j1b", type=str, default=rps.DEF_2j1b_vari, help="2j1b region variable setting.")
+@click.option("--var-2j2b", type=str, default=rps.DEF_2j2b_vari, help="2j2b region variable setting.")
+@click.option("--sel-1j1b", type=str, default=rps.DEF_1j1b_sels, help="1j1b region selection setting.")
+@click.option("--sel-2j1b", type=str, default=rps.DEF_2j1b_sels, help="2j1b region selection setting.")
+@click.option("--sel-2j2b", type=str, default=rps.DEF_2j2b_sels, help="2j2b region selection setting.")
+@click.option("--herwig-version", type=click.Choice(["704", "713"]), default="704", help="ttbar Herwig version.")
 @click.option("--drop-sys", type=str, help="Drop a systematic.")
 @click.option("--do-tables", is_flag=True, help="Produce tables.")
 @click.option("--do-sys-plots", is_flag=True, help="Produce red/blue plots.")
@@ -91,7 +48,7 @@ def simple_setup1(outname):
 @click.option("--drop-1j1b", is_flag=True, help="Drop the 1j1b region.")
 @click.option("--drop-2j1b", is_flag=True, help="Drop the 2j1b region.")
 @click.option("--drop-2j2b", is_flag=True, help="Drop the 2j2b region.")
-def tunable(
+def generate(
     outname,
     bin_1j1b,
     bin_2j1b,
@@ -124,19 +81,19 @@ def tunable(
         sel_1j1b = None
         log.info("Excluding 1j1b")
     else:
-        sel_1j1b = selection_with_period(sel_1j1b, only_1516, only_17, only_18)
+        sel_1j1b = rph.selection_with_period(sel_1j1b, only_1516, only_17, only_18)
     if drop_2j1b:
         sel_2j1b = None
         log.info("Excluding 2j1b")
     else:
-        sel_2j1b = selection_with_period(sel_2j1b, only_1516, only_17, only_18)
+        sel_2j1b = rph.selection_with_period(sel_2j1b, only_1516, only_17, only_18)
     if drop_2j2b:
         sel_2j2b = None
         log.info("Excluding 2j2b")
     else:
-        sel_2j2b = selection_with_period(sel_2j2b, only_1516, only_17, only_18)
+        sel_2j2b = rph.selection_with_period(sel_2j2b, only_1516, only_17, only_18)
 
-    preamble = top_blocks(
+    preamble = rpb.top_blocks(
         reg1j1b_binning=bin_1j1b,
         reg2j1b_binning=bin_2j1b,
         reg2j2b_binning=bin_2j2b,
@@ -153,32 +110,28 @@ def tunable(
     with open(outname, "w") as f:
         print(preamble, file=f)
         if do_valplots:
-            import requests
-            meta_req = requests.get("https://cern.ch/ddavis/tdub_data/meta.yml")
-            meta = yaml.full_load(meta_req.content)
-            print(
-                blocks_for_all_regions(
-                    meta, sel_1j1b, sel_2j1b, sel_2j2b, is_preselection=is_preselection
-                ),
-                file=f
-            )
-            print("", file=f)
-        print(SAMPLE_BLOCKS, file=f)
-        print(NORMFACTOR_BLOCKS, file=f)
-        print(modeling_blocks(rpb.NTUP_DIR, sel_1j1b, sel_2j1b, sel_2j2b, herwig_version), file=f)
-        rpb.const_sys_blocks(f)
+            print(rpv.default_vrp_blocks(sel_1j1b, sel_2j1b, sel_2j2b, is_preselection=is_preselection), file=f)
+        print(rpb.sample_blocks(), file=f)
+        print(rpb.norm_factor_blocks(), file=f)
+        print(rpb.sys_modeling_blocks(rps.NTUP_DIR, sel_1j1b, sel_2j1b, sel_2j2b, herwig_version), file=f)
+        print(rpb.sys_minor_blocks(), file=f)
+        print(rpb.sys_sf_weight_blocks(), file=f)
+        print(rpb.sys_pdf_weight_blocks(), file=f)
+        print(rpb.sys_twosided_tree_blocks(), file=f)
+        print(rpb.sys_onesided_tree_blocks(), file=f)
+
     if do_valplots:
         fix_systematics(outname)
 
-    blocks = all_blocks(outname)
+    blocks = rpc.all_blocks(outname)
     if drop_1j1b:
-        blocks = drop_region(blocks, "1j1b")
+        blocks = rpc.drop_region(blocks, "1j1b")
     if drop_2j1b:
-        blocks = drop_region(blocks, "2j1b")
+        blocks = rpc.drop_region(blocks, "2j1b")
     if drop_2j2b:
-        blocks = drop_region(blocks, "2j2b")
+        blocks = rpc.drop_region(blocks, "2j2b")
     if drop_sys is not None:
-        blocks = drop_systematics(blocks, [drop_sys])
+        blocks = rpc.drop_systematics(blocks, [drop_sys])
 
     final_conf = "\n\n".join(blocks)
     with open(outname, "w") as outf:
@@ -193,9 +146,9 @@ def tunable(
 @click.option("-n", "--new-file", type=str)
 def rm_region(config, region, new_file):
     """Remove regions from a config file."""
-    blocks = all_blocks(config)
+    blocks = rpc.all_blocks(config)
     for r in region:
-        blocks = drop_region(blocks, r)
+        blocks = rpc.drop_region(blocks, r)
 
     outf = config if new_file is None else new_file
     with open(outf, "w") as f:
@@ -208,7 +161,7 @@ def rm_region(config, region, new_file):
 @click.option("-n", "--new-file", type=str)
 def rm_sys(config, sys, new_file):
     """Remove systematics from a config file."""
-    new_conf = "\n\n".join(drop_systematics(all_blocks(config), sys))
+    new_conf = "\n\n".join(rpc.drop_systematics(rpc.all_blocks(config), sys))
     outf = config if new_file is None else new_file
     with open(outf, "w") as f:
         print(new_conf, file=f)

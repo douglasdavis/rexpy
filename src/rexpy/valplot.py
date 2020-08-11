@@ -3,6 +3,10 @@ import logging
 import os
 from pathlib import PosixPath
 
+# third party
+import requests
+import yaml
+
 # rexpy
 from rexpy.confparse import regions_from
 
@@ -139,8 +143,16 @@ def blocks_for_all_regions(meta, sel_1j1b, sel_2j1b, sel_2j2b, is_preselection=F
     b1j1b = blocks_for_region(meta, "1j1b", sel_1j1b, is_preselection)
     b2j1b = blocks_for_region(meta, "2j1b", sel_2j1b, is_preselection)
     b2j2b = blocks_for_region(meta, "2j2b", sel_2j2b, is_preselection)
-    return "{}\n\n{}\n\n{}".format(
+    return "{}\n\n{}\n\n{}\n".format(
         "\n\n".join(b1j1b), "\n\n".join(b2j1b), "\n\n".join(b2j2b)
+    )
+
+
+def default_vrp_blocks(sel_1j1b, sel_2j1b, sel_2j2b, is_preselection=False):
+    meta_req = requests.get("https://cern.ch/ddavis/tdub_data/meta.yml")
+    meta = yaml.full_load(meta_req.content)
+    return blocks_for_all_regions(
+        meta, sel_1j1b, sel_2j1b, sel_2j2b, is_preselection=is_preselection
     )
 
 
