@@ -14,6 +14,7 @@ import click
 # rexpy
 from rexpy.batch import job_params
 import rexpy.pycondor as pycondor
+import rexpy.confparse as rpcp
 from rexpy.confparse import (
     regions_from,
     systematics_from,
@@ -158,15 +159,16 @@ def rank(config):
 
 @cli.command("complete")
 @click.argument("config", type=click.Path(exists=True, resolve_path=True))
-@click.option("-s", "--systematics", type=str, help="only these systematics (comma separated)")
-@click.option("-w", "--ws-suffix", type=str, help="extra workspace suffix")
-@click.option("--copy-histograms-from", type=click.Path(exists=True, resolve_path=True), help="Use existing histograms")
-@click.option("--dont-fit", is_flag=True, help="only do n and d steps")
-@click.option("--dont-rank", is_flag=True, help="Skip the ranking step")
-@click.option("--dont-draw", is_flag=True, help="Skip the plotting steps")
-@click.option("--dont-submit", is_flag=True, help="do not submit to condor")
-@click.option("--granular-ntup", is_flag=True, help="do granular ntuple step")
-@click.option("--actually-local", is_flag=True, help="do steps locally")
+@click.option("-s", "--systematics", type=str, help="Only these systematics (comma separated).")
+@click.option("-w", "--ws-suffix", type=str, help="Extra workspace suffix.")
+@click.option("--copy-histograms-from", type=click.Path(exists=True, resolve_path=True), help="Use existing histograms.")
+@click.option("--dont-fit", is_flag=True, help="Only do n and d steps.")
+@click.option("--dont-rank", is_flag=True, help="Skip the ranking step.")
+@click.option("--dont-draw", is_flag=True, help="Skip the plotting steps.")
+@click.option("--dont-submit", is_flag=True, help="Do not submit to condor.")
+@click.option("--granular-ntup", is_flag=True, help="Do granular ntuple step.")
+@click.option("--actually-local", is_flag=True, help="Do steps locally.")
+@click.option("--do-blind", is_flag=True, help="Run steps again as blind.")
 def complete(
     config,
     systematics,
@@ -178,13 +180,14 @@ def complete(
     dont_submit,
     granular_ntup,
     actually_local,
+    do_blind,
 ):
     """Run a complete set of trex-fitter stages ('n'; 'wf'; 'dp'; 'r'; 'i')"""
     config_path = PosixPath(config).resolve()
     config_name = config_path.name
-    workspace = (config_path.parent / "rpcc_{}".format(config_path.stem)).resolve()
+    workspace = (config_path.parent / f"rpcc_{config_path.stem}").resolve()
     if ws_suffix:
-        workspace = "{}__{}".format(workspace, ws_suffix)
+        workspace = f"{workspace}__{ws_suffix}"
     os.mkdir(workspace)
     shutil.copyfile(str(config_path), os.path.join(workspace, "fit.conf"))
     workspace = os.path.abspath(workspace)
@@ -235,6 +238,8 @@ def complete(
         log.info("Will run fit step")
         fit = pycondor.Job(name="fit", dag=dagman, **standard_params)
         fit.add_arg(fit_argument(config, specific_sys=syslist if systematics else None))
+        if do_blind:
+            fit.add_arg(fit_argument(config, specific_sys=syslist if systematics else None, as_blind=True))
         if copy_histograms_from is None:
             fit.add_parent(ntuple)
         # the draw step
@@ -242,6 +247,8 @@ def complete(
             log.info("Will run drawing steps")
             draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
             draw.add_arg(draw_argument(config, specific_sys=syslist if systematics else None))
+            if do_blind:
+                draw.add_arg(draw_argument(config, specific_sys=syslist if systematics else None, as_blind=True))
             draw.add_parent(fit)
         # the rank step
         if not dont_rank:
@@ -250,16 +257,22 @@ def complete(
             rank.add_args(rank_arguments(config, specific_sys=syslist))
             rank.add_parent(fit)
             rank_draw = pycondor.Job(name="rank_draw", dag=dagman, **standard_params)
-            rank_draw.add_arg("r {} Ranking=plot".format(config))
+            rank_draw.add_arg(f"r {config} Ranking=plot")
             rank_draw.add_parent(rank)
+            if do_blind:
+                rank.add_args(rank_arguments(config, specific_sys=syslist, as_blind=True))
+                rank_draw.add_arg(f"r {config} Ranking=plot:{rpcp.BLIND_ARGS}")
             if systematics is None:
                 log.info("Will run impact step")
                 group = pycondor.Job(name="group", dag=dagman, **standard_params)
                 group.add_args(grouped_impact_arguments(config))
                 group.add_parent(fit)
                 group_combine = pycondor.Job(name="group_combine", dag=dagman, **standard_params)
-                group_combine.add_arg("i {} GroupedImpact=combine".format(config))
+                group_combine.add_arg(f"i {config} GroupedImpact=combine")
                 group_combine.add_parent(group)
+                if do_blind:
+                    group.add_args(grouped_impact_arguments(config, as_blind=True))
+                    group_combine.add_arg(f"i {config} GroupedImpact=combine:{rpcp.BLIND_ARGS}")
     # fmt: on
 
     orig_path = os.getcwd()
@@ -274,11 +287,11 @@ def complete(
         import rexpy.batch as rpb
         f = str(PosixPath(workspace) / "fit.conf")
         rpb.parallel_n_step(f)
-        rpb.wfdp_step(f)
-        rpb.parallel_r_step(f)
-        rpb.r_draw_step(f)
-        rpb.parallel_i_step(f)
-        rpb.i_combine_step(f)
+        rpb.wfdp_step(f, do_blind=do_blind)
+        rpb.parallel_r_step(f, do_blind=do_blind)
+        rpb.r_draw_step(f, do_blind=do_blind)
+        rpb.parallel_i_step(f, do_blind=do_blind)
+        rpb.i_combine_step(f, do_blind=do_blind)
 
     return 0
 

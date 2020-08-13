@@ -47,6 +47,8 @@ def job_params(wkspace, executable, **kwargs):
     )
 
 
+
+
 def _run_n_step(args):
     p = subprocess.Popen(f"{args[0]} n {args[1]} Regions={args[2]}", shell=True)
     return p.wait()
@@ -57,17 +59,42 @@ def _run_wf_step(args):
     return p.wait()
 
 
+def _run_wf_step_blind(args):
+    p = subprocess.Popen(f"{args[0]} wf {args[1]} FitBlind=True:Suffix=_asimov", shell=True)
+    return p.wait()
+
+
 def _run_dp_step(args):
     p = subprocess.Popen(f"{args[0]} dp {args[1]}", shell=True)
     return p.wait()
 
 
+def _run_dp_step_blind(args):
+    p = subprocess.Popen(f"{args[0]} dp {args[1]} FitBlind=True:Suffix=_asimov", shell=True)
+    return p.wait()
+
+
 def _run_r_draw_step(args):
     p = subprocess.Popen(f"{args[0]} r {args[1]} Ranking=plot", shell=True)
+    return p.wait()
+
+
+def _run_r_draw_step_blind(args):
+    p = subprocess.Popen(
+        f"{args[0]} r {args[1]} Ranking=plot:FitBlind=True:Suffix=_asimov", shell=True
+    )
+    return p.wait()
 
 
 def _run_r_step(args):
     p = subprocess.Popen(f"{args[0]} r {args[1]} Ranking={args[2]}", shell=True)
+    return p.wait()
+
+
+def _run_r_step_blind(args):
+    p = subprocess.Popen(
+        f"{args[0]} r {args[1]} Ranking={args[2]}:FitBlind=True:Suffix=_asimov", shell=True
+    )
     return p.wait()
 
 
@@ -76,8 +103,24 @@ def _run_i_step(args):
     return p.wait()
 
 
+def _run_i_step_blind(args):
+    p = subprocess.Popen(
+        f"{args[0]} i {args[1]} GroupedImpact={args[2]}:FitBlind=True:Suffix=_asimov",
+        shell=True,
+    )
+    return p.wait()
+
+
 def _run_i_combine_step(args):
     p = subprocess.Popen(f"{args[0]} i {args[1]} GroupedImpact=combine", shell=True)
+    return p.wait()
+
+
+def _run_i_combine_step_blind(args):
+    p = subprocess.Popen(
+        f"{args[0]} i {args[1]} GroupedImpact=combine:FitBlind=True:Suffix=_asimov",
+        shell=True,
+    )
     return p.wait()
 
 
@@ -103,13 +146,15 @@ def parallel_n_step(config, regions=None):
     os.chdir(curdir)
 
 
-def wfdp_step(config):
+def wfdp_step(config, do_blind=False):
     """Execute the wftp steps.
 
     Parameters
     ----------
     config : str
         Path of the config file.
+    do_blind : bool
+        Also run step in Asimov setup.
 
     """
     curdir = os.getcwd()
@@ -117,10 +162,13 @@ def wfdp_step(config):
     os.chdir(run_dir)
     _run_wf_step((TREX_EXE, config))
     _run_dp_step((TREX_EXE, config))
+    if do_blind:
+        _run_wf_step_blind((TREX_EXE, config))
+        _run_dp_step_blind((TREX_EXE, config))
     os.chdir(curdir)
 
 
-def parallel_r_step(config, systematics=None):
+def parallel_r_step(config, systematics=None, do_blind=False):
     """Parallelize the impart ranking step via multiprocessing.
 
     Parameters
@@ -129,6 +177,8 @@ def parallel_r_step(config, systematics=None):
         Path of the config file.
     systematics : list(str), optional
         Manually define the systematics.
+    do_blind : bool
+        Also run step in Asimov setup.
 
     """
     curdir = os.getcwd()
@@ -139,32 +189,40 @@ def parallel_r_step(config, systematics=None):
     args = [(TREX_EXE, config, sys) for sys in systematics]
     pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
     pool.map(_run_r_step, args)
+    if do_blind:
+        pool.map(_run_r_step_blind, args)
     os.chdir(curdir)
 
 
-def r_draw_step(config):
+def r_draw_step(config, do_blind=False):
     """Execute the ranking plot drawing step.
 
     Parameters
     ----------
     config : str
         Path of the config file.
+    do_blind : bool
+        Also run step in Asimov setup.
 
     """
     curdir = os.getcwd()
     run_dir = pathlib.PosixPath(config).resolve().parent
     os.chdir(run_dir)
     _run_r_draw_step((TREX_EXE, config))
+    if do_blind:
+        _run_r_draw_step_blind((TREX_EXE, config))
     os.chdir(curdir)
 
 
-def parallel_i_step(config):
+def parallel_i_step(config, do_blind=False):
     """Parallelize the grouped impact step via multiprocessing.
 
     Parameters
     ----------
     config : str
         Path of the config file.
+    do_blind : bool
+        Also run step in Asimov setup.
 
     """
     curdir = os.getcwd()
@@ -175,20 +233,26 @@ def parallel_i_step(config):
     args = [(TREX_EXE, config, g) for g in groups]
     pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
     pool.map(_run_i_step, args)
+    if do_blind:
+        pool.map(_run_i_step_blind, args)
     os.chdir(curdir)
 
 
-def i_combine_step(config):
+def i_combine_step(config, do_blind=False):
     """Execute the grouped impact combine step.
 
     Parameters
     ----------
     config : str
         Path of the config file.
+    do_blind : bool
+        Also run step in Asimov setup.
 
     """
     curdir = os.getcwd()
     run_dir = pathlib.PosixPath(config).resolve().parent
     os.chdir(run_dir)
     _run_i_combine_step((TREX_EXE, config))
+    if do_blind:
+        _run_i_combine_step_blind((TREX_EXE, config))
     os.chdir(curdir)

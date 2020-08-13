@@ -41,7 +41,6 @@ def cli():
 @click.option("--do-sys-plots", is_flag=True, help="Produce red/blue plots.")
 @click.option("--do-valplots", is_flag=True, help="Produce validation region plots.")
 @click.option("--is-preselection", is_flag=True, help="use preselection plotting definitions")
-@click.option("--fit-data", is_flag=True, help="Fit to data.")
 @click.option("--only-1516", is_flag=True, help="Fit only 15/16.")
 @click.option("--only-17", is_flag=True, help="Fit only 17.")
 @click.option("--only-18", is_flag=True, help="Fit only 18.")
@@ -65,7 +64,6 @@ def generate(
     do_sys_plots,
     do_valplots,
     is_preselection,
-    fit_data,
     only_1516,
     only_17,
     only_18,
@@ -105,7 +103,6 @@ def generate(
         reg2j2b_selection=sel_2j2b,
         dotables="TRUE" if do_tables else "FALSE",
         systplots="TRUE" if do_sys_plots else "FALSE",
-        fitblind="FALSE" if fit_data else "TRUE",
     )
     with open(outname, "w") as f:
         print(preamble, file=f)

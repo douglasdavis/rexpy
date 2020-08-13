@@ -49,7 +49,7 @@ echo "Fit variable: ${FITVAR}"
 echo "Showering version: ${SHOWER}"
 mkdir -p $OUTDIR
 
-rp-conf.py generate $OUTDIR/main_data.conf \
+rp-conf.py generate $OUTDIR/main.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -60,10 +60,10 @@ rp-conf.py generate $OUTDIR/main_data.conf \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
            --herwig-version $SHOWER \
-           --fit-data \
-           --do-tables
+           --do-tables \
+           --do-sys-plots \
 
-rp-conf.py generate $OUTDIR/main_data_plots.conf \
+rp-conf.py generate $OUTDIR/main_plots.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -74,24 +74,9 @@ rp-conf.py generate $OUTDIR/main_data_plots.conf \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
            --herwig-version $SHOWER \
-           --fit-data \
            --do-valplots
 
-rp-conf.py generate $OUTDIR/main_asimov.conf \
-           --var-1j1b $FITVAR \
-           --var-2j1b $FITVAR \
-           --var-2j2b $FITVAR \
-           --bin-1j1b '12,0.35,0.76' \
-           --bin-2j1b '12,0.22,0.70' \
-           --bin-2j2b '12,0.45,0.775' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
-           --herwig-version $SHOWER \
-           --do-sys-plots \
-           --do-tables
-
-rp-conf.py generate $OUTDIR/main_asimov_singlebin2j2b.conf \
+rp-conf.py generate $OUTDIR/main_singlebin2j2b.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -102,9 +87,11 @@ rp-conf.py generate $OUTDIR/main_asimov_singlebin2j2b.conf \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
            --herwig-version $SHOWER \
+           --do-tables \
            --do-sys-plots
 
-rp-conf.py generate $OUTDIR/main_asimov_1j1b.conf \
+
+rp-conf.py generate $OUTDIR/main_1j1b.conf \
            --var-1j1b $FITVAR \
            --bin-1j1b '12,0.35,0.76' \
            --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
@@ -112,7 +99,7 @@ rp-conf.py generate $OUTDIR/main_asimov_1j1b.conf \
            --drop-2j1b \
            --drop-2j2b
 
-rp-conf.py generate $OUTDIR/main_asimov_2j1b.conf \
+rp-conf.py generate $OUTDIR/main_2j1b.conf \
            --var-2j1b $FITVAR \
            --bin-2j1b '12,0.22,0.70' \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
@@ -120,7 +107,7 @@ rp-conf.py generate $OUTDIR/main_asimov_2j1b.conf \
            --drop-1j1b \
            --drop-2j2b
 
-rp-conf.py generate $OUTDIR/main_asimov_2j2b.conf \
+rp-conf.py generate $OUTDIR/main_2j2b.conf \
            --var-2j2b $FITVAR \
            --bin-2j2b '12,0.45,0.775' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
@@ -128,7 +115,7 @@ rp-conf.py generate $OUTDIR/main_asimov_2j2b.conf \
            --drop-1j1b \
            --drop-2j1b
 
-rp-conf.py generate $OUTDIR/main_asimov_1j1b2j1b.conf \
+rp-conf.py generate $OUTDIR/main_1j1b2j1b.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --bin-1j1b '12,0.35,0.76' \
@@ -138,7 +125,7 @@ rp-conf.py generate $OUTDIR/main_asimov_1j1b2j1b.conf \
            --herwig-version $SHOWER \
            --drop-2j2b
 
-rp-conf.py generate $OUTDIR/main_asimov_1j1b2j2b.conf \
+rp-conf.py generate $OUTDIR/main_1j1b2j2b.conf \
            --var-1j1b $FITVAR \
            --var-2j2b $FITVAR \
            --bin-1j1b '12,0.35,0.76' \
@@ -148,56 +135,7 @@ rp-conf.py generate $OUTDIR/main_asimov_1j1b2j2b.conf \
            --herwig-version $SHOWER \
            --drop-2j1b
 
-rp-conf.py generate $OUTDIR/main_data_1j1b.conf \
-           --var-1j1b $FITVAR \
-           --bin-1j1b '12,0.35,0.76' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
-           --herwig-version $SHOWER \
-           --fit-data \
-           --drop-2j1b \
-           --drop-2j2b
-
-rp-conf.py generate $OUTDIR/main_data_2j1b.conf \
-           --var-2j1b $FITVAR \
-           --bin-2j1b '12,0.22,0.70' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
-           --herwig-version $SHOWER \
-           --fit-data \
-           --drop-1j1b \
-           --drop-2j2b
-
-rp-conf.py generate $OUTDIR/main_data_2j2b.conf \
-           --var-2j2b $FITVAR \
-           --bin-2j2b '12,0.45,0.775' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
-           --herwig-version $SHOWER \
-           --fit-data \
-           --drop-1j1b \
-           --drop-2j1b
-
-rp-conf.py generate $OUTDIR/main_data_1j1b2j1b.conf \
-           --var-1j1b $FITVAR \
-           --var-2j1b $FITVAR \
-           --bin-1j1b '12,0.35,0.76' \
-           --bin-2j1b '12,0.22,0.70' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
-           --herwig-version $SHOWER \
-           --fit-data \
-           --drop-2j2b
-
-rp-conf.py generate $OUTDIR/main_data_1j1b2j2b.conf \
-           --var-1j1b $FITVAR \
-           --var-2j2b $FITVAR \
-           --bin-1j1b '12,0.35,0.76' \
-           --bin-2j2b '12,0.45,0.775' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
-           --herwig-version $SHOWER \
-           --fit-data \
-           --drop-2j1b
-
-rp-conf.py generate $OUTDIR/main_data_only1516.conf \
+rp-conf.py generate $OUTDIR/main_only1516.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -208,10 +146,9 @@ rp-conf.py generate $OUTDIR/main_data_only1516.conf \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
            --herwig-version $SHOWER \
-           --fit-data \
            --only-1516
 
-rp-conf.py generate $OUTDIR/main_data_only17.conf \
+rp-conf.py generate $OUTDIR/main_only17.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -222,10 +159,9 @@ rp-conf.py generate $OUTDIR/main_data_only17.conf \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
            --herwig-version $SHOWER \
-           --fit-data \
            --only-17
 
-rp-conf.py generate $OUTDIR/main_data_only18.conf \
+rp-conf.py generate $OUTDIR/main_only18.conf \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -236,10 +172,9 @@ rp-conf.py generate $OUTDIR/main_data_only18.conf \
            --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
            --herwig-version $SHOWER \
-           --fit-data \
            --only-18
 
-rp-conf.py generate $OUTDIR/presel_data_plots.conf \
+rp-conf.py generate $OUTDIR/presel_plots.conf \
            --is-preselection \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
@@ -248,10 +183,9 @@ rp-conf.py generate $OUTDIR/presel_data_plots.conf \
            --sel-2j1b 'reg2j1b == 1 && OS == 1' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1' \
            --herwig-version $SHOWER \
-           --fit-data \
            --do-valplots
 
-rp-conf.py generate $OUTDIR/presel_data.conf \
+rp-conf.py generate $OUTDIR/presel.conf \
            --is-preselection \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
@@ -260,17 +194,5 @@ rp-conf.py generate $OUTDIR/presel_data.conf \
            --sel-2j1b 'reg2j1b == 1 && OS == 1' \
            --sel-2j2b 'reg2j2b == 1 && OS == 1' \
            --herwig-version $SHOWER \
-           --fit-data \
-           --do-tables
-
-rp-conf.py generate $OUTDIR/presel_asimov.conf \
-           --is-preselection \
-           --var-1j1b $FITVAR \
-           --var-2j1b $FITVAR \
-           --var-2j2b $FITVAR \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1' \
-           --herwig-version $SHOWER \
-           --do-sys-plots \
-           --do-tables
+           --do-tables \
+           --do-sys-plots

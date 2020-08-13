@@ -3,6 +3,8 @@
 # stdlib
 from pathlib import PosixPath
 
+BLIND_ARGS = "FitBlind=TRUE:Suffix=_asimov"
+
 
 def all_blocks(config, delimiter="\n\n"):
     """Get all blocks in a config based on a delimiter.
@@ -154,7 +156,7 @@ def regions_from(config, exclude=None):
         return regs
 
 
-def rank_arguments(config, specific_sys=None):
+def rank_arguments(config, specific_sys=None, as_blind=False):
     """Get a set of trex-fitter executable arguments for ranking.
 
     Parameters
@@ -164,6 +166,8 @@ def rank_arguments(config, specific_sys=None):
     specific_sys : iterable(str), optional
         Specific systematics to use; if None (the default), uses all
         discovered systematics.
+    as_blind : bool
+        Include command line arguments for performing blind fit.
 
     Returns
     -------
@@ -171,16 +175,21 @@ def rank_arguments(config, specific_sys=None):
         The list of trex-fitter arguments.
     """
     systematics = systematics_from(config, specific_sys=specific_sys)
-    return ["r {} Ranking={}".format(config, sys) for sys in systematics]
+    args = ["r {} Ranking={}".format(config, sys) for sys in systematics]
+    if as_blind:
+        args = [f"{arg}:{BLIND_ARGS}" for arg in args]
+    return args
 
 
-def grouped_impact_arguments(config):
+def grouped_impact_arguments(config, as_blind=False):
     """Get a set of trex-fitter executable arguments for grouped impact.
 
     Parameters
     ----------
     config : str
         Path of the config file.
+    as_blind : bool
+        Include command line arguments for performing blind fit.
 
     Returns
     -------
@@ -189,10 +198,13 @@ def grouped_impact_arguments(config):
     """
     groups = sub_block_values(config, "SubCategory")
     groups = list(groups) + ["Gammas", "FullSyst"]
-    return ["i {} GroupedImpact={}".format(config, g) for g in groups]
+    args = ["i {} GroupedImpact={}".format(config, g) for g in groups]
+    if as_blind:
+        args = [f"{arg}:{BLIND_ARGS}" for arg in args]
+    return args
 
 
-def draw_argument(config, specific_sys=None):
+def draw_argument(config, specific_sys=None, as_blind=False):
     """Get the draw trex-fitter step argument"
 
     Parameters
@@ -202,6 +214,8 @@ def draw_argument(config, specific_sys=None):
     specific_sys : iterable(str), optional
         Specific systematics to use; if None (the default), uses all
         discovered systematics.
+    as_blind : bool
+        Include command line arguments for performing blind fit.
 
     Returns
     -------
@@ -210,12 +224,17 @@ def draw_argument(config, specific_sys=None):
     """
     if specific_sys is not None:
         systs = ",".join(systematics_from(config, specific_sys))
-        return "dp {} Systematics={}".format(config, systs)
+        arg = "dp {} Systematics={}".format(config, systs)
     else:
-        return "dp {}".format(config)
+        arg = "dp {}".format(config)
+
+    if as_blind:
+        arg = f"{arg}:{BLIND_ARGS}"
+
+    return arg
 
 
-def fit_argument(config, specific_sys=None, dont_fit_vr=True):
+def fit_argument(config, specific_sys=None, dont_fit_vr=True, as_blind=False):
     """Get the fit trex-fitter step argument.
 
     Parameters
@@ -225,6 +244,10 @@ def fit_argument(config, specific_sys=None, dont_fit_vr=True):
     specific_sys : iterable(str), optional
         Specific systematics to use; if None (the default), uses all
         discovered systematics.
+    dont_fit_vr : bool
+        Do not include VR regions in fit argument.
+    as_blind : bool
+        Include command line arguments for performing blind fit.
 
     Returns
     -------
@@ -235,18 +258,20 @@ def fit_argument(config, specific_sys=None, dont_fit_vr=True):
     if dont_fit_vr:
         regions = regions_from(config)
         regions = [r for r in regions if not r.startswith("VR")]
-        region_arg = "Regions={}".format(",".join(regions))
+        region_arg = " Regions={}".format(",".join(regions))
 
-    if specific_sys is None:
-        return "wf {} {}".format(config, region_arg).strip()
+    arg = f"wf {config}{region_arg}"
+    arg = arg.strip()
 
-    systematics = systematics_from(config, specific_sys=specific_sys)
-    systematics = ",".join(systematics)
+    if specific_sys is not None:
+        systematics = systematics_from(config, specific_sys=specific_sys)
+        systematics = ",".join(systematics)
+        arg = f"{arg}:Systematics={systematics}"
 
-    if not region_arg:
-        return "wf {} Systematics={}".format(config, systematics)
-    else:
-        return "wf {} {}:Systematics={}".format(config, region_arg, systematics)
+    if as_blind:
+        arg = f"{arg}:{BLIND_ARGS}"
+
+    return arg
 
 
 def ntuple_arguments_granular(config, fitname="tW"):

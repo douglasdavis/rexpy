@@ -37,7 +37,6 @@ def top_blocks(**kwargs):
         ntuplepaths=c.NTUP_DIR,
         dotables="FALSE",
         systplots="FALSE",
-        fitblind="TRUE",
         reg1j1b_selection=c.DEF_1j1b_sels,
         reg1j1b_variable=c.DEF_1j1b_vari,
         reg1j1b_binning=c.DEF_1j1b_bins,
@@ -97,7 +96,6 @@ def top_blocks(**kwargs):
       POIAsimov: 1
       FitType: SPLUSB
       FitRegion: CRSR
-      FitBlind: {fitblind}
       UseMinos: all
       GetGoodnessOfFit: TRUE
       SaturatedModel: TRUE
