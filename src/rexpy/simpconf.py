@@ -7,9 +7,11 @@ from pathlib import Path
 ON_SPAR = Path("/atlasgpfs01/usatlas/data/ddavis").exists()
 NTUP_DIR = None
 if ON_SPAR:
-    NTUP_DIR = "/atlasgpfs01/usatlas/data/ddavis/wtloop/WTA01_20200506"
+    NTUP_DIR = "/atlasgpfs01/usatlas/data/ddavis/wtloop/WTA02_20200809"
 else:
     NTUP_DIR = "/ddd/atlas/data/wtloop/WTA01_20200506"
+
+TTBAR_AUX_WEIGHT = "1.0"
 
 DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"
 DEF_1j1b_swmc = "reg1j1b == 1 && OS == 1 && mass_lep1jet1 < 155 && mass_lep2jet1 < 155"

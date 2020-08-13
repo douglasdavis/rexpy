@@ -13,7 +13,7 @@ import rexpy.blocks as rpb
 import rexpy.confparse as rpc
 import rexpy.helpers as rph
 import rexpy.valplot as rpv
-import rexpy.simpconf as rps
+import rexpy.simpconf as rpsc
 
 
 log = logging.getLogger("rp-conf.py")
@@ -26,15 +26,16 @@ def cli():
 
 @cli.command("generate")
 @click.argument("outname", type=click.Path(resolve_path=True))
-@click.option("--bin-1j1b", type=str, default=rps.DEF_1j1b_bins, help="1j1b region binning settings.")
-@click.option("--bin-2j1b", type=str, default=rps.DEF_2j1b_bins, help="2j1b region binning settings.")
-@click.option("--bin-2j2b", type=str, default=rps.DEF_2j2b_bins, help="2j2b region binning settings.")
-@click.option("--var-1j1b", type=str, default=rps.DEF_1j1b_vari, help="1j1b region variable setting.")
-@click.option("--var-2j1b", type=str, default=rps.DEF_2j1b_vari, help="2j1b region variable setting.")
-@click.option("--var-2j2b", type=str, default=rps.DEF_2j2b_vari, help="2j2b region variable setting.")
-@click.option("--sel-1j1b", type=str, default=rps.DEF_1j1b_sels, help="1j1b region selection setting.")
-@click.option("--sel-2j1b", type=str, default=rps.DEF_2j1b_sels, help="2j1b region selection setting.")
-@click.option("--sel-2j2b", type=str, default=rps.DEF_2j2b_sels, help="2j2b region selection setting.")
+@click.option("--bin-1j1b", type=str, default=rpsc.DEF_1j1b_bins, help="1j1b region binning settings.")
+@click.option("--bin-2j1b", type=str, default=rpsc.DEF_2j1b_bins, help="2j1b region binning settings.")
+@click.option("--bin-2j2b", type=str, default=rpsc.DEF_2j2b_bins, help="2j2b region binning settings.")
+@click.option("--var-1j1b", type=str, default=rpsc.DEF_1j1b_vari, help="1j1b region variable setting.")
+@click.option("--var-2j1b", type=str, default=rpsc.DEF_2j1b_vari, help="2j1b region variable setting.")
+@click.option("--var-2j2b", type=str, default=rpsc.DEF_2j2b_vari, help="2j2b region variable setting.")
+@click.option("--sel-1j1b", type=str, default=rpsc.DEF_1j1b_sels, help="1j1b region selection setting.")
+@click.option("--sel-2j1b", type=str, default=rpsc.DEF_2j1b_sels, help="2j1b region selection setting.")
+@click.option("--sel-2j2b", type=str, default=rpsc.DEF_2j2b_sels, help="2j2b region selection setting.")
+@click.option("--ttbar-aux-weight", type=click.Choice(["1.0", "tptrw", "trrw"]), default="1.0", help="Extra ttbar weight.")
 @click.option("--herwig-version", type=click.Choice(["704", "713"]), default="704", help="ttbar Herwig version.")
 @click.option("--drop-sys", type=str, help="Drop a systematic.")
 @click.option("--do-tables", is_flag=True, help="Produce tables.")
@@ -58,6 +59,7 @@ def generate(
     sel_1j1b,
     sel_2j1b,
     sel_2j2b,
+    ttbar_aux_weight,
     herwig_version,
     drop_sys,
     do_tables,
@@ -91,6 +93,11 @@ def generate(
     else:
         sel_2j2b = rph.selection_with_period(sel_2j2b, only_1516, only_17, only_18)
 
+    if ttbar_aux_weight == "tptrw":
+        rpsc.TTBAR_AUX_WEIGHT = "weight_tptrw_tool"
+    elif ttbar_aux_weight == "trrw":
+        rpsc.TTBAR_AUX_WEIGHT = "weight_trrw_tool"
+
     preamble = rpb.top_blocks(
         reg1j1b_binning=bin_1j1b,
         reg2j1b_binning=bin_2j1b,
@@ -110,7 +117,7 @@ def generate(
             print(rpv.default_vrp_blocks(sel_1j1b, sel_2j1b, sel_2j2b, is_preselection=is_preselection), file=f)
         print(rpb.sample_blocks(), file=f)
         print(rpb.norm_factor_blocks(), file=f)
-        print(rpb.sys_modeling_blocks(rps.NTUP_DIR, sel_1j1b, sel_2j1b, sel_2j2b, herwig_version), file=f)
+        print(rpb.sys_modeling_blocks(rpsc.NTUP_DIR, sel_1j1b, sel_2j1b, sel_2j2b, herwig_version), file=f)
         print(rpb.sys_minor_blocks(), file=f)
         print(rpb.sys_sf_weight_blocks(), file=f)
         print(rpb.sys_pdf_weight_blocks(), file=f)

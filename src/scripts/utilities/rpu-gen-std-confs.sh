@@ -7,13 +7,13 @@ function usage() {
     echo "  -o, --outdir    Output directory."
     echo "  -s, --shower    Herwg showering version to use (704 or 713)."
     echo "  -h, --help      Print help message and exit."
-    echo "  -f, --fitvar    Fit variable (default is bdtres03)."
+    echo "  -f, --fitvar    Fit variable (default is bdtres04)."
     echo ""
 }
 
 OUTDIR=$(pwd)
 SHOWER="713"
-FITVAR="bdtres03"
+FITVAR="bdtres04"
 
 while [[ $# -gt 0 ]]
 do
@@ -56,9 +56,9 @@ rp-conf.py generate $OUTDIR/main.conf \
            --bin-1j1b '12,0.35,0.76' \
            --bin-2j1b '12,0.22,0.70' \
            --bin-2j2b '12,0.45,0.775' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
            --herwig-version $SHOWER \
            --do-tables \
            --do-sys-plots \
@@ -70,9 +70,9 @@ rp-conf.py generate $OUTDIR/main_plots.conf \
            --bin-1j1b '12,0.35,0.76' \
            --bin-2j1b '12,0.22,0.70' \
            --bin-2j2b '12,0.45,0.775' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
            --herwig-version $SHOWER \
            --do-valplots
 
@@ -83,9 +83,9 @@ rp-conf.py generate $OUTDIR/main_singlebin2j2b.conf \
            --bin-1j1b '12,0.35,0.76' \
            --bin-2j1b '12,0.22,0.70' \
            --bin-2j2b '1,0.0,1.0' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
            --herwig-version $SHOWER \
            --do-tables \
            --do-sys-plots
@@ -94,7 +94,7 @@ rp-conf.py generate $OUTDIR/main_singlebin2j2b.conf \
 rp-conf.py generate $OUTDIR/main_1j1b.conf \
            --var-1j1b $FITVAR \
            --bin-1j1b '12,0.35,0.76' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
            --herwig-version $SHOWER \
            --drop-2j1b \
            --drop-2j2b
@@ -102,7 +102,7 @@ rp-conf.py generate $OUTDIR/main_1j1b.conf \
 rp-conf.py generate $OUTDIR/main_2j1b.conf \
            --var-2j1b $FITVAR \
            --bin-2j1b '12,0.22,0.70' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
            --herwig-version $SHOWER \
            --drop-1j1b \
            --drop-2j2b
@@ -110,7 +110,7 @@ rp-conf.py generate $OUTDIR/main_2j1b.conf \
 rp-conf.py generate $OUTDIR/main_2j2b.conf \
            --var-2j2b $FITVAR \
            --bin-2j2b '12,0.45,0.775' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
            --herwig-version $SHOWER \
            --drop-1j1b \
            --drop-2j1b
@@ -120,8 +120,8 @@ rp-conf.py generate $OUTDIR/main_1j1b2j1b.conf \
            --var-2j1b $FITVAR \
            --bin-1j1b '12,0.35,0.76' \
            --bin-2j1b '12,0.22,0.70' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
            --herwig-version $SHOWER \
            --drop-2j2b
 
@@ -130,8 +130,8 @@ rp-conf.py generate $OUTDIR/main_1j1b2j2b.conf \
            --var-2j2b $FITVAR \
            --bin-1j1b '12,0.35,0.76' \
            --bin-2j2b '12,0.45,0.775' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
            --herwig-version $SHOWER \
            --drop-2j1b
 
@@ -142,9 +142,9 @@ rp-conf.py generate $OUTDIR/main_only1516.conf \
            --bin-1j1b '12,0.35,0.76' \
            --bin-2j1b '12,0.22,0.70' \
            --bin-2j2b '12,0.45,0.775' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
            --herwig-version $SHOWER \
            --only-1516
 
@@ -155,9 +155,9 @@ rp-conf.py generate $OUTDIR/main_only17.conf \
            --bin-1j1b '12,0.35,0.76' \
            --bin-2j1b '12,0.22,0.70' \
            --bin-2j2b '12,0.45,0.775' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
            --herwig-version $SHOWER \
            --only-17
 
@@ -168,9 +168,9 @@ rp-conf.py generate $OUTDIR/main_only18.conf \
            --bin-1j1b '12,0.35,0.76' \
            --bin-2j1b '12,0.22,0.70' \
            --bin-2j2b '12,0.45,0.775' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres03 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres03 < 0.70' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres03 > 0.45 && bdtres03 < 0.775' \
+           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
+           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
+           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
            --herwig-version $SHOWER \
            --only-18
 

@@ -130,7 +130,7 @@ def top_blocks(**kwargs):
 
 
 def sample_blocks(**kwargs):
-    params = dict(ttbar_aux_weight="1.0",)
+    params = dict()
     for k in kwargs:
         params[k] = kwargs[k]
     return dedent(
@@ -211,7 +211,7 @@ def sample_blocks(**kwargs):
       MCweight: "weight_nominal"
       NtupleFiles: MCNP_999999_FS_MC16a_nominal,MCNP_999999_FS_MC16d_nominal,MCNP_999999_FS_MC16e_nominal
     """
-    ).format(**params)
+    ).format(ttbar_aux_weight=c.TTBAR_AUX_WEIGHT, **params)
 
 
 def norm_factor_blocks():
@@ -290,10 +290,14 @@ def _ttbar_shower_norms(
     sel_2j1b=None,
     sel_2j2b=None,
     herwig_dsid="410558",
-    ttbar_aux_weight="1.0",
 ):
     overall, m1j1b, m2j1b, m2j2b = norm_uncertainties_ttbar(
-        ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_dsid, ttbar_aux_weight,
+        ntup_dir,
+        sel_1j1b,
+        sel_2j1b,
+        sel_2j2b,
+        herwig_dsid,
+        f"weight_nominal * {c.TTBAR_AUX_WEIGHT}",
     )
     return """\
 Systematic: "ttbar_PS_norm"
@@ -356,7 +360,6 @@ def sys_modeling_blocks(
     sel_2j1b=None,
     sel_2j2b=None,
     herwig_version="704",
-    ttbar_aux_weight="1.0",
 ):
     herwig_dsid = _herwig_version_to_dsid(herwig_version)
     tW_norms = _tW_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b)
@@ -366,7 +369,6 @@ def sys_modeling_blocks(
         sel_2j1b,
         sel_2j2b,
         herwig_dsid,
-        f"weight_nominal * {ttbar_aux_weight}",
     )
     shower_norm_blocks = "{}\n\n{}".format(tW_norms, ttbar_norms)
     return """\
@@ -778,12 +780,11 @@ Systematic: "ttbar_ptreweight_2j2b"
   Symmetrisation: ONESIDED
   Samples: ttbar
   Type: HISTO
-  Regions: reg2j2b
-""".format(
-        shower_norm_blocks=shower_norm_blocks,
-        herwig_dsid=herwig_dsid,
-        ttbar_aux_weight=ttbar_aux_weight,
-    )
+  Regions: reg2j2b\n""".format(
+      shower_norm_blocks=shower_norm_blocks,
+      herwig_dsid=herwig_dsid,
+      ttbar_aux_weight=c.TTBAR_AUX_WEIGHT,
+  )
 
 
 def sys_minor_blocks():
@@ -891,7 +892,7 @@ def sys_minor_blocks():
     )
 
 
-def sys_sf_weight_blocks(ttbar_aux_weight="1.0"):
+def sys_sf_weight_blocks():
     blocks = []
     for name, properties in SYS_WEIGHTS.items():
         block = """\
@@ -921,13 +922,13 @@ def sys_sf_weight_blocks(ttbar_aux_weight="1.0"):
             title=properties.title,
             branch_up=properties.branch_up,
             branch_down=properties.branch_down,
-            ttbar_aux_weight=ttbar_aux_weight,
+            ttbar_aux_weight=c.TTBAR_AUX_WEIGHT,
         )
         blocks.append(dedent(block))
     return "\n".join(blocks)
 
 
-def sys_pdf_weight_blocks(ttbar_aux_weight="1.0"):
+def sys_pdf_weight_blocks():
     blocks = []
     for name, properties in PDF_WEIGHTS.items():
         block = """\
@@ -958,7 +959,7 @@ def sys_pdf_weight_blocks(ttbar_aux_weight="1.0"):
             category=properties.category,
             title=properties.title,
             branch=properties.branch,
-            ttbar_aux_weight=ttbar_aux_weight,
+            ttbar_aux_weight=c.TTBAR_AUX_WEIGHT,
         )
         blocks.append(dedent(block))
     return "\n".join(blocks)
