@@ -167,8 +167,8 @@ def rank(config):
 @click.option("--dont-draw", is_flag=True, help="Skip the plotting steps.")
 @click.option("--dont-submit", is_flag=True, help="Do not submit to condor.")
 @click.option("--granular-ntup", is_flag=True, help="Do granular ntuple step.")
-@click.option("--actually-local", is_flag=True, help="Do steps locally.")
-@click.option("--do-blind", is_flag=True, help="Run steps again as blind.")
+@click.option("--local", is_flag=True, help="Do steps locally.")
+@click.option("--and-blind", is_flag=True, help="Run steps again as blind.")
 def complete(
     config,
     systematics,
@@ -179,8 +179,8 @@ def complete(
     dont_draw,
     dont_submit,
     granular_ntup,
-    actually_local,
-    do_blind,
+    local,
+    and_blind,
 ):
     """Run a complete set of trex-fitter stages ('n'; 'wf'; 'dp'; 'r'; 'i')"""
     config_path = PosixPath(config).resolve()
@@ -202,7 +202,7 @@ def complete(
     hupdate_params = job_params(workspace, HUPDATE_EXE)
 
     # never submit if we do local.
-    if actually_local:
+    if local:
         dont_submit = True
 
     if copy_histograms_from is None:
@@ -238,7 +238,7 @@ def complete(
         log.info("Will run fit step")
         fit = pycondor.Job(name="fit", dag=dagman, **standard_params)
         fit.add_arg(fit_argument(config, specific_sys=syslist if systematics else None))
-        if do_blind:
+        if and_blind:
             fit.add_arg(fit_argument(config, specific_sys=syslist if systematics else None, as_blind=True))
         if copy_histograms_from is None:
             fit.add_parent(ntuple)
@@ -247,7 +247,7 @@ def complete(
             log.info("Will run drawing steps")
             draw = pycondor.Job(name="draw", dag=dagman, **standard_params)
             draw.add_arg(draw_argument(config, specific_sys=syslist if systematics else None))
-            if do_blind:
+            if and_blind:
                 draw.add_arg(draw_argument(config, specific_sys=syslist if systematics else None, as_blind=True))
             draw.add_parent(fit)
         # the rank step
@@ -259,7 +259,7 @@ def complete(
             rank_draw = pycondor.Job(name="rank_draw", dag=dagman, **standard_params)
             rank_draw.add_arg(f"r {config} Ranking=plot")
             rank_draw.add_parent(rank)
-            if do_blind:
+            if and_blind:
                 rank.add_args(rank_arguments(config, specific_sys=syslist, as_blind=True))
                 rank_draw.add_arg(f"r {config} Ranking=plot:{rpcp.BLIND_ARGS}")
             if systematics is None:
@@ -270,7 +270,7 @@ def complete(
                 group_combine = pycondor.Job(name="group_combine", dag=dagman, **standard_params)
                 group_combine.add_arg(f"i {config} GroupedImpact=combine")
                 group_combine.add_parent(group)
-                if do_blind:
+                if and_blind:
                     group.add_args(grouped_impact_arguments(config, as_blind=True))
                     group_combine.add_arg(f"i {config} GroupedImpact=combine:{rpcp.BLIND_ARGS}")
     # fmt: on
@@ -283,15 +283,15 @@ def complete(
         dagman.build_submit()
     os.chdir(orig_path)
 
-    if actually_local:
+    if local:
         import rexpy.batch as rpb
         f = str(PosixPath(workspace) / "fit.conf")
         rpb.parallel_n_step(f)
-        rpb.wfdp_step(f, do_blind=do_blind)
-        rpb.parallel_r_step(f, do_blind=do_blind)
-        rpb.r_draw_step(f, do_blind=do_blind)
-        rpb.parallel_i_step(f, do_blind=do_blind)
-        rpb.i_combine_step(f, do_blind=do_blind)
+        rpb.wfdp_step(f, do_blind=and_blind)
+        rpb.parallel_r_step(f, do_blind=and_blind)
+        rpb.r_draw_step(f, do_blind=and_blind)
+        rpb.parallel_i_step(f, do_blind=and_blind)
+        rpb.i_combine_step(f, do_blind=and_blind)
 
     return 0
 

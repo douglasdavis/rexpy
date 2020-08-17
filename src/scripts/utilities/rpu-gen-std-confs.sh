@@ -4,16 +4,36 @@ function usage() {
     echo "rpu-gen-std-confs.sh"
     echo ""
     echo "Flags and options:"
-    echo "  -o, --outdir    Output directory."
-    echo "  -s, --shower    Herwg showering version to use (704 or 713)."
-    echo "  -h, --help      Print help message and exit."
-    echo "  -f, --fitvar    Fit variable (default is bdtres04)."
+    echo "  -h, --help        Print help message and exit."
+    echo "  -o, --outdir      Output directory."
+    echo "  -s, --shower      Herwg showering version to use (704 or 713)."
+    echo "  -f, --fitvar      Fit variable (default is bdtres04)."
+    echo "      --nbin-1j1b   Number of bins for 1j1b region."
+    echo "      --nbin-2j1b   Number of bins for 2j1b region."
+    echo "      --nbin-2j2b   Number of bins for 2j2b region."
+    echo "      --xmin-1j1b   Minimum for 1j1b region."
+    echo "      --xmin-2j1b   Minimum for 2j1b region."
+    echo "      --xmin-2j2b   Minimum for 2j2b region."
+    echo "      --xmax-1j1b   Maximum for 1j1b region."
+    echo "      --xmax-2j1b   Maximum for 2j1b region."
+    echo "      --xmax-2j2b   Maximum for 2j2b region."
+    echo "      --ttbar-aux   Auxiliary weight for ttbar sample."
     echo ""
 }
 
 OUTDIR=$(pwd)
 SHOWER="713"
 FITVAR="bdtres04"
+NBIN_1j1b="12"
+NBIN_2j1b="12"
+NBIN_2j2b="12"
+XMIN_1j1b="0.35"
+XMAX_1j1b="0.76"
+XMIN_2j1b="0.22"
+XMAX_2j1b="0.70"
+XMIN_2j2b="0.45"
+XMAX_2j2b="0.775"
+TTBAR_AUX="none"
 
 while [[ $# -gt 0 ]]
 do
@@ -35,6 +55,46 @@ do
             shift
             SHOWER="$1"
             ;;
+        --nbin-1j1b)
+            shift
+            NBIN_1j1b="$1"
+            ;;
+        --nbin-2j1b)
+            shift
+            NBIN_2j1b="$1"
+            ;;
+        --nbin-2j2b)
+            shift
+            NBIN_2j2b="$1"
+            ;;
+        --xmin-1j1b)
+            shift
+            XMIN_1j1b="$1"
+            ;;
+        --xmin-2j1b)
+            shift
+            XMIN_2j1b="$1"
+            ;;
+        --xmin-2j2b)
+            shift
+            XMIN_2j2b="$1"
+            ;;
+        --xmax-1j1b)
+            shift
+            XMAX_1j1b="$1"
+            ;;
+        --xmax-2j1b)
+            shift
+            XMAX_2j1b="$1"
+            ;;
+        --xmax-2j2b)
+            shift
+            XMAX_2j2b="$1"
+            ;;
+        --ttbar-aux)
+            shift
+            TTBAR_AUX="$1"
+            ;;
         *)
             echo "Unknown option '$key'"
             usage
@@ -50,149 +110,162 @@ echo "Showering version: ${SHOWER}"
 mkdir -p $OUTDIR
 
 rp-conf.py generate $OUTDIR/main.conf \
+           --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
-           --bin-1j1b '12,0.35,0.76' \
-           --bin-2j1b '12,0.22,0.70' \
-           --bin-2j2b '12,0.45,0.775' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
+           --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
+           --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
+           --bin-2j2b "$NBIN_2j2b,$XMIN_2j2b,$XMAX_2j2b" \
+           --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
+           --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
+           --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
            --herwig-version $SHOWER \
            --do-tables \
            --do-sys-plots \
 
 rp-conf.py generate $OUTDIR/main_plots.conf \
+           --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
-           --bin-1j1b '12,0.35,0.76' \
-           --bin-2j1b '12,0.22,0.70' \
-           --bin-2j2b '12,0.45,0.775' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
+           --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
+           --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
+           --bin-2j2b "$NBIN_2j2b,$XMIN_2j2b,$XMAX_2j2b" \
+           --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
+           --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
+           --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
            --herwig-version $SHOWER \
            --do-valplots
 
 rp-conf.py generate $OUTDIR/main_singlebin2j2b.conf \
+           --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
-           --bin-1j1b '12,0.35,0.76' \
-           --bin-2j1b '12,0.22,0.70' \
-           --bin-2j2b '1,0.0,1.0' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
+           --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
+           --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
+           --bin-2j2b "1,0.0,1.0" \
+           --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
+           --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
+           --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
            --herwig-version $SHOWER \
            --do-tables \
            --do-sys-plots
 
 
 rp-conf.py generate $OUTDIR/main_1j1b.conf \
+           --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
-           --bin-1j1b '12,0.35,0.76' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
+           --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
+           --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
            --herwig-version $SHOWER \
            --drop-2j1b \
            --drop-2j2b
 
 rp-conf.py generate $OUTDIR/main_2j1b.conf \
+           --ttbar-aux-weight $TTBAR_AUX \
            --var-2j1b $FITVAR \
-           --bin-2j1b '12,0.22,0.70' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
+           --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
+           --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
            --herwig-version $SHOWER \
            --drop-1j1b \
            --drop-2j2b
 
 rp-conf.py generate $OUTDIR/main_2j2b.conf \
+           --ttbar-aux-weight $TTBAR_AUX \
            --var-2j2b $FITVAR \
-           --bin-2j2b '12,0.45,0.775' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
+           --bin-2j2b "$NBIN_2j2b,$XMIN_2j2b,$XMAX_2j2b" \
+           --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
            --herwig-version $SHOWER \
            --drop-1j1b \
            --drop-2j1b
 
 rp-conf.py generate $OUTDIR/main_1j1b2j1b.conf \
+           --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
-           --bin-1j1b '12,0.35,0.76' \
-           --bin-2j1b '12,0.22,0.70' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
+           --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
+           --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
+           --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
+           --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
            --herwig-version $SHOWER \
            --drop-2j2b
 
 rp-conf.py generate $OUTDIR/main_1j1b2j2b.conf \
+           --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j2b $FITVAR \
-           --bin-1j1b '12,0.35,0.76' \
-           --bin-2j2b '12,0.45,0.775' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
+           --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
+           --bin-2j2b "$NBIN_2j2b,$XMIN_2j2b,$XMAX_2j2b" \
+           --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
+           --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
            --herwig-version $SHOWER \
            --drop-2j1b
 
 rp-conf.py generate $OUTDIR/main_only1516.conf \
+           --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
-           --bin-1j1b '12,0.35,0.76' \
-           --bin-2j1b '12,0.22,0.70' \
-           --bin-2j2b '12,0.45,0.775' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
+           --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
+           --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
+           --bin-2j2b "$NBIN_2j2b,$XMIN_2j2b,$XMAX_2j2b" \
+           --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
+           --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
+           --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
            --herwig-version $SHOWER \
            --only-1516
 
 rp-conf.py generate $OUTDIR/main_only17.conf \
+           --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
-           --bin-1j1b '12,0.35,0.76' \
-           --bin-2j1b '12,0.22,0.70' \
-           --bin-2j2b '12,0.45,0.775' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
+           --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
+           --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
+           --bin-2j2b "$NBIN_2j2b,$XMIN_2j2b,$XMAX_2j2b" \
+           --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
+           --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
+           --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
            --herwig-version $SHOWER \
            --only-17
 
 rp-conf.py generate $OUTDIR/main_only18.conf \
+           --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
-           --bin-1j1b '12,0.35,0.76' \
-           --bin-2j1b '12,0.22,0.70' \
-           --bin-2j2b '12,0.45,0.775' \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1 && bdtres04 > 0.35' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1 && bdtres04 < 0.70' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1 && bdtres04 > 0.45 && bdtres04 < 0.775' \
+           --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
+           --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
+           --bin-2j2b "$NBIN_2j2b,$XMIN_2j2b,$XMAX_2j2b" \
+           --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
+           --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
+           --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
            --herwig-version $SHOWER \
            --only-18
 
 rp-conf.py generate $OUTDIR/presel_plots.conf \
+           --ttbar-aux-weight $TTBAR_AUX \
            --is-preselection \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1' \
+           --sel-1j1b "reg1j1b == 1 && OS == 1" \
+           --sel-2j1b "reg2j1b == 1 && OS == 1" \
+           --sel-2j2b "reg2j2b == 1 && OS == 1" \
            --herwig-version $SHOWER \
            --do-valplots
 
 rp-conf.py generate $OUTDIR/presel.conf \
+           --ttbar-aux-weight $TTBAR_AUX \
            --is-preselection \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
            --var-2j2b $FITVAR \
-           --sel-1j1b 'reg1j1b == 1 && OS == 1' \
-           --sel-2j1b 'reg2j1b == 1 && OS == 1' \
-           --sel-2j2b 'reg2j2b == 1 && OS == 1' \
+           --sel-1j1b "reg1j1b == 1 && OS == 1" \
+           --sel-2j1b "reg2j1b == 1 && OS == 1" \
+           --sel-2j2b "reg2j2b == 1 && OS == 1" \
            --herwig-version $SHOWER \
            --do-tables \
            --do-sys-plots

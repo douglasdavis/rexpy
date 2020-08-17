@@ -9,7 +9,7 @@ NTUP_DIR = None
 if ON_SPAR:
     NTUP_DIR = "/atlasgpfs01/usatlas/data/ddavis/wtloop/WTA02_20200809"
 else:
-    NTUP_DIR = "/ddd/atlas/data/wtloop/WTA01_20200506"
+    NTUP_DIR = "/ddd/atlas/data/wtloop/WTA02_20200809"
 
 TTBAR_AUX_WEIGHT = "1.0"
 

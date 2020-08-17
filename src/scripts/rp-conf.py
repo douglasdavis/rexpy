@@ -26,6 +26,7 @@ def cli():
 
 @cli.command("generate")
 @click.argument("outname", type=click.Path(resolve_path=True))
+@click.option("--ntup-dir", type=click.Path(resolve_path=True), help="Path to ntuples.")
 @click.option("--bin-1j1b", type=str, default=rpsc.DEF_1j1b_bins, help="1j1b region binning settings.")
 @click.option("--bin-2j1b", type=str, default=rpsc.DEF_2j1b_bins, help="2j1b region binning settings.")
 @click.option("--bin-2j2b", type=str, default=rpsc.DEF_2j2b_bins, help="2j2b region binning settings.")
@@ -35,7 +36,7 @@ def cli():
 @click.option("--sel-1j1b", type=str, default=rpsc.DEF_1j1b_sels, help="1j1b region selection setting.")
 @click.option("--sel-2j1b", type=str, default=rpsc.DEF_2j1b_sels, help="2j1b region selection setting.")
 @click.option("--sel-2j2b", type=str, default=rpsc.DEF_2j2b_sels, help="2j2b region selection setting.")
-@click.option("--ttbar-aux-weight", type=click.Choice(["1.0", "tptrw", "trrw"]), default="1.0", help="Extra ttbar weight.")
+@click.option("--ttbar-aux-weight", type=click.Choice(["none", "tptrw", "trrw"]), default="none", help="Extra ttbar weight.")
 @click.option("--herwig-version", type=click.Choice(["704", "713"]), default="704", help="ttbar Herwig version.")
 @click.option("--drop-sys", type=str, help="Drop a systematic.")
 @click.option("--do-tables", is_flag=True, help="Produce tables.")
@@ -50,6 +51,7 @@ def cli():
 @click.option("--drop-2j2b", is_flag=True, help="Drop the 2j2b region.")
 def generate(
     outname,
+    ntup_dir,
     bin_1j1b,
     bin_2j1b,
     bin_2j2b,
@@ -75,6 +77,10 @@ def generate(
 ):
     """Generate a config with user defined binning, save to OUTNAME."""
     log.info("Generating config file: %s" % outname)
+    if ntup_dir is None:
+        log.info("Using default ntuple directory for this machine: %s" % rpsc.NTUP_DIR)
+    else:
+        log.info("Using ntuple directory: %s" % ntup_dir)
     import yaml
     from rexpy.valplot import blocks_for_all_regions, fix_systematics
     if drop_1j1b:
@@ -97,6 +103,8 @@ def generate(
         rpsc.TTBAR_AUX_WEIGHT = "weight_tptrw_tool"
     elif ttbar_aux_weight == "trrw":
         rpsc.TTBAR_AUX_WEIGHT = "weight_trrw_tool"
+    elif ttbar_aux_weight == "none":
+        rpsc.TTBAR_AUX_WEIGHT = "1.0"
 
     preamble = rpb.top_blocks(
         reg1j1b_binning=bin_1j1b,
