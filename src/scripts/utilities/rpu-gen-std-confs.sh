@@ -7,7 +7,7 @@ function usage() {
     echo "  -h, --help        Print help message and exit."
     echo "  -o, --outdir      Output directory."
     echo "  -s, --shower      Herwg showering version to use (704 or 713)."
-    echo "  -f, --fitvar      Fit variable (default is bdtres04)."
+    echo "  -f, --fitvar      Fit variable (default is bdtres05)."
     echo "      --nbin-1j1b   Number of bins for 1j1b region."
     echo "      --nbin-2j1b   Number of bins for 2j1b region."
     echo "      --nbin-2j2b   Number of bins for 2j2b region."
@@ -23,7 +23,7 @@ function usage() {
 
 OUTDIR=$(pwd)
 SHOWER="713"
-FITVAR="bdtres04"
+FITVAR="bdtres05"
 NBIN_1j1b="12"
 NBIN_2j1b="12"
 NBIN_2j2b="12"
