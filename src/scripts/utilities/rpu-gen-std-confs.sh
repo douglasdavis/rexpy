@@ -109,7 +109,7 @@ echo "Fit variable: ${FITVAR}"
 echo "Showering version: ${SHOWER}"
 mkdir -p $OUTDIR
 
-rp-conf.py generate $OUTDIR/main.conf \
+rex.py config gen $OUTDIR/main.conf \
            --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
@@ -124,7 +124,7 @@ rp-conf.py generate $OUTDIR/main.conf \
            --do-tables \
            --do-sys-plots \
 
-rp-conf.py generate $OUTDIR/main_plots.conf \
+rex.py config gen $OUTDIR/main_plots.conf \
            --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
@@ -138,7 +138,7 @@ rp-conf.py generate $OUTDIR/main_plots.conf \
            --herwig-version $SHOWER \
            --do-valplots
 
-rp-conf.py generate $OUTDIR/main_singlebin2j2b.conf \
+rex.py config gen $OUTDIR/main_singlebin2j2b.conf \
            --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
@@ -154,7 +154,7 @@ rp-conf.py generate $OUTDIR/main_singlebin2j2b.conf \
            --do-sys-plots
 
 
-rp-conf.py generate $OUTDIR/main_1j1b.conf \
+rex.py config gen $OUTDIR/main_1j1b.conf \
            --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
@@ -163,7 +163,7 @@ rp-conf.py generate $OUTDIR/main_1j1b.conf \
            --drop-2j1b \
            --drop-2j2b
 
-rp-conf.py generate $OUTDIR/main_2j1b.conf \
+rex.py config gen $OUTDIR/main_2j1b.conf \
            --ttbar-aux-weight $TTBAR_AUX \
            --var-2j1b $FITVAR \
            --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
@@ -172,7 +172,7 @@ rp-conf.py generate $OUTDIR/main_2j1b.conf \
            --drop-1j1b \
            --drop-2j2b
 
-rp-conf.py generate $OUTDIR/main_2j2b.conf \
+rex.py config gen $OUTDIR/main_2j2b.conf \
            --ttbar-aux-weight $TTBAR_AUX \
            --var-2j2b $FITVAR \
            --bin-2j2b "$NBIN_2j2b,$XMIN_2j2b,$XMAX_2j2b" \
@@ -181,7 +181,7 @@ rp-conf.py generate $OUTDIR/main_2j2b.conf \
            --drop-1j1b \
            --drop-2j1b
 
-rp-conf.py generate $OUTDIR/main_1j1b2j1b.conf \
+rex.py config gen $OUTDIR/main_1j1b2j1b.conf \
            --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
@@ -192,7 +192,7 @@ rp-conf.py generate $OUTDIR/main_1j1b2j1b.conf \
            --herwig-version $SHOWER \
            --drop-2j2b
 
-rp-conf.py generate $OUTDIR/main_1j1b2j2b.conf \
+rex.py config gen $OUTDIR/main_1j1b2j2b.conf \
            --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j2b $FITVAR \
@@ -203,7 +203,7 @@ rp-conf.py generate $OUTDIR/main_1j1b2j2b.conf \
            --herwig-version $SHOWER \
            --drop-2j1b
 
-rp-conf.py generate $OUTDIR/main_only1516.conf \
+rex.py config gen $OUTDIR/main_only1516.conf \
            --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
@@ -217,7 +217,7 @@ rp-conf.py generate $OUTDIR/main_only1516.conf \
            --herwig-version $SHOWER \
            --only-1516
 
-rp-conf.py generate $OUTDIR/main_only17.conf \
+rex.py config gen $OUTDIR/main_only17.conf \
            --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
@@ -231,7 +231,7 @@ rp-conf.py generate $OUTDIR/main_only17.conf \
            --herwig-version $SHOWER \
            --only-17
 
-rp-conf.py generate $OUTDIR/main_only18.conf \
+rex.py config gen $OUTDIR/main_only18.conf \
            --ttbar-aux-weight $TTBAR_AUX \
            --var-1j1b $FITVAR \
            --var-2j1b $FITVAR \
@@ -245,7 +245,7 @@ rp-conf.py generate $OUTDIR/main_only18.conf \
            --herwig-version $SHOWER \
            --only-18
 
-rp-conf.py generate $OUTDIR/presel_plots.conf \
+rex.py config gen $OUTDIR/presel_plots.conf \
            --ttbar-aux-weight $TTBAR_AUX \
            --is-preselection \
            --var-1j1b $FITVAR \
@@ -257,7 +257,7 @@ rp-conf.py generate $OUTDIR/presel_plots.conf \
            --herwig-version $SHOWER \
            --do-valplots
 
-rp-conf.py generate $OUTDIR/presel.conf \
+rex.py config gen $OUTDIR/presel.conf \
            --ttbar-aux-weight $TTBAR_AUX \
            --is-preselection \
            --var-1j1b $FITVAR \

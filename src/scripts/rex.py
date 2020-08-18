@@ -223,5 +223,13 @@ def local(config, suffix, and_blind):
     os.chdir(curdir)
 
 
+@run.command("condor")
+@click.argument("config", type=click.Path(resolve_path=True))
+@click.option("--suffix", type=str, help="Add suffix to workspace.")
+def condor(config, suffix):
+    """Run TRExFitter steps with HTCondor."""
+    pass
+
+
 if __name__ == "__main__":
     cli()

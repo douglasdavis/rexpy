@@ -67,11 +67,11 @@ def create_workspace(config, run_type, suffix):
         Copy of configuration file in the workspace.
 
     """
-    config_path = PosixPath(config)
+    config_path = pathlib.PosixPath(config)
     config_name = config_path.name
     workspace = (config_path.parent / f"rexpy-{run_type}-{config_path.stem}")
     if suffix:
-        workspace = PosixPath(f"{workspace}__{suffix}")
+        workspace = pathlib.PosixPath(f"{workspace}__{suffix}")
     workspace.mkdir(exist_ok=False)
     shutil.copyfile(config_path, workspace / "fit.conf")
     return workspace, workspace / "fit.conf"
