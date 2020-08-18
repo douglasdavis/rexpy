@@ -47,6 +47,34 @@ def job_params(wkspace, executable, **kwargs):
     )
 
 
+def create_workspace(config, run_type, suffix):
+    """Create workspace to run steps.
+
+    Parameters
+    ----------
+    config : str or os.PathLike
+        Original TRExFitter config file.
+    run_type : str
+        Run environment type: 'condor' or 'local'
+    suffix : str, optional
+        Add a suffix to the workspace
+
+    Returns
+    -------
+    pathlib.PosixPath
+        Created workspace path.
+    pathlib.PosixPath
+        Copy of configuration file in the workspace.
+
+    """
+    config_path = PosixPath(config)
+    config_name = config_path.name
+    workspace = (config_path.parent / f"rexpy-{run_type}-{config_path.stem}")
+    if suffix:
+        workspace = PosixPath(f"{workspace}__{suffix}")
+    workspace.mkdir(exist_ok=False)
+    shutil.copyfile(config_path, workspace / "fit.conf")
+    return workspace, workspace / "fit.conf"
 
 
 def _run_n_step(args):

@@ -3,6 +3,8 @@
 # stdlib
 from pathlib import PosixPath
 import logging
+import os
+import shutil
 
 # third party
 import click
@@ -19,6 +21,7 @@ log = logging.getLogger("rex.py")
 
 @click.group("rex.py")
 def cli():
+    """Command line interface for rexpy."""
     pass
 
 
@@ -29,16 +32,18 @@ def cli():
 @click.option("--condor-sub", type=str, help="Use condor, arg is workspace dir.")
 @click.option("--dont-submit", is_flag=True, help="If using condor, don't submit.")
 def augment(rootfiledir, npyfiledir, dry, condor_sub, dont_submit):
+    """Augment ROOT files with NumPy array files."""
     import rexpy.augnpy
     rexpy.augnpy.augment(rootfiledir, npyfiledir, dry, condor_sub, dont_submit)
 
 
 @cli.group("config")
 def config():
+    """Handle TRExFitter configuration files."""
     pass
 
 
-@config.command("generate")
+@config.command("gen")
 @click.argument("outname", type=click.Path(resolve_path=True))
 @click.option("--ntup-dir", type=click.Path(resolve_path=True), help="Path to ntuples.")
 @click.option("--bin-1j1b", type=str, default=rpsc.DEF_1j1b_bins, help="1j1b region binning settings.")
@@ -63,7 +68,7 @@ def config():
 @click.option("--drop-1j1b", is_flag=True, help="Drop the 1j1b region.")
 @click.option("--drop-2j1b", is_flag=True, help="Drop the 2j1b region.")
 @click.option("--drop-2j2b", is_flag=True, help="Drop the 2j2b region.")
-def generate(
+def gen(
     outname,
     ntup_dir,
     bin_1j1b,
@@ -195,7 +200,27 @@ def rm_sys(config, sys, new_file):
 
 @cli.group("run")
 def run():
+    """Run TRExFitter n, wf, dp, r, and i steps in an automated way."""
     pass
+
+
+@run.command("local")
+@click.argument("config", type=click.Path(resolve_path=True))
+@click.option("--suffix", type=str, help="Add suffix to workspace.")
+@click.option("--and-blind", is_flag=True, help="Run steps blind as well.")
+def local(config, suffix, and_blind):
+    """Run TRExFitter steps locally."""
+    import rexpy.batch as rpb
+    curdir = PosixPath.cwd()
+    workspace, f = rpb.create_workspace(config, "local", suffix)
+    os.chdir(workspace)
+    rpb.parallel_n_step(f)
+    rpb.wfdp_step(f, do_blind=and_blind)
+    rpb.parallel_r_step(f, do_blind=and_blind)
+    rpb.r_draw_step(f, do_blind=and_blind)
+    rpb.parallel_i_step(f, do_blind=and_blind)
+    rpb.i_combine_step(f, do_blind=and_blind)
+    os.chdir(curdir)
 
 
 if __name__ == "__main__":
