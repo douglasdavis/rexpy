@@ -1,39 +1,77 @@
 from pathlib import Path
 
 
-######################################
-####### Default constants ############
-######################################
+##################################################
+####### Default constants ########################
+##################################################
 ON_SPAR = Path("/atlasgpfs01/usatlas/data/ddavis").exists()
-NTUP_DIR = None
-if ON_SPAR:
-    NTUP_DIR = "/atlasgpfs01/usatlas/data/ddavis/wtloop/WTA02_20200821"
-else:
-    NTUP_DIR = "/ddd/atlas/data/wtloop/WTA02_20200821"
+NTUP_PROD = "WTA02_20200821"
 
 TTBAR_AUX_WEIGHT = "1.0"
 
-DEF_1j1b_sels = "reg1j1b == 1 && OS == 1"
-DEF_1j1b_swmc = "reg1j1b == 1 && OS == 1 && mass_lep1jet1 < 155 && mass_lep2jet1 < 155"
-DEF_1j1b_vari = "bdtres10"
+DEF_1j1b_var = "bdtres10"
 DEF_1j1b_nbin = 12
 DEF_1j1b_xmin = 0.17
 DEF_1j1b_xmax = 0.76
-DEF_1j1b_bins = "{},{},{}".format(DEF_1j1b_nbin, DEF_1j1b_xmin, DEF_1j1b_xmax)
+DEF_1j1b_lo_cut = 0.35
 
-DEF_2j1b_sels = "reg2j1b == 1 && OS == 1"
-DEF_2j1b_swmc = "reg2j1b == 1 && OS == 1 && mass_lep1jetb < 155 && mass_lep2jetb < 155"
-DEF_2j1b_vari = "bdtres10"
+DEF_2j1b_var = "bdtres10"
 DEF_2j1b_nbin = 12
 DEF_2j1b_xmin = 0.22
 DEF_2j1b_xmax = 0.85
-DEF_2j1b_bins = "{},{},{}".format(DEF_2j1b_nbin, DEF_2j1b_xmin, DEF_2j1b_xmax)
+DEF_2j1b_hi_cut = 0.70
 
-DEF_2j2b_sels = "reg2j2b == 1 && OS == 1"
-DEF_2j2b_swmc = "reg2j2b == 1 && OS == 1 && minimaxmbl < 155"
-DEF_2j2b_vari = "bdtres10"
+DEF_2j2b_var = "bdtres10"
 DEF_2j2b_nbin = 12
 DEF_2j2b_xmin = 0.20
 DEF_2j2b_xmax = 0.90
-DEF_2j2b_bins = "{},{},{}".format(DEF_2j2b_nbin, DEF_2j2b_xmin, DEF_2j2b_xmax)
-######################################
+DEF_2j2b_lo_cut = 0.45
+DEF_2j2b_hi_cut = 0.775
+##################################################
+
+def ntuple_directory():
+    if ON_SPAR:
+        return f"/atlasgpfs01/usatlas/data/ddavis/wtloop/{NTUP_PROD}"
+    return f"/ddd/atlas/data/wtloop/{NTUP_PROD}"
+
+
+def r1j1b_selection(apply_cuts=False):
+    if apply_cuts:
+        return f"reg1j1b == 1 && OS == 1 && {DEF_1j1b_var} > {DEF_1j1b_lo_cut}"
+    return "reg1j1b == 1 && OS == 1"
+
+
+def r2j1b_selection(apply_cuts=False):
+    if apply_cuts:
+        return f"reg2j1b == 1 && OS == 1 && {DEF_2j1b_var} < {DEF_2j1b_hi_cut}"
+    return "reg2j1b == 1 && OS == 1"
+
+
+def r2j2b_selection(apply_cuts=False):
+    if apply_cuts:
+        return f"reg2j2b == 1 && OS == 1 && {DEF_2j2b_var} < {DEF_2j2b_hi_cut} && {DEF_2j2b_var} > {DEF_2j2b_lo_cut}"
+    return "reg2j2b == 1 && OS == 1"
+
+
+def r1j1b_bins():
+    return f"{DEF_1j1b_nbin},{DEF_1j1b_xmin},{DEF_1j1b_xmax}"
+
+
+def r2j1b_bins():
+    return f"{DEF_2j1b_nbin},{DEF_2j1b_xmin},{DEF_2j1b_xmax}"
+
+
+def r2j2b_bins():
+    return f"{DEF_2j2b_nbin},{DEF_2j2b_xmin},{DEF_2j2b_xmax}"
+
+
+def r1j1b_var():
+    return f"{DEF_1j1b_var}"
+
+
+def r2j1b_var():
+    return f"{DEF_2j1b_var}"
+
+
+def r2j2b_var():
+    return f"{DEF_2j2b_var}"
