@@ -1,0 +1,8 @@
+#!/bin/bash
+
+## This bash script wraps the rexpy __main__.py script such that we
+## can use the command line interface without pip installing the rexpy
+## package itself. This is required for use with the ATLAS environment
+## 'lsetup views' workflow.
+
+python -m rexpy $@

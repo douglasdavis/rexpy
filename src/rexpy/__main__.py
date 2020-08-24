@@ -19,7 +19,14 @@ import rexpy.simpconf as rpsc
 
 log = logging.getLogger("rex.py")
 
-@click.group("rex.py")
+
+context_settings = {
+    "max_content_width": 82,
+    "help_option_names": ['-h', '--help'],
+}
+
+
+@click.group(name="rexpy", context_settings=context_settings)
 def cli():
     """Command line interface for rexpy."""
     pass
@@ -232,4 +239,4 @@ def condor(config, suffix):
 
 
 if __name__ == "__main__":
-    cli()
+    cli(prog_name="rexpy")

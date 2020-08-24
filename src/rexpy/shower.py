@@ -14,7 +14,7 @@ try:
     if not rps.ON_SPAR:
         ROOT.ROOT.EnableImplicitMT()
 except ImportError:
-    log.warn("ROOT was not imported; some rexpy.shower module functions require it")
+    log.debug("ROOT was not imported; some rexpy.shower module functions require it")
 # fmt: on
 
 
