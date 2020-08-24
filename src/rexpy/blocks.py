@@ -285,11 +285,7 @@ Systematic: "tW_PS_migration"
 
 
 def _ttbar_shower_norms(
-    ntup_dir,
-    sel_1j1b=None,
-    sel_2j1b=None,
-    sel_2j2b=None,
-    herwig_dsid="410558",
+    ntup_dir, sel_1j1b=None, sel_2j1b=None, sel_2j2b=None, herwig_dsid="410558",
 ):
     overall, m1j1b, m2j1b, m2j2b = norm_uncertainties_ttbar(
         ntup_dir,
@@ -355,21 +351,11 @@ def _herwig_version_to_dsid(herwig_version):
 
 
 def sys_modeling_blocks(
-    ntup_dir,
-    sel_1j1b=None,
-    sel_2j1b=None,
-    sel_2j2b=None,
-    herwig_version="704",
+    ntup_dir, sel_1j1b=None, sel_2j1b=None, sel_2j2b=None, herwig_version="704",
 ):
     herwig_dsid = _herwig_version_to_dsid(herwig_version)
     tW_norms = _tW_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b)
-    ttbar_norms = _ttbar_shower_norms(
-        ntup_dir,
-        sel_1j1b,
-        sel_2j1b,
-        sel_2j2b,
-        herwig_dsid,
-    )
+    ttbar_norms = _ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_dsid,)
     shower_norm_blocks = "{}\n\n{}".format(tW_norms, ttbar_norms)
     return """\
 Systematic: "tW_DRDS"
@@ -781,10 +767,10 @@ Systematic: "ttbar_ptreweight_2j2b"
   Samples: ttbar
   Type: HISTO
   Regions: reg2j2b\n""".format(
-      shower_norm_blocks=shower_norm_blocks,
-      herwig_dsid=herwig_dsid,
-      ttbar_aux_weight=c.TTBAR_AUX_WEIGHT,
-  )
+        shower_norm_blocks=shower_norm_blocks,
+        herwig_dsid=herwig_dsid,
+        ttbar_aux_weight=c.TTBAR_AUX_WEIGHT,
+    )
 
 
 def sys_minor_blocks():

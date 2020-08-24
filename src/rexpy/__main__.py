@@ -4,7 +4,6 @@
 from pathlib import PosixPath
 import logging
 import os
-import shutil
 
 # third party
 import click
@@ -107,8 +106,7 @@ def gen(
         log.info("Using default ntuple directory for this machine: %s" % rpsc.NTUP_DIR)
     else:
         log.info("Using ntuple directory: %s" % ntup_dir)
-    import yaml
-    from rexpy.valplot import blocks_for_all_regions, fix_systematics
+    from rexpy.valplot import fix_systematics
     if drop_1j1b:
         sel_1j1b = None
         log.info("Excluding 1j1b")

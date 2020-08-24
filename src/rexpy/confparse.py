@@ -335,11 +335,11 @@ def ntuple_arguments(config, specific_sys=None):
     """
     regions = regions_from(config)
 
-    ## first no specific systematics
+    # first no specific systematics
     if specific_sys is None:
         return ["n {} Regions={}".format(config, r) for r in regions]
 
-    ## otherwise, construct for specific systematics
+    # otherwise, construct for specific systematics
     systematics = systematics_from(config, specific_sys=specific_sys)
     systematics = ",".join(systematics)
     return [

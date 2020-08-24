@@ -68,7 +68,6 @@ def create_workspace(config, run_type, suffix):
 
     """
     config_path = pathlib.PosixPath(config)
-    config_name = config_path.name
     workspace = (config_path.parent / f"rexpy-{run_type}-{config_path.stem}")
     if suffix:
         workspace = pathlib.PosixPath(f"{workspace}__{suffix}")
