@@ -51,6 +51,7 @@ def config():
 
 @config.command("gen")
 @click.argument("outname", type=click.Path(resolve_path=True))
+@click.option("--pre-exec", type=click.Path(resolve_path=True), help="File to execute (for config modifications)")
 @click.option("--ntup-dir", type=click.Path(resolve_path=True), help="Path to ntuples.")
 @click.option("--bin-1j1b", type=str, default=rpsc.r1j1b_bins(), help="1j1b region binning settings.", show_default=True)
 @click.option("--bin-2j1b", type=str, default=rpsc.r2j1b_bins(), help="2j1b region binning settings.", show_default=True)
@@ -76,6 +77,7 @@ def config():
 @click.option("--drop-2j2b", is_flag=True, help="Drop the 2j2b region.")
 def gen(
     outname,
+    pre_exec,
     ntup_dir,
     bin_1j1b,
     bin_2j1b,
@@ -101,6 +103,9 @@ def gen(
     drop_2j2b,
 ):
     """Generate a config with user defined binning, save to OUTNAME."""
+
+    if pre_exec is not None:
+        exec(PosixPath(pre_exec).read_text())
 
     bin_1j1b = bin_1j1b if bin_1j1b is not None else rpsc.r1j1b_bins()
     bin_2j1b = bin_2j1b if bin_2j1b is not None else rpsc.r2j1b_bins()
@@ -243,7 +248,8 @@ def local(config, suffix, and_blind):
 @click.option("-s", "--sys", type=str, help="Comma separated specific systematics to use.")
 @click.option("-x", "--sfx", type=str, help="Add suffix to workspace.")
 @click.option("-c", "--chf", type=click.Path(resolve_path=True), help="Copy existing histograms.")
-def condor(config, sys, sfx, chf):
+@click.option("--submit/--no-submit", default=False, help="Submit the jobs")
+def condor(config, sys, sfx, chf, submit):
     """Run TRExFitter steps with HTCondor."""
     import rexpy.batch as rpb
     import rexpy.helpers as rph
@@ -280,7 +286,10 @@ def condor(config, sys, sfx, chf):
         icombine = rpb.condor_icombine_step(workspace, dag=dagman)
         i.add_parent(wf)
         icombine.add_parent(i)
-    dagman.build()
+    if submit:
+        dagman.build_submit()
+    else:
+        dagman.build()
 
 
 if __name__ == "__main__":
