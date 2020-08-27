@@ -4,10 +4,209 @@ import os
 import pathlib
 import shutil
 
-from rexpy.confparse import regions_from, systematics_from, grouped_impact_arguments
+import rexpy.pycondor as pycondor
+import rexpy.confparse
+from rexpy.confparse import (
+    regions_from,
+    systematics_from,
+    sub_block_values,
+)
 
 
 TREX_EXE = shutil.which("trex-fitter")
+
+
+def rank_arguments(config, specific_sys=None, as_blind=False):
+    """Get a set of trex-fitter executable arguments for ranking.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+    specific_sys : iterable(str), optional
+        Specific systematics to use; if None (the default), uses all
+        discovered systematics.
+    as_blind : bool
+        Include command line arguments for performing blind fit.
+
+    Returns
+    -------
+    list(str)
+        The list of trex-fitter arguments.
+    """
+    systematics = systematics_from(config, specific_sys=specific_sys)
+    args = ["r {} Ranking={}".format(config, sys) for sys in systematics]
+    if as_blind:
+        args = [f"{arg}:{BLIND_ARGS}" for arg in args]
+    return args
+
+
+def grouped_impact_arguments(config, as_blind=False):
+    """Get a set of trex-fitter executable arguments for grouped impact.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+    as_blind : bool
+        Include command line arguments for performing blind fit.
+
+    Returns
+    -------
+    list(str)
+        The list of trex-fitter arguments
+    """
+    groups = sub_block_values(config, "SubCategory")
+    groups = list(groups) + ["Gammas", "FullSyst"]
+    args = ["i {} GroupedImpact={}".format(config, g) for g in groups]
+    if as_blind:
+        args = [f"{arg}:{BLIND_ARGS}" for arg in args]
+    return args
+
+
+def draw_argument(config, specific_sys=None, as_blind=False):
+    """Get the draw trex-fitter step argument"
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+    specific_sys : iterable(str), optional
+        Specific systematics to use; if None (the default), uses all
+        discovered systematics.
+    as_blind : bool
+        Include command line arguments for performing blind fit.
+
+    Returns
+    -------
+    str
+        the fit step argument
+    """
+    if specific_sys is not None:
+        systs = ",".join(systematics_from(config, specific_sys))
+        arg = "dp {} Systematics={}".format(config, systs)
+    else:
+        arg = "dp {}".format(config)
+
+    if as_blind:
+        arg = f"{arg}:{BLIND_ARGS}"
+
+    return arg
+
+
+def fit_argument(config, specific_sys=None, dont_fit_vr=True, as_blind=False):
+    """Get the fit trex-fitter step argument.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+    specific_sys : iterable(str), optional
+        Specific systematics to use; if None (the default), uses all
+        discovered systematics.
+    dont_fit_vr : bool
+        Do not include VR regions in fit argument.
+    as_blind : bool
+        Include command line arguments for performing blind fit.
+
+    Returns
+    -------
+    str
+        the fit step argument
+    """
+    region_arg = ""
+    if dont_fit_vr:
+        regions = regions_from(config)
+        regions = [r for r in regions if not r.startswith("VR")]
+        region_arg = " Regions={}".format(",".join(regions))
+
+    arg = f"wf {config}{region_arg}"
+    arg = arg.strip()
+
+    if specific_sys is not None:
+        systematics = systematics_from(config, specific_sys=specific_sys)
+        systematics = ",".join(systematics)
+        arg = f"{arg}:Systematics={systematics}"
+
+    if as_blind:
+        arg = f"{arg}:{BLIND_ARGS}"
+
+    return arg
+
+
+def ntuple_arguments_granular(config, fitname="tW"):
+    """Get the set of granular trex-fitter ntupling instructions
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+    fitname : str
+        Name of the fit.
+
+    Returns
+    -------
+    list(str)
+        trex-fitter n step arguments.
+    list(str)
+        hupdate.exe execution instructions.
+
+    """
+    regions = regions_from(config)
+    systematics = systematics_from(config)
+    region_hupdate_files = {r: [] for r in regions}
+    args = []
+    for r in regions:
+        for s in systematics:
+            if "1j1b" in s and "1j1b" not in r:
+                continue
+            if "2j1b" in s and "2j1b" not in r:
+                continue
+            if "2j2b" in s and "2j2b" not in r:
+                continue
+            args.append(f"n {config} Regions={r}:Systematics={s}:SaveSuffix=_{s}")
+            region_hupdate_files[r].append(
+                f"{fitname}/Histograms/{fitname}_{r}_histos_{s}.root"
+            )
+    updates = []
+    for k, v in region_hupdate_files.items():
+        a1 = f"{fitname}/Histograms/{fitname}_{k}_histos.root"
+        a2 = " ".join(v)
+        updates.append(f"{a1} {a2}")
+    return args, updates
+
+
+def ntuple_arguments(config, specific_sys=None):
+    """Get the set of trex-fitter executable arguments for ntupling.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+    specific_sys : iterable(str), optional
+        The set of systematics to use; if None (the default), uses all
+        discovered systematics.
+
+    Returns
+    -------
+    list(str)
+        The list of trex-fitter arguments
+
+    """
+    regions = regions_from(config)
+
+    # first no specific systematics
+    if specific_sys is None:
+        return ["n {} Regions={}".format(config, r) for r in regions]
+
+    # otherwise, construct for specific systematics
+    systematics = systematics_from(config, specific_sys=specific_sys)
+    systematics = ",".join(systematics)
+    return [
+        "n {} Regions={}:Systematics={}".format(config, r, systematics) for r in regions
+    ]
+
+
 
 
 def job_params(wkspace, executable, **kwargs):
@@ -68,12 +267,12 @@ def create_workspace(config, run_type, suffix):
 
     """
     config_path = pathlib.PosixPath(config)
-    workspace = (config_path.parent / f"rexpy-{run_type}-{config_path.stem}")
+    workspace = config_path.parent / f"rexpy-{run_type}-{config_path.stem}"
     if suffix:
         workspace = pathlib.PosixPath(f"{workspace}__{suffix}")
     workspace.mkdir(exist_ok=False)
     shutil.copyfile(config_path, workspace / "fit.conf")
-    return workspace, workspace / "fit.conf"
+    return workspace.absolute(), (workspace / "fit.conf").absolute()
 
 
 def _run_n_step(args):
@@ -283,3 +482,197 @@ def i_combine_step(config, do_blind=False):
     if do_blind:
         _run_i_combine_step_blind((TREX_EXE, config))
     os.chdir(curdir)
+
+
+def condor_n_step(wkspace, sys=None, job_name="ntuple", dag=None):
+    """Generate a condor job for running the ntuple step.
+
+    Parameters
+    ----------
+    wkspace : pathlib.Path
+        Path of the config file.
+    sys : list(str), optional
+        Specific ystematics to use.
+    job_name : str
+        Name for the condor job.
+    dag : pycondor.Dagman, optional
+        Dagman to assign the job to.
+
+    Returns
+    -------
+    pycondor.Job
+        Condor job with necessary arguments.
+
+    """
+    jp = job_params(wkspace, TREX_EXE)
+    config = wkspace / "fit.conf"
+    ntup_args = ntuple_arguments(config, specific_sys=sys)
+    j = pycondor.Job(name=job_name, dag=dag, **jp)
+    j.add_args(ntup_args)
+    return j
+
+
+def condor_dp_step(wkspace, sys=None, job_name="draw", dag=None, do_blind=False):
+    """Generate a condor job for running the drawing steps.
+
+    Parameters
+    ----------
+    wkspace : pathlib.Path
+        Path of the config file.
+    sys : list(str), optional
+        Specific ystematics to use.
+    job_name : str
+        Name for the condor job.
+    dag : pycondor.Dagman, optional
+        Dagman to assign the job to.
+    do_blind : bool
+        Also run step in Asimov setup.
+
+    Returns
+    -------
+    pycondor.Job
+        Condor job with necessary arguments.
+
+    """
+    jp = job_params(wkspace, TREX_EXE)
+    config = wkspace / "fit.conf"
+    j = pycondor.Job(name=job_name, dag=dag, **jp)
+    j.add_arg(draw_argument(config, specific_sys=sys, as_blind=False))
+    if do_blind:
+        j.add_arg(draw_argument(config, specific_sys=sys, as_blind=True))
+    return j
+
+
+def condor_wf_step(wkspace, sys=None, job_name="wf", dag=None, do_blind=False):
+    """Generate a condor job for running the fitting steps.
+
+    Parameters
+    ----------
+    wkspace : pathlib.Path
+        Path of the config file.
+    sys : list(str), optional
+        Specific ystematics to use.
+    job_name : str
+        Name for the condor job.
+    dag : pycondor.Dagman, optional
+        Dagman to assign the job to.
+    do_blind : bool
+        Also run step in Asimov setup.
+
+    Returns
+    -------
+    pycondor.Job
+        Condor job with necessary arguments.
+
+    """
+    jp = job_params(wkspace, TREX_EXE)
+    config = wkspace / "fit.conf"
+    fit_arg = fit_argument(config, specific_sys=sys)
+    j = pycondor.Job(name=job_name, dag=dag, **jp)
+    j.add_arg(fit_arg)
+    if do_blind:
+        fit_arg2 = fit_argument(config, specific_sys=sys, as_blind=True)
+        j.add_arg(fit_arg2)
+    return j
+
+
+def condor_r_step(wkspace, sys=None, job_name="rank", dag=None, do_blind=False):
+    """Generate a condor job for running the ranking steps.
+
+    Parameters
+    ----------
+    wkspace : pathlib.Path
+        Path of the config file.
+    sys : list(str), optional
+        Specific ystematics to use.
+    job_name : str
+        Name for the condor job.
+    dag : pycondor.Dagman, optional
+        Dagman to assign the job to.
+    do_blind : bool
+        Also run step in Asimov setup.
+
+    Returns
+    -------
+    pycondor.Job
+        Condor job with necessary arguments.
+
+    """
+    jp = job_params(wkspace, TREX_EXE)
+    config = wkspace / "fit.conf"
+    rank_args = rank_arguments(config, specific_sys=sys)
+    if do_blind:
+        rank_args += rank_arguments(config, specific_sys=sys, as_blind=True)
+    j = pycondor.Job(name=job_name, dag=dag, **jp)
+    j.add_args(rank_args)
+    return j
+
+
+def condor_rplot_step(wkspace, job_name="rplot", dag=None, do_blind=False):
+    """Generate a condor job for running the ranking steps.
+
+    Parameters
+    ----------
+    wkspace : pathlib.Path
+        Path of the config file.
+    job_name : str
+        Name for the condor job.
+    dag : pycondor.Dagman, optional
+        Dagman to assign the job to.
+    do_blind : bool
+        Also run step in Asimov setup.
+
+    Returns
+    -------
+    pycondor.Job
+        Condor job with necessary arguments.
+
+    """
+
+    jp = job_params(wkspace, TREX_EXE)
+    config = wkspace / "fit.conf"
+    j = pycondor.Job(name=job_name, dag=dag, **jp)
+    j.add_arg(f"r {config} Ranking=plot")
+    if do_blind:
+        j.add_arg(f"r {config} Ranking=plot:{rexpy.confparse.BLIND_ARGS}")
+    return j
+
+
+def condor_i_step(wkspace, job_name="impact", dag=None, do_blind=False):
+    """Generate a condor job for running the ranking steps.
+
+    Parameters
+    ----------
+    wkspace : pathlib.Path
+        Path of the config file.
+    job_name : str
+        Name for the condor job.
+    dag : pycondor.Dagman, optional
+        Dagman to assign the job to.
+    do_blind : bool
+        Also run step in Asimov setup.
+
+    Returns
+    -------
+    pycondor.Job
+        Condor job with necessary arguments.
+
+    """
+    jp = job_params(wkspace, TREX_EXE)
+    config = wkspace / "fit.conf"
+    impact_args = grouped_impact_arguments(config)
+    if do_blind:
+        impact_args += grouped_impact_arguments(config, as_blind=True)
+    j = pycondor.Job(name=job_name, dag=dag, **jp)
+    j.add_args(impact_args)
+    return j
+
+
+def condor_icombine_step(wkspace, job_name="impactcomb", dag=None, do_blind=False):
+    jp = job_params(wkspace, TREX_EXE)
+    config = wkspace / "fit.conf"
+    j = pycondor.Job(name=job_name, dag=dag, **jp)
+    j.add_arg(f"i {config} GroupedImpact=combine")
+    if do_blind:
+        j.add_arg(f"i {config} GroupedImpact=combine:{rexpy.confparse.BLIND_ARGS}")
+    return j

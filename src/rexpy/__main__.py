@@ -240,10 +240,47 @@ def local(config, suffix, and_blind):
 
 @run.command("condor")
 @click.argument("config", type=click.Path(resolve_path=True))
-@click.option("--suffix", type=str, help="Add suffix to workspace.")
-def condor(config, suffix):
+@click.option("-s", "--sys", type=str, help="Comma separated specific systematics to use.")
+@click.option("-x", "--sfx", type=str, help="Add suffix to workspace.")
+@click.option("-c", "--chf", type=click.Path(resolve_path=True), help="Copy existing histograms.")
+def condor(config, sys, sfx, chf):
     """Run TRExFitter steps with HTCondor."""
-    pass
+    import rexpy.batch as rpb
+    import rexpy.helpers as rph
+    import rexpy.pycondor as pycondor
+
+    # create workspace and the condo dagman
+    workspace, f = rpb.create_workspace(config, "condor", sfx)
+    dagman = pycondor.Dagman("rexpy-dag", submit=str(workspace / "sub"))
+
+    # check for specific systematics
+    sys = sys.split(",") if sys is not None else None
+
+    # copy histograms if requested
+    if chf is not None:
+        rph.copy_histograms(chf, workspace)
+
+    # generate all condor jobs.
+    n = None
+    if chf is None:
+        n = rpb.condor_n_step(workspace, dag=dagman, sys=sys)
+    wf = rpb.condor_wf_step(workspace, dag=dagman, sys=sys)
+    dp = rpb.condor_dp_step(workspace, dag=dagman, sys=sys)
+    r = rpb.condor_r_step(workspace, dag=dagman, sys=sys)
+    rplot = rpb.condor_rplot_step(workspace, dag=dagman)
+
+    # setup job dependencies
+    if n is not None:
+        wf.add_parent(n)
+    dp.add_parent(wf)
+    r.add_parent(wf)
+    rplot.add_parent(r)
+    if sys is None:
+        i = rpb.condor_i_step(workspace, dag=dagman)
+        icombine = rpb.condor_icombine_step(workspace, dag=dagman)
+        i.add_parent(wf)
+        icombine.add_parent(i)
+    dagman.build()
 
 
 if __name__ == "__main__":
