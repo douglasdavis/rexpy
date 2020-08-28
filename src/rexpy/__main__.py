@@ -259,6 +259,9 @@ def condor(config, sys, sfx, chf, submit):
     workspace, f = rpb.create_workspace(config, "condor", sfx)
     dagman = pycondor.Dagman("rexpy-dag", submit=str(workspace / "sub"))
 
+    cwd = PosixPath.cwd()
+    os.chdir(workspace)
+
     # check for specific systematics
     sys = sys.split(",") if sys is not None else None
 
@@ -291,6 +294,7 @@ def condor(config, sys, sfx, chf, submit):
     else:
         dagman.build()
 
+    os.chdir(cwd)
 
 if __name__ == "__main__":
     cli(prog_name="rexpy")
