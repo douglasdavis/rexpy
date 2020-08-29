@@ -146,6 +146,7 @@ def gen(
         rpsc.TTBAR_AUX_WEIGHT = "1.0"
 
     preamble = rpb.top_blocks(
+        ntuplepaths=ntup_dir,
         reg1j1b_binning=bin_1j1b,
         reg2j1b_binning=bin_2j1b,
         reg2j2b_binning=bin_2j2b,
@@ -295,6 +296,7 @@ def condor(config, sys, sfx, chf, submit):
         dagman.build()
 
     os.chdir(cwd)
+
 
 if __name__ == "__main__":
     cli(prog_name="rexpy")
