@@ -75,6 +75,7 @@ def config():
 @click.option("--drop-1j1b", is_flag=True, help="Drop the 1j1b region.")
 @click.option("--drop-2j1b", is_flag=True, help="Drop the 2j1b region.")
 @click.option("--drop-2j2b", is_flag=True, help="Drop the 2j2b region.")
+@click.option("--asimov-fit", is_flag=True, help="Fit Asimov (i.e. blind).")
 def gen(
     outname,
     pre_exec,
@@ -101,6 +102,7 @@ def gen(
     drop_1j1b,
     drop_2j1b,
     drop_2j2b,
+    asimov_fit,
 ):
     """Generate a config with user defined binning, save to OUTNAME."""
 
@@ -158,6 +160,7 @@ def gen(
         reg2j2b_selection=sel_2j2b,
         dotables="TRUE" if do_tables else "FALSE",
         systplots="TRUE" if do_sys_plots else "FALSE",
+        fitblind="TRUE" if asimov_fit else "FALSE",
     )
     with open(outname, "w") as f:
         print(preamble, file=f)

@@ -47,6 +47,7 @@ def top_blocks(**kwargs):
         reg2j2b_variable=c.DEF_2j2b_var,
         reg2j2b_binning=c.r2j2b_bins(),
         spr="reg1j1b,reg2j1b,reg2j2b",
+        fitblind="TRUE",
     )
     for k in kwargs:
         params[k] = kwargs[k]
@@ -99,6 +100,7 @@ def top_blocks(**kwargs):
       UseMinos: all
       GetGoodnessOfFit: TRUE
       SaturatedModel: TRUE
+      FitBlind: {fitblind}
 
     Region: "reg1j1b"
       VariableTitle: "BDT Classifier Response"

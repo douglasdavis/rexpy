@@ -24,7 +24,7 @@ function usage() {
 
 OUTDIR=$(pwd)
 SHOWER="704"
-FITVAR="bdtres10"
+FITVAR="bdtres21"
 NTUPDIR="/ddd/atlas/data/wtloop/WTA01_20200827"
 NBIN_1j1b="12"
 NBIN_2j1b="12"
@@ -270,6 +270,9 @@ python -m rexpy config gen $OUTDIR/presel_plots.conf \
        --var-1j1b $FITVAR \
        --var-2j1b $FITVAR \
        --var-2j2b $FITVAR \
+       --bin-1j1b "12,0.2,0.8" \
+       --bin-2j1b "12,0.2,0.8" \
+       --bin-2j2b "12,0.2,0.8" \
        --sel-1j1b "reg1j1b == 1 && OS == 1" \
        --sel-2j1b "reg2j1b == 1 && OS == 1" \
        --sel-2j2b "reg2j2b == 1 && OS == 1" \
@@ -277,9 +280,13 @@ python -m rexpy config gen $OUTDIR/presel_plots.conf \
        --do-valplots
 
 python -m rexpy config gen $OUTDIR/presel.conf \
+       --asimov-fit \
        --ntup-dir ${NTUPDIR} \
        --ttbar-aux-weight $TTBAR_AUX \
        --is-preselection \
+       --bin-1j1b "12,0.2,0.8" \
+       --bin-2j1b "12,0.2,0.8" \
+       --bin-2j2b "12,0.2,0.8" \
        --var-1j1b $FITVAR \
        --var-2j1b $FITVAR \
        --var-2j2b $FITVAR \
