@@ -19,9 +19,11 @@ function usage() {
     echo "      --xmax-2j1b   Maximum for 2j1b region."
     echo "      --xmax-2j2b   Maximum for 2j2b region."
     echo "      --ttbar-aux   Auxiliary weight for ttbar sample."
+    echo "      --asimov-fit  Run as Asimov."
     echo ""
 }
 
+ASIMOV=""
 OUTDIR=$(pwd)
 SHOWER="704"
 FITVAR="bdtres21"
@@ -29,12 +31,12 @@ NTUPDIR="/ddd/atlas/data/wtloop/WTA01_20200827"
 NBIN_1j1b="12"
 NBIN_2j1b="12"
 NBIN_2j2b="12"
-XMIN_1j1b="0.35"
-XMAX_1j1b="0.76"
-XMIN_2j1b="0.22"
+XMIN_1j1b="0.34"
+XMAX_1j1b="0.75"
+XMIN_2j1b="0.25"
 XMAX_2j1b="0.70"
-XMIN_2j2b="0.45"
-XMAX_2j2b="0.775"
+XMIN_2j2b="0.40"
+XMAX_2j2b="0.725"
 TTBAR_AUX="none"
 
 while [[ $# -gt 0 ]]
@@ -101,6 +103,9 @@ do
             shift
             TTBAR_AUX="$1"
             ;;
+        --asimov-fit)
+            ASIMOV=--asimov-fit
+            ;;
         *)
             echo "Unknown option '$key'"
             usage
@@ -116,7 +121,7 @@ echo "Showering version: ${SHOWER}"
 echo "Ntuple dir: ${NTUPDIR}"
 mkdir -p $OUTDIR
 
-python -m rexpy config gen $OUTDIR/main.conf \
+python -m rexpy config gen $OUTDIR/main.conf ${ASIMOV} \
        --ntup-dir ${NTUPDIR} \
        --ttbar-aux-weight $TTBAR_AUX \
        --var-1j1b ${FITVAR} \
@@ -132,7 +137,7 @@ python -m rexpy config gen $OUTDIR/main.conf \
        --do-tables \
        --do-sys-plots
 
-python -m rexpy config gen $OUTDIR/main_plots.conf \
+python -m rexpy config gen $OUTDIR/main_plots.conf ${ASIMOV} \
        --ntup-dir ${NTUPDIR} \
        --ttbar-aux-weight $TTBAR_AUX \
        --var-1j1b $FITVAR \
@@ -147,7 +152,7 @@ python -m rexpy config gen $OUTDIR/main_plots.conf \
        --herwig-version $SHOWER \
        --do-valplots
 
-python -m rexpy config gen $OUTDIR/main_singlebin2j2b.conf \
+python -m rexpy config gen $OUTDIR/main_singlebin2j2b.conf ${ASIMOV} \
        --ntup-dir ${NTUPDIR} \
        --ttbar-aux-weight $TTBAR_AUX \
        --var-1j1b $FITVAR \
@@ -164,7 +169,7 @@ python -m rexpy config gen $OUTDIR/main_singlebin2j2b.conf \
        --do-sys-plots
 
 
-python -m rexpy config gen $OUTDIR/main_1j1b.conf \
+python -m rexpy config gen $OUTDIR/main_1j1b.conf ${ASIMOV} \
        --ntup-dir ${NTUPDIR} \
        --ttbar-aux-weight $TTBAR_AUX \
        --var-1j1b $FITVAR \
@@ -174,7 +179,7 @@ python -m rexpy config gen $OUTDIR/main_1j1b.conf \
        --drop-2j1b \
        --drop-2j2b
 
-python -m rexpy config gen $OUTDIR/main_2j1b.conf \
+python -m rexpy config gen $OUTDIR/main_2j1b.conf ${ASIMOV} \
        --ntup-dir ${NTUPDIR} \
        --ttbar-aux-weight $TTBAR_AUX \
        --var-2j1b $FITVAR \
@@ -184,7 +189,7 @@ python -m rexpy config gen $OUTDIR/main_2j1b.conf \
        --drop-1j1b \
        --drop-2j2b
 
-python -m rexpy config gen $OUTDIR/main_2j2b.conf \
+python -m rexpy config gen $OUTDIR/main_2j2b.conf ${ASIMOV} \
        --ntup-dir ${NTUPDIR} \
        --ttbar-aux-weight $TTBAR_AUX \
        --var-2j2b $FITVAR \
@@ -194,7 +199,7 @@ python -m rexpy config gen $OUTDIR/main_2j2b.conf \
        --drop-1j1b \
        --drop-2j1b
 
-python -m rexpy config gen $OUTDIR/main_1j1b2j1b.conf \
+python -m rexpy config gen $OUTDIR/main_1j1b2j1b.conf ${ASIMOV} \
        --ntup-dir ${NTUPDIR} \
        --ttbar-aux-weight $TTBAR_AUX \
        --var-1j1b $FITVAR \
@@ -206,7 +211,7 @@ python -m rexpy config gen $OUTDIR/main_1j1b2j1b.conf \
        --herwig-version $SHOWER \
        --drop-2j2b
 
-python -m rexpy config gen $OUTDIR/main_1j1b2j2b.conf \
+python -m rexpy config gen $OUTDIR/main_1j1b2j2b.conf ${ASIMOV} \
        --ntup-dir ${NTUPDIR} \
        --ttbar-aux-weight $TTBAR_AUX \
        --var-1j1b $FITVAR \
@@ -218,7 +223,7 @@ python -m rexpy config gen $OUTDIR/main_1j1b2j2b.conf \
        --herwig-version $SHOWER \
        --drop-2j1b
 
-python -m rexpy config gen $OUTDIR/main_only1516.conf \
+python -m rexpy config gen $OUTDIR/main_only1516.conf ${ASIMOV} \
        --ntup-dir ${NTUPDIR} \
        --ttbar-aux-weight $TTBAR_AUX \
        --var-1j1b $FITVAR \
@@ -233,7 +238,7 @@ python -m rexpy config gen $OUTDIR/main_only1516.conf \
        --herwig-version $SHOWER \
        --only-1516
 
-python -m rexpy config gen $OUTDIR/main_only17.conf \
+python -m rexpy config gen $OUTDIR/main_only17.conf ${ASIMOV} \
        --ntup-dir ${NTUPDIR} \
        --ttbar-aux-weight $TTBAR_AUX \
        --var-1j1b $FITVAR \
@@ -248,7 +253,7 @@ python -m rexpy config gen $OUTDIR/main_only17.conf \
        --herwig-version $SHOWER \
        --only-17
 
-python -m rexpy config gen $OUTDIR/main_only18.conf \
+python -m rexpy config gen $OUTDIR/main_only18.conf ${ASIMOV} \
        --ntup-dir ${NTUPDIR} \
        --ttbar-aux-weight $TTBAR_AUX \
        --var-1j1b $FITVAR \
@@ -263,7 +268,7 @@ python -m rexpy config gen $OUTDIR/main_only18.conf \
        --herwig-version $SHOWER \
        --only-18
 
-python -m rexpy config gen $OUTDIR/presel_plots.conf \
+python -m rexpy config gen $OUTDIR/presel_plots.conf ${ASIMOV} \
        --ntup-dir ${NTUPDIR} \
        --ttbar-aux-weight $TTBAR_AUX \
        --is-preselection \
@@ -279,8 +284,7 @@ python -m rexpy config gen $OUTDIR/presel_plots.conf \
        --herwig-version $SHOWER \
        --do-valplots
 
-python -m rexpy config gen $OUTDIR/presel.conf \
-       --asimov-fit \
+python -m rexpy config gen $OUTDIR/presel.conf ${ASIMOV} \
        --ntup-dir ${NTUPDIR} \
        --ttbar-aux-weight $TTBAR_AUX \
        --is-preselection \
