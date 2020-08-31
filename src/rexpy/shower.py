@@ -45,6 +45,9 @@ def norm_uncertainties(
     df_pp8 = RDataFrame(chain_pp8)
     df_ph7 = RDataFrame(chain_ph7)
 
+    if weight_expression == "weight_nominal * 1.0":
+        weight_expression = "weight_nominal"
+
     log.info("1j1b selection: '%s'" % sel_1j1b)
     log.info("2j1b selection: '%s'" % sel_2j1b)
     log.info("2j2b selection: '%s'" % sel_2j2b)
@@ -55,14 +58,26 @@ def norm_uncertainties(
     r2j1b_pp8, r2j1b_ph7 = 0.0, 0.0
     r2j2b_pp8, r2j2b_ph7 = 0.0, 0.0
     if sel_1j1b is not None:
-        r1j1b_pp8 = df_pp8.Filter(str(sel_1j1b)).Define("wtu", weight_expression).Sum("wtu")
-        r1j1b_ph7 = df_ph7.Filter(str(sel_1j1b)).Define("wtu", weight_expression).Sum("wtu")
+        if weight_expression == "weight_nominal":
+            r1j1b_pp8 = df_pp8.Filter(str(sel_1j1b)).Sum("weight_nominal")
+            r1j1b_ph7 = df_ph7.Filter(str(sel_1j1b)).Sum("weight_nominal")
+        else:
+            r1j1b_pp8 = df_pp8.Filter(str(sel_1j1b)).Define("wtu", weight_expression).Sum("wtu")
+            r1j1b_ph7 = df_ph7.Filter(str(sel_1j1b)).Define("wtu", weight_expression).Sum("wtu")
     if sel_2j1b is not None:
-        r2j1b_pp8 = df_pp8.Filter(str(sel_2j1b)).Define("wtu", weight_expression).Sum("wtu")
-        r2j1b_ph7 = df_ph7.Filter(str(sel_2j1b)).Define("wtu", weight_expression).Sum("wtu")
+        if weight_expression == "weight_nominal":
+            r2j1b_pp8 = df_pp8.Filter(str(sel_2j1b)).Sum("weight_nominal")
+            r2j1b_ph7 = df_ph7.Filter(str(sel_2j1b)).Sum("weight_nominal")
+        else:
+            r2j1b_pp8 = df_pp8.Filter(str(sel_2j1b)).Define("wtu", weight_expression).Sum("wtu")
+            r2j1b_ph7 = df_ph7.Filter(str(sel_2j1b)).Define("wtu", weight_expression).Sum("wtu")
     if sel_2j2b is not None:
-        r2j2b_pp8 = df_pp8.Filter(str(sel_2j2b)).Define("wtu", weight_expression).Sum("wtu")
-        r2j2b_ph7 = df_ph7.Filter(str(sel_2j2b)).Define("wtu", weight_expression).Sum("wtu")
+        if weight_expression == "weight_nominal":
+            r2j2b_pp8 = df_pp8.Filter(str(sel_2j2b)).Sum("weight_nominal")
+            r2j2b_ph7 = df_ph7.Filter(str(sel_2j2b)).Sum("weight_nominal")
+        else:
+            r2j2b_pp8 = df_pp8.Filter(str(sel_2j2b)).Define("wtu", weight_expression).Sum("wtu")
+            r2j2b_ph7 = df_ph7.Filter(str(sel_2j2b)).Define("wtu", weight_expression).Sum("wtu")
 
     if sel_1j1b is not None:
         r1j1b_pp8 = r1j1b_pp8.GetValue()
