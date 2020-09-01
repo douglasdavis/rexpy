@@ -147,6 +147,19 @@ def gen(
     elif ttbar_aux_weight == "none":
         rpsc.TTBAR_AUX_WEIGHT = "1.0"
 
+    if "WTA01" in ntup_dir:
+        import rexpy.systematic_tables
+        category = rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"].category
+        smoothing = rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"].smoothing
+        title = rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"].title
+        rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"] = rexpy.systematic_tables.NTSysTree2s(
+            "MET_SoftTrk_ScaleUp",
+            "MET_SoftTrk_ScaleDown",
+            category,
+            smoothing,
+            title
+        )
+
     preamble = rpb.top_blocks(
         ntuplepaths=ntup_dir,
         reg1j1b_binning=bin_1j1b,
