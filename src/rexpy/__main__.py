@@ -4,6 +4,7 @@
 from pathlib import PosixPath
 import logging
 import os
+import warnings
 
 # third party
 import click
@@ -36,11 +37,11 @@ def cli():
 @click.argument("npyfiledir", type=click.Path(resolve_path=True, exists=True))
 @click.option("--dry", is_flag=True, help="Dry run (print would-be commands.")
 @click.option("--condor-sub", type=str, help="Use condor, arg is workspace dir.")
-@click.option("--dont-submit", is_flag=True, help="If using condor, don't submit.")
-def augment(rootfiledir, npyfiledir, dry, condor_sub, dont_submit):
+@click.option("--submit/--no-submit", default=False, help="If using condor, submit.")
+def augment(rootfiledir, npyfiledir, dry, condor_sub, submit):
     """Augment ROOT files with NumPy array files."""
     import rexpy.augnpy
-    rexpy.augnpy.augment(rootfiledir, npyfiledir, dry, condor_sub, dont_submit)
+    rexpy.augnpy.augment(rootfiledir, npyfiledir, dry, condor_sub, submit)
 
 
 @cli.group("config")
@@ -56,18 +57,18 @@ def config():
 @click.option("--bin-1j1b", type=str, default=rpsc.r1j1b_bins(), help="1j1b region binning settings.", show_default=True)
 @click.option("--bin-2j1b", type=str, default=rpsc.r2j1b_bins(), help="2j1b region binning settings.", show_default=True)
 @click.option("--bin-2j2b", type=str, default=rpsc.r2j2b_bins(), help="2j2b region binning settings.", show_default=True)
+@click.option("--var-all", type=str, default=None, help="Override all region variables", show_default=True)
 @click.option("--var-1j1b", type=str, default=rpsc.r1j1b_var(), help="1j1b region variable setting.", show_default=True)
 @click.option("--var-2j1b", type=str, default=rpsc.r2j1b_var(), help="2j1b region variable setting.", show_default=True)
 @click.option("--var-2j2b", type=str, default=rpsc.r2j2b_var(), help="2j2b region variable setting.", show_default=True)
 @click.option("--sel-1j1b", type=str, default=rpsc.r1j1b_selection(), help="1j1b region selection setting.", show_default=True)
 @click.option("--sel-2j1b", type=str, default=rpsc.r2j1b_selection(), help="2j1b region selection setting.", show_default=True)
 @click.option("--sel-2j2b", type=str, default=rpsc.r2j2b_selection(), help="2j2b region selection setting.", show_default=True)
-@click.option("--ttbar-aux-weight", type=click.Choice(["none", "tptrw", "trrw"]), default="none", help="Extra ttbar weight.", show_default=True)
-@click.option("--herwig-version", type=click.Choice(["704", "713"]), default="704", help="ttbar Herwig version.")
+@click.option("--herwig-version", type=click.Choice(["704", "713"]), default="704", help="ttbar Herwig version.", show_default=True)
 @click.option("--drop-sys", type=str, help="Drop a systematic.")
 @click.option("--do-tables", is_flag=True, help="Produce tables.")
 @click.option("--do-sys-plots", is_flag=True, help="Produce red/blue plots.")
-@click.option("--do-valplots", is_flag=True, help="Produce validation region plots.")
+@click.option("--do-val-plots", is_flag=True, help="Produce validation region plots.")
 @click.option("--is-preselection", is_flag=True, help="use preselection plotting definitions")
 @click.option("--only-1516", is_flag=True, help="Fit only 15/16.")
 @click.option("--only-17", is_flag=True, help="Fit only 17.")
@@ -75,7 +76,8 @@ def config():
 @click.option("--drop-1j1b", is_flag=True, help="Drop the 1j1b region.")
 @click.option("--drop-2j1b", is_flag=True, help="Drop the 2j1b region.")
 @click.option("--drop-2j2b", is_flag=True, help="Drop the 2j2b region.")
-@click.option("--asimov-fit", is_flag=True, help="Fit Asimov (i.e. blind).")
+@click.option("--fit-data", is_flag=True, help="Fit to data")
+@click.option("--asimov-fit", is_flag=True, help="deprecated option (Asimov is default, use --fit-data for fit to data)")
 def gen(
     outname,
     pre_exec,
@@ -83,18 +85,18 @@ def gen(
     bin_1j1b,
     bin_2j1b,
     bin_2j2b,
+    var_all,
     var_1j1b,
     var_2j1b,
     var_2j2b,
     sel_1j1b,
     sel_2j1b,
     sel_2j2b,
-    ttbar_aux_weight,
     herwig_version,
     drop_sys,
     do_tables,
     do_sys_plots,
-    do_valplots,
+    do_val_plots,
     is_preselection,
     only_1516,
     only_17,
@@ -102,12 +104,19 @@ def gen(
     drop_1j1b,
     drop_2j1b,
     drop_2j2b,
+    fit_data,
     asimov_fit,
 ):
     """Generate a config with user defined binning, save to OUTNAME."""
 
     if pre_exec is not None:
         exec(PosixPath(pre_exec).read_text())
+
+    if asimov_fit:
+        warnings.warn(
+            "--asimov-fit is deprecated (it's the default, use --fit-data to fit to data",
+            DeprecationWarning
+        )
 
     bin_1j1b = bin_1j1b if bin_1j1b is not None else rpsc.r1j1b_bins()
     bin_2j1b = bin_2j1b if bin_2j1b is not None else rpsc.r2j1b_bins()
@@ -118,6 +127,11 @@ def gen(
     sel_1j1b = sel_1j1b if sel_1j1b is not None else rpsc.r1j1b_selection()
     sel_2j1b = sel_2j1b if sel_2j1b is not None else rpsc.r2j1b_selection()
     sel_2j2b = sel_2j2b if sel_2j2b is not None else rpsc.r2j2b_selection()
+
+    if var_all is not None:
+        var_1j1b = var_all
+        var_2j1b = var_all
+        var_2j2b = var_all
 
     log.info("Generating config file: %s" % outname)
     if ntup_dir is None:
@@ -140,25 +154,18 @@ def gen(
     else:
         sel_2j2b = rph.selection_with_period(sel_2j2b, only_1516, only_17, only_18)
 
-    if ttbar_aux_weight == "tptrw":
-        rpsc.TTBAR_AUX_WEIGHT = "weight_tptrw_tool"
-    elif ttbar_aux_weight == "trrw":
-        rpsc.TTBAR_AUX_WEIGHT = "weight_trrw_tool"
-    elif ttbar_aux_weight == "none":
-        rpsc.TTBAR_AUX_WEIGHT = "1.0"
-
-    if "WTA01" in ntup_dir:
-        import rexpy.systematic_tables
-        category = rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"].category
-        smoothing = rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"].smoothing
-        title = rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"].title
-        rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"] = rexpy.systematic_tables.NTSysTree2s(
-            "MET_SoftTrk_ScaleUp",
-            "MET_SoftTrk_ScaleDown",
-            category,
-            smoothing,
-            title
-        )
+    # if "WTA01" in ntup_dir:
+    #     import rexpy.systematic_tables
+    #     category = rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"].category
+    #     smoothing = rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"].smoothing
+    #     title = rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"].title
+    #     rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"] = rexpy.systematic_tables.NTSysTree2s(
+    #         "MET_SoftTrk_ScaleUp",
+    #         "MET_SoftTrk_ScaleDown",
+    #         category,
+    #         smoothing,
+    #         title
+    #     )
 
     preamble = rpb.top_blocks(
         ntuplepaths=ntup_dir,
@@ -173,11 +180,11 @@ def gen(
         reg2j2b_selection=sel_2j2b,
         dotables="TRUE" if do_tables else "FALSE",
         systplots="TRUE" if do_sys_plots else "FALSE",
-        fitblind="TRUE" if asimov_fit else "FALSE",
+        fitblind="FALSE" if fit_data else "TRUE",
     )
     with open(outname, "w") as f:
         print(preamble, file=f)
-        if do_valplots:
+        if do_val_plots:
             print(rpv.default_vrp_blocks(sel_1j1b, sel_2j1b, sel_2j2b, is_preselection=is_preselection), file=f)
         print(rpb.sample_blocks(), file=f)
         print(rpb.norm_factor_blocks(), file=f)
@@ -188,7 +195,7 @@ def gen(
         print(rpb.sys_twosided_tree_blocks(), file=f)
         print(rpb.sys_onesided_tree_blocks(), file=f)
 
-    if do_valplots:
+    if do_val_plots:
         fix_systematics(outname)
 
     blocks = rpc.all_blocks(outname)
@@ -245,17 +252,18 @@ def run():
 @click.argument("config", type=click.Path(resolve_path=True))
 @click.option("--suffix", type=str, help="Add suffix to workspace.")
 @click.option("--and-blind", is_flag=True, help="Run steps blind as well.")
-def local(config, suffix, and_blind):
+@click.option("--n-parallel", type=int, default=None, help="Max parallel jobs (default is CPU count)")
+def local(config, suffix, and_blind, n_parallel):
     """Run TRExFitter steps locally."""
     import rexpy.batch as rpb
     curdir = PosixPath.cwd()
     workspace, f = rpb.create_workspace(config, "local", suffix)
     os.chdir(workspace)
-    rpb.parallel_n_step(f)
+    rpb.parallel_n_step(f, processes=n_parallel)
     rpb.wfdp_step(f, do_blind=and_blind)
-    rpb.parallel_r_step(f, do_blind=and_blind)
+    rpb.parallel_r_step(f, do_blind=and_blind, processes=n_parallel)
     rpb.r_draw_step(f, do_blind=and_blind)
-    rpb.parallel_i_step(f, do_blind=and_blind)
+    rpb.parallel_i_step(f, do_blind=and_blind, processes=n_parallel)
     rpb.i_combine_step(f, do_blind=and_blind)
     os.chdir(curdir)
 
@@ -263,17 +271,18 @@ def local(config, suffix, and_blind):
 @run.command("condor")
 @click.argument("config", type=click.Path(resolve_path=True))
 @click.option("-s", "--sys", type=str, help="Comma separated specific systematics to use.")
-@click.option("-x", "--sfx", type=str, help="Add suffix to workspace.")
-@click.option("-c", "--chf", type=click.Path(resolve_path=True), help="Copy existing histograms.")
+@click.option("-x", "--suffix", type=str, help="Add suffix to workspace.")
+@click.option("-c", "--copy-hists", type=click.Path(resolve_path=True), help="Copy existing histograms.")
+@click.option("-n", "--ntup-only", is_flag=True, help="Only fun the ntuple step.")
 @click.option("--submit/--no-submit", default=False, help="Submit the jobs")
-def condor(config, sys, sfx, chf, submit):
+def condor(config, sys, suffix, copy_hists, ntup_only, submit):
     """Run TRExFitter steps with HTCondor."""
     import rexpy.batch as rpb
     import rexpy.helpers as rph
     import rexpy.pycondor as pycondor
 
     # create workspace and the condo dagman
-    workspace, f = rpb.create_workspace(config, "condor", sfx)
+    workspace, f = rpb.create_workspace(config, "condor", suffix)
     dagman = pycondor.Dagman("rexpy-dag", submit=str(workspace / "sub"))
 
     cwd = PosixPath.cwd()
@@ -283,29 +292,39 @@ def condor(config, sys, sfx, chf, submit):
     sys = sys.split(",") if sys is not None else None
 
     # copy histograms if requested
-    if chf is not None:
-        rph.copy_histograms(chf, workspace)
+    if copy_hists is not None:
+        rph.copy_histograms(copy_hists, workspace)
 
     # generate all condor jobs.
     n = None
-    if chf is None:
+    if copy_hists is None:
         n = rpb.condor_n_step(workspace, dag=dagman, sys=sys)
-    wf = rpb.condor_wf_step(workspace, dag=dagman, sys=sys)
-    dp = rpb.condor_dp_step(workspace, dag=dagman, sys=sys)
-    r = rpb.condor_r_step(workspace, dag=dagman, sys=sys)
-    rplot = rpb.condor_rplot_step(workspace, dag=dagman)
+
+    if not ntup_only:
+        wf = rpb.condor_wf_step(workspace, dag=dagman, sys=sys)
+        dp = rpb.condor_dp_step(workspace, dag=dagman, sys=sys)
+        r = rpb.condor_r_step(workspace, dag=dagman, sys=sys)
+        rplot = rpb.condor_rplot_step(workspace, dag=dagman)
 
     # setup job dependencies
-    if n is not None:
+    if n is not None and not ntup_only:
         wf.add_parent(n)
-    dp.add_parent(wf)
-    r.add_parent(wf)
-    rplot.add_parent(r)
-    if sys is None:
-        i = rpb.condor_i_step(workspace, dag=dagman)
-        icombine = rpb.condor_icombine_step(workspace, dag=dagman)
-        i.add_parent(wf)
-        icombine.add_parent(i)
+    else:
+        pass
+    if not ntup_only:
+        dp.add_parent(wf)
+        r.add_parent(wf)
+        rplot.add_parent(r)
+        if sys is None:
+            i = rpb.condor_i_step(workspace, dag=dagman)
+            icombine = rpb.condor_icombine_step(workspace, dag=dagman)
+            i.add_parent(wf)
+            icombine.add_parent(i)
+        else:
+            pass
+    else:
+        pass
+
     if submit:
         dagman.build_submit()
     else:

@@ -66,7 +66,7 @@ def commands(rootfiledir, npyfiledir):
     return coms
 
 
-def condor(workspace, coms, dont_submit):
+def condor(workspace, coms, submit):
     workspace = os.path.abspath(workspace)
     os.mkdir(workspace)
     dagman = pycondor.Dagman(name="rp-augment-npy", submit=os.path.join(workspace, "sub"))
@@ -75,10 +75,10 @@ def condor(workspace, coms, dont_submit):
     augjob.add_args(coms)
     orig_path = os.getcwd()
     os.chdir(workspace)
-    if dont_submit:
-        dagman.build()
-    else:
+    if submit:
         dagman.build_submit()
+    else:
+        dagman.build()
     os.chdir(orig_path)
     return 0
 

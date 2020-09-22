@@ -1,9 +1,14 @@
+"""Module for handling batch steps."""
+
+#stdlib
 import multiprocessing
 import subprocess
 import os
 import pathlib
 import shutil
+from functools import wraps
 
+# rexpy
 import rexpy.pycondor as pycondor
 import rexpy.confparse
 from rexpy.confparse import (
@@ -350,7 +355,34 @@ def _run_i_combine_step_blind(args):
     return p.wait()
 
 
-def parallel_n_step(config, regions=None):
+def restore_cwd(func):
+    """Decorator to enforce preservation of current working directory.
+
+    Functions executing TRExFitter steps locally are designed to
+    execute TRExFitter from the directory where the config file lives.
+    We are not always running the python executable from that
+    directory, so we change to the config file's parent directory with
+    :py:func:`os.chdir` in all of those functions. This decorator
+    ensures that we return back to the current working directory
+    before that function was called.
+
+    Parameters
+    ----------
+    func : callable
+        Function to call (expected to call :py:func:`os.chdir`)
+
+    """
+    @wraps(func)
+    def decorator(*args, **kwargs):
+        cwd = os.getcwd()
+        res = func(*args, **kwargs)
+        os.chdir(cwd)
+        return res
+    return decorator
+
+
+@restore_cwd
+def parallel_n_step(config, regions=None, processes=None):
     """Parallelize the ntuple step via multiprocessing.
 
     Parameters
@@ -359,19 +391,19 @@ def parallel_n_step(config, regions=None):
         Path of the config file.
     regions : list(str), optional
         Manually define regions.
+    processes : int, optional
+        Max number of processes to run in parallel
 
     """
-    curdir = os.getcwd()
-    run_dir = pathlib.PosixPath(config).resolve().parent
-    os.chdir(run_dir)
+    os.chdir(pathlib.PosixPath(config).resolve().parent)
     if regions is None:
         regions = regions_from(config)
     args = [(TREX_EXE, config, region) for region in regions]
-    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
+    pool = multiprocessing.Pool(processes=processes)
     pool.map(_run_n_step, args)
-    os.chdir(curdir)
 
 
+@restore_cwd
 def wfdp_step(config, do_blind=False):
     """Execute the wftp steps.
 
@@ -383,18 +415,16 @@ def wfdp_step(config, do_blind=False):
         Also run step in Asimov setup.
 
     """
-    curdir = os.getcwd()
-    run_dir = pathlib.PosixPath(config).resolve().parent
-    os.chdir(run_dir)
+    os.chdir(pathlib.PosixPath(config).resolve().parent)
     _run_wf_step((TREX_EXE, config))
     _run_dp_step((TREX_EXE, config))
     if do_blind:
         _run_wf_step_blind((TREX_EXE, config))
         _run_dp_step_blind((TREX_EXE, config))
-    os.chdir(curdir)
 
 
-def parallel_r_step(config, systematics=None, do_blind=False):
+@restore_cwd
+def parallel_r_step(config, systematics=None, do_blind=False, processes=None):
     """Parallelize the impart ranking step via multiprocessing.
 
     Parameters
@@ -405,21 +435,21 @@ def parallel_r_step(config, systematics=None, do_blind=False):
         Manually define the systematics.
     do_blind : bool
         Also run step in Asimov setup.
+    processes : int, optional
+        Max number of processes to run in parallel
 
     """
-    curdir = os.getcwd()
-    run_dir = pathlib.PosixPath(config).resolve().parent
-    os.chdir(run_dir)
+    os.chdir(pathlib.PosixPath(config).resolve().parent)
     if systematics is None:
         systematics = systematics_from(config)
     args = [(TREX_EXE, config, sys) for sys in systematics]
-    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
+    pool = multiprocessing.Pool(processes=processes)
     pool.map(_run_r_step, args)
     if do_blind:
         pool.map(_run_r_step_blind, args)
-    os.chdir(curdir)
 
 
+@restore_cwd
 def r_draw_step(config, do_blind=False):
     """Execute the ranking plot drawing step.
 
@@ -431,16 +461,14 @@ def r_draw_step(config, do_blind=False):
         Also run step in Asimov setup.
 
     """
-    curdir = os.getcwd()
-    run_dir = pathlib.PosixPath(config).resolve().parent
-    os.chdir(run_dir)
+    os.chdir(pathlib.PosixPath(config).resolve().parent)
     _run_r_draw_step((TREX_EXE, config))
     if do_blind:
         _run_r_draw_step_blind((TREX_EXE, config))
-    os.chdir(curdir)
 
 
-def parallel_i_step(config, do_blind=False):
+@restore_cwd
+def parallel_i_step(config, do_blind=False, processes=None):
     """Parallelize the grouped impact step via multiprocessing.
 
     Parameters
@@ -449,21 +477,21 @@ def parallel_i_step(config, do_blind=False):
         Path of the config file.
     do_blind : bool
         Also run step in Asimov setup.
+    processes : int, optional
+        Max number of processes to run in parallel
 
     """
-    curdir = os.getcwd()
-    run_dir = pathlib.PosixPath(config).resolve().parent
-    os.chdir(run_dir)
+    os.chdir(pathlib.PosixPath(config).resolve().parent)
     args = grouped_impact_arguments(config)
     groups = [a.split()[-1].split("=")[-1] for a in args]
     args = [(TREX_EXE, config, g) for g in groups]
-    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
+    pool = multiprocessing.Pool(processes=processes)
     pool.map(_run_i_step, args)
     if do_blind:
         pool.map(_run_i_step_blind, args)
-    os.chdir(curdir)
 
 
+@restore_cwd
 def i_combine_step(config, do_blind=False):
     """Execute the grouped impact combine step.
 
@@ -475,13 +503,10 @@ def i_combine_step(config, do_blind=False):
         Also run step in Asimov setup.
 
     """
-    curdir = os.getcwd()
-    run_dir = pathlib.PosixPath(config).resolve().parent
-    os.chdir(run_dir)
+    os.chdir(pathlib.PosixPath(config).resolve().parent)
     _run_i_combine_step((TREX_EXE, config))
     if do_blind:
         _run_i_combine_step_blind((TREX_EXE, config))
-    os.chdir(curdir)
 
 
 def condor_n_step(wkspace, sys=None, job_name="ntuple", dag=None):

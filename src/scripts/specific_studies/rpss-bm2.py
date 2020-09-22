@@ -3,6 +3,7 @@
 import itertools
 import shutil
 import pathlib
+import subprocess
 
 import click
 
@@ -17,17 +18,19 @@ CUT_MATRIX = {
 }
 
 
-FITVAR = "bdtres40"
-R1J1B_XMAX = 0.78
-R2J1B_XMIN = 0.25
+FITVAR = "bdtres03"
+R1J1B_XMAX = 0.76
+R2J1B_XMIN = 0.22
+
 
 @click.command()
-@click.argument("ntup_dir", type=click.Path(resolve_path=True))
-@click.argument("fitvar", type=str)
-@click.argument("r1j1b_xmax", type=float)
-@click.argument("r2j1b_xmin", type=float)
+@click.argument("ntupdir", type=click.Path(resolve_path=True))
 @click.argument("outdir", type=str)
-def prepare_configs(ntup_dir, fitvar, r1j1b_xmax, r2j1b_xmin, outdir):
+@click.option("--fit-var", type=str, default=FITVAR, help="Branch name", show_default=True)
+@click.option("--r1j1b-xmax", type=float, default=R1J1B_XMAX, help="1j1b max", show_default=True)
+@click.option("--r2j1b-xmin", type=float, default=R2J1B_XMIN, help="2j1b min", show_default=True)
+@click.option("--submit/--no-submit", default=False, help="Submit jobs", show_default=True)
+def prepare_configs(ntupdir, outdir, fit_var, r1j1b_xmax, r2j1b_xmin, submit):
     itr = itertools.product(
         CUT_MATRIX["1j1b_min"],
         CUT_MATRIX["2j1b_max"],
@@ -38,19 +41,19 @@ def prepare_configs(ntup_dir, fitvar, r1j1b_xmax, r2j1b_xmin, outdir):
     outdir = pathlib.Path(outdir).resolve()
     (outdir / "configs").mkdir(exist_ok=True, parents=True)
 
-    const_args = f"--asimov-fit --ntup-dir {ntup_dir} --var-1j1b {fitvar} --var-2j1b {fitvar} --var-2j2b {fitvar}"
+    const_args = f"--asimov-fit --ntup-dir {ntupdir} --var-all {fit_var}"
 
     all_args = []
     for i, (r1j1b_xmin, r2j1b_xmax, r2j2b_xmin, r2j2b_xmax) in enumerate(itr):
         fname = "{:0.3f}_{:0.3f}_{:0.3f}_{:0.3f}.conf".format(
             r1j1b_xmin, r2j1b_xmax, r2j2b_xmin, r2j2b_xmax
         )
-        sel_1j1b = f'""reg1j1b==1&&OS==1&&{fitvar}>{r1j1b_xmin}""'
-        sel_2j1b = f'""reg2j1b==1&&OS==1&&{fitvar}<{r2j1b_xmax}""'
-        sel_2j2b = f'""reg2j2b==1&&OS==1&&{fitvar}>{r2j2b_xmin}&&{fitvar}<{r2j2b_xmax}""'
-        bin_1j1b = f'12,{r1j1b_xmin},{r1j1b_xmax}'
-        bin_2j1b = f'12,{r2j1b_xmin},{r2j1b_xmax}'
-        bin_2j2b = f'12,{r2j2b_xmin},{r2j2b_xmax}'
+        sel_1j1b = f'"reg1j1b==1&&OS==1&&{fit_var}>{r1j1b_xmin}"'
+        sel_2j1b = f'"reg2j1b==1&&OS==1&&{fit_var}<{r2j1b_xmax}"'
+        sel_2j2b = f'"reg2j2b==1&&OS==1&&{fit_var}>{r2j2b_xmin}&&{fit_var}<{r2j2b_xmax}"'
+        bin_1j1b = f"12,{r1j1b_xmin},{r1j1b_xmax}"
+        bin_2j1b = f"12,{r2j1b_xmin},{r2j1b_xmax}"
+        bin_2j2b = f"12,{r2j2b_xmin},{r2j2b_xmax}"
         args = (
             f"{const_args} "
             f"--sel-1j1b {sel_1j1b} "
@@ -60,13 +63,23 @@ def prepare_configs(ntup_dir, fitvar, r1j1b_xmax, r2j1b_xmin, outdir):
             f"--bin-2j1b {bin_2j1b} "
             f"--bin-2j2b {bin_2j2b} "
         )
-        full_arg = f'"-m rexpy config gen {outdir}/configs/{fname} {args}"'
-        all_args.append(full_arg)
+        full_arg = f"-m rexpy config gen {outdir}/configs/{fname} {args}"
+        all_args.append((full_arg, fname))
 
-    jargs = rpb.job_params(outdir / "confgen", shutil.which("python"))
-    j = pycondor.Job(name="bm", **jargs)
-    j.add_args(all_args)
-    j.build()
+    total = len(all_args)
+    for i, (arg, fname) in enumerate(all_args):
+        subprocess.call(f"python {arg}", shell=True)
+        subprocess.call(f"python -m rexpy run condor {outdir}/configs/{fname} --submit", shell=True)
+        print(f"{i}/{total}")
+
+    # dag = pycondor.Dagman("bmdag", submit=str(outdir / "confgen" / "sub"))
+    # jargs = rpb.job_params(outdir / "confgen", shutil.which("python"))
+    # j = pycondor.Job(name="bm", dag=dag, **jargs)
+    # j.add_args([a[0] for a in all_args])
+    # if submit:
+    #     dag.build_submit()
+    # else:
+    #     dag.build()
 
 
 if __name__ == "__main__":

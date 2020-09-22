@@ -153,13 +153,13 @@ def sample_blocks(**kwargs):
       Title: "ttbar_AFII"
       Type: GHOST
       NtupleFiles: ttbar_410472_AFII_MC16a_nominal,ttbar_410472_AFII_MC16e_nominal,ttbar_410472_AFII_MC16d_nominal
-      MCweight: "weight_nominal * {ttbar_aux_weight}"
+      MCweight: "weight_nominal"
 
     Sample: "ttbar_PDF"
       Title: "ttbar_PDF"
       Type: GHOST
       NtupleFiles: ttbar_410472_FS_MC16a_nominal,ttbar_410472_FS_MC16e_nominal,ttbar_410472_FS_MC16d_nominal
-      MCweight: "weight_sys_PDFset_90900 * {ttbar_aux_weight}"
+      MCweight: "weight_sys_PDFset_90900"
 
     Sample: "Data"
       HistoNameSuff: "_Data"
@@ -184,7 +184,7 @@ def sample_blocks(**kwargs):
       FillColor: 634
       LineColor: 1
       Type: BACKGROUND
-      MCweight: "weight_nominal * {ttbar_aux_weight}"
+      MCweight: "weight_nominal"
 
     Sample: "Zjets"
       Title: "Z+jets"
@@ -213,7 +213,7 @@ def sample_blocks(**kwargs):
       MCweight: "weight_nominal"
       NtupleFiles: MCNP_999999_FS_MC16a_nominal,MCNP_999999_FS_MC16d_nominal,MCNP_999999_FS_MC16e_nominal
     """
-    ).format(ttbar_aux_weight=c.TTBAR_AUX_WEIGHT, **params)
+    ).format(**params)
 
 
 def norm_factor_blocks():
@@ -295,7 +295,6 @@ def _ttbar_shower_norms(
         sel_2j1b,
         sel_2j2b,
         herwig_dsid,
-        f"weight_nominal * {c.TTBAR_AUX_WEIGHT}",
     )
     return """\
 Systematic: "ttbar_PS_norm"
@@ -579,8 +578,8 @@ Systematic: "ttbar_AR_ISR_scale_muR_1j1b"
   Category: "Background_Model"
   SubCategory: "Background_Model"
   Title: "ttbar ISR Scale muR Variation 1j1b"
-  WeightUp: "weight_sys_scale_muR_20 * {ttbar_aux_weight}"
-  WeightDown: "weight_sys_scale_muR_05 * {ttbar_aux_weight}"
+  WeightUp: "weight_sys_scale_muR_20"
+  WeightDown: "weight_sys_scale_muR_05"
   Symmetrisation: TWOSIDED
   Samples: ttbar
   Type: HISTO
@@ -590,8 +589,8 @@ Systematic: "ttbar_AR_ISR_scale_muR_2j1b"
   Category: "Background_Model"
   SubCategory: "Background_Model"
   Title: "ttbar ISR Scale muR Variation 2j1b"
-  WeightUp: "weight_sys_scale_muR_20 * {ttbar_aux_weight}"
-  WeightDown: "weight_sys_scale_muR_05 * {ttbar_aux_weight}"
+  WeightUp: "weight_sys_scale_muR_20"
+  WeightDown: "weight_sys_scale_muR_05"
   Symmetrisation: TWOSIDED
   Samples: ttbar
   Type: HISTO
@@ -601,8 +600,8 @@ Systematic: "ttbar_AR_ISR_scale_muR_2j2b"
   Category: "Background_Model"
   SubCategory: "Background_Model"
   Title: "ttbar ISR Scale muR Variation 2j2b"
-  WeightUp: "weight_sys_scale_muR_20 * {ttbar_aux_weight}"
-  WeightDown: "weight_sys_scale_muR_05 * {ttbar_aux_weight}"
+  WeightUp: "weight_sys_scale_muR_20"
+  WeightDown: "weight_sys_scale_muR_05"
   Symmetrisation: TWOSIDED
   Samples: ttbar
   Type: HISTO
@@ -612,8 +611,8 @@ Systematic: "ttbar_AR_ISR_scale_muF_1j1b"
   Category: "Background_Model"
   SubCategory: "Background_Model"
   Title: "ttbar ISR Scale muF Variation 1j1b"
-  WeightUp: "weight_sys_scale_muF_20 * {ttbar_aux_weight}"
-  WeightDown: "weight_sys_scale_muF_05 * {ttbar_aux_weight}"
+  WeightUp: "weight_sys_scale_muF_20"
+  WeightDown: "weight_sys_scale_muF_05"
   Symmetrisation: TWOSIDED
   Samples: ttbar
   Type: HISTO
@@ -623,8 +622,8 @@ Systematic: "ttbar_AR_ISR_scale_muF_2j1b"
   Category: "Background_Model"
   SubCategory: "Background_Model"
   Title: "ttbar ISR Scale muF Variation 2j1b"
-  WeightUp: "weight_sys_scale_muF_20 * {ttbar_aux_weight}"
-  WeightDown: "weight_sys_scale_muF_05 * {ttbar_aux_weight}"
+  WeightUp: "weight_sys_scale_muF_20"
+  WeightDown: "weight_sys_scale_muF_05"
   Symmetrisation: TWOSIDED
   Samples: ttbar
   Type: HISTO
@@ -634,8 +633,8 @@ Systematic: "ttbar_AR_ISR_scale_muF_2j2b"
   Category: "Background_Model"
   SubCategory: "Background_Model"
   Title: "ttbar ISR Scale muF Variation 2j2b"
-  WeightUp: "weight_sys_scale_muF_20 * {ttbar_aux_weight}"
-  WeightDown: "weight_sys_scale_muF_05 * {ttbar_aux_weight}"
+  WeightUp: "weight_sys_scale_muF_20"
+  WeightDown: "weight_sys_scale_muF_05"
   Symmetrisation: TWOSIDED
   Samples: ttbar
   Type: HISTO
@@ -645,8 +644,8 @@ Systematic: "ttbar_AR_ISR_A14_1j1b"
   Category: "Background_Model"
   SubCategory: "Background_Model"
   Title: "ttbar ISR A14 1j1b"
-  WeightUp: "weight_sys_isr_alphaS_Var3cUp * {ttbar_aux_weight}"
-  WeightDown: "weight_sys_isr_alphaS_Var3cDown * {ttbar_aux_weight}"
+  WeightUp: "weight_sys_isr_alphaS_Var3cUp"
+  WeightDown: "weight_sys_isr_alphaS_Var3cDown"
   Symmetrisation: TWOSIDED
   Samples: ttbar
   Type: HISTO
@@ -656,8 +655,8 @@ Systematic: "ttbar_AR_ISR_A14_2j1b"
   Category: "Background_Model"
   SubCategory: "Background_Model"
   Title: "ttbar ISR A14 2j1b"
-  WeightUp: "weight_sys_isr_alphaS_Var3cUp * {ttbar_aux_weight}"
-  WeightDown: "weight_sys_isr_alphaS_Var3cDown * {ttbar_aux_weight}"
+  WeightUp: "weight_sys_isr_alphaS_Var3cUp"
+  WeightDown: "weight_sys_isr_alphaS_Var3cDown"
   Symmetrisation: TWOSIDED
   Samples: ttbar
   Type: HISTO
@@ -667,8 +666,8 @@ Systematic: "ttbar_AR_ISR_A14_2j2b"
   Category: "Background_Model"
   SubCategory: "Background_Model"
   Title: "ttbar ISR A14 2j2b"
-  WeightUp: "weight_sys_isr_alphaS_Var3cUp * {ttbar_aux_weight}"
-  WeightDown: "weight_sys_isr_alphaS_Var3cDown * {ttbar_aux_weight}"
+  WeightUp: "weight_sys_isr_alphaS_Var3cUp"
+  WeightDown: "weight_sys_isr_alphaS_Var3cDown"
   Symmetrisation: TWOSIDED
   Samples: ttbar
   Type: HISTO
@@ -678,8 +677,8 @@ Systematic: "ttbar_AR_FSR_1j1b"
   Category: "Background_Model"
   SubCategory: "Background_Model"
   Title: "ttbar FSR 1j1b"
-  WeightUp: "weight_sys_fsr_muR_20 * {ttbar_aux_weight}"
-  WeightDown: "weight_sys_fsr_muR_05 * {ttbar_aux_weight}"
+  WeightUp: "weight_sys_fsr_muR_20"
+  WeightDown: "weight_sys_fsr_muR_05"
   Symmetrisation: TWOSIDED
   Samples: ttbar
   Type: HISTO
@@ -689,8 +688,8 @@ Systematic: "ttbar_AR_FSR_2j1b"
   Category: "Background_Model"
   SubCategory: "Background_Model"
   Title: "ttbar FSR 2j1b"
-  WeightUp: "weight_sys_fsr_muR_20 * {ttbar_aux_weight}"
-  WeightDown: "weight_sys_fsr_muR_05 * {ttbar_aux_weight}"
+  WeightUp: "weight_sys_fsr_muR_20"
+  WeightDown: "weight_sys_fsr_muR_05"
   Symmetrisation: TWOSIDED
   Samples: ttbar
   Type: HISTO
@@ -700,8 +699,8 @@ Systematic: "ttbar_AR_FSR_2j2b"
   Category: "Background_Model"
   SubCategory: "Background_Model"
   Title: "ttbar FSR 2j2b"
-  WeightUp: "weight_sys_fsr_muR_20 * {ttbar_aux_weight}"
-  WeightDown: "weight_sys_fsr_muR_05 * {ttbar_aux_weight}"
+  WeightUp: "weight_sys_fsr_muR_20"
+  WeightDown: "weight_sys_fsr_muR_05"
   Symmetrisation: TWOSIDED
   Samples: ttbar
   Type: HISTO
@@ -771,7 +770,6 @@ Systematic: "ttbar_ptreweight_2j2b"
   Regions: reg2j2b\n""".format(
         shower_norm_blocks=shower_norm_blocks,
         herwig_dsid=herwig_dsid,
-        ttbar_aux_weight=c.TTBAR_AUX_WEIGHT,
     )
 
 
@@ -900,8 +898,8 @@ def sys_sf_weight_blocks():
           Category: "{category}"
           SubCategory: "{category}"
           Title: "{title}"
-          WeightUp: "{branch_up} * {ttbar_aux_weight}"
-          WeightDown: "{branch_down} * {ttbar_aux_weight}"
+          WeightUp: "{branch_up}"
+          WeightDown: "{branch_down}"
           Type: HISTO
           Symmetrisation: TWOSIDED
           Samples: ttbar\n""".format(
@@ -910,7 +908,6 @@ def sys_sf_weight_blocks():
             title=properties.title,
             branch_up=properties.branch_up,
             branch_down=properties.branch_down,
-            ttbar_aux_weight=c.TTBAR_AUX_WEIGHT,
         )
         blocks.append(dedent(block))
     return "\n".join(blocks)
@@ -925,7 +922,7 @@ def sys_pdf_weight_blocks():
           Category: "{category}"
           SubCategory: "{category}"
           Title: "{title}"
-          WeightUp: "{branch} * {ttbar_aux_weight}"
+          WeightUp: "{branch}"
           ReferenceSample: ttbar_PDF
           Type: HISTO
           Symmetrisation: ONESIDED
@@ -947,7 +944,6 @@ def sys_pdf_weight_blocks():
             category=properties.category,
             title=properties.title,
             branch=properties.branch,
-            ttbar_aux_weight=c.TTBAR_AUX_WEIGHT,
         )
         blocks.append(dedent(block))
     return "\n".join(blocks)

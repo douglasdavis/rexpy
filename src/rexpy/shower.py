@@ -26,7 +26,6 @@ def norm_uncertainties(
     sel_1j1b: Optional[str] = None,
     sel_2j1b: Optional[str] = None,
     sel_2j2b: Optional[str] = None,
-    weight_expression: str = "weight_nominal",
 ):
     log.info("Calculating shower norm uncertainties")
     pp8_files = ["{}/{}.root".format(ntup_dir, f) for f in pp8_files.split(",")]
@@ -45,39 +44,22 @@ def norm_uncertainties(
     df_pp8 = RDataFrame(chain_pp8)
     df_ph7 = RDataFrame(chain_ph7)
 
-    if weight_expression == "weight_nominal * 1.0":
-        weight_expression = "weight_nominal"
-
     log.info("1j1b selection: '%s'" % sel_1j1b)
     log.info("2j1b selection: '%s'" % sel_2j1b)
     log.info("2j2b selection: '%s'" % sel_2j2b)
-
-    log.info("Weight expression: '%s'" % weight_expression)
 
     r1j1b_pp8, r1j1b_ph7 = 0.0, 0.0
     r2j1b_pp8, r2j1b_ph7 = 0.0, 0.0
     r2j2b_pp8, r2j2b_ph7 = 0.0, 0.0
     if sel_1j1b is not None:
-        if weight_expression == "weight_nominal":
-            r1j1b_pp8 = df_pp8.Filter(str(sel_1j1b)).Sum("weight_nominal")
-            r1j1b_ph7 = df_ph7.Filter(str(sel_1j1b)).Sum("weight_nominal")
-        else:
-            r1j1b_pp8 = df_pp8.Filter(str(sel_1j1b)).Define("wtu", weight_expression).Sum("wtu")
-            r1j1b_ph7 = df_ph7.Filter(str(sel_1j1b)).Define("wtu", weight_expression).Sum("wtu")
+        r1j1b_pp8 = df_pp8.Filter(str(sel_1j1b)).Sum("weight_nominal")
+        r1j1b_ph7 = df_ph7.Filter(str(sel_1j1b)).Sum("weight_nominal")
     if sel_2j1b is not None:
-        if weight_expression == "weight_nominal":
-            r2j1b_pp8 = df_pp8.Filter(str(sel_2j1b)).Sum("weight_nominal")
-            r2j1b_ph7 = df_ph7.Filter(str(sel_2j1b)).Sum("weight_nominal")
-        else:
-            r2j1b_pp8 = df_pp8.Filter(str(sel_2j1b)).Define("wtu", weight_expression).Sum("wtu")
-            r2j1b_ph7 = df_ph7.Filter(str(sel_2j1b)).Define("wtu", weight_expression).Sum("wtu")
+        r2j1b_pp8 = df_pp8.Filter(str(sel_2j1b)).Sum("weight_nominal")
+        r2j1b_ph7 = df_ph7.Filter(str(sel_2j1b)).Sum("weight_nominal")
     if sel_2j2b is not None:
-        if weight_expression == "weight_nominal":
-            r2j2b_pp8 = df_pp8.Filter(str(sel_2j2b)).Sum("weight_nominal")
-            r2j2b_ph7 = df_ph7.Filter(str(sel_2j2b)).Sum("weight_nominal")
-        else:
-            r2j2b_pp8 = df_pp8.Filter(str(sel_2j2b)).Define("wtu", weight_expression).Sum("wtu")
-            r2j2b_ph7 = df_ph7.Filter(str(sel_2j2b)).Define("wtu", weight_expression).Sum("wtu")
+        r2j2b_pp8 = df_pp8.Filter(str(sel_2j2b)).Sum("weight_nominal")
+        r2j2b_ph7 = df_ph7.Filter(str(sel_2j2b)).Sum("weight_nominal")
 
     if sel_1j1b is not None:
         r1j1b_pp8 = r1j1b_pp8.GetValue()
@@ -122,12 +104,11 @@ def norm_uncertainties(
 
 
 def norm_uncertainties_ttbar(
-    ntup_dir: str = "/atlasgpfs01/usatlas/data/ddavis/wtloop/WTA01_20200506",
+    ntup_dir: str,
     sel_1j1b: Optional[str] = None,
     sel_2j1b: Optional[str] = None,
     sel_2j2b: Optional[str] = None,
     herwig_dsid: str = "410558",
-    weight_expression: str = "weight_nominal",
 ):
     pp8_files = (
         "ttbar_410472_AFII_MC16a_nominal,"
@@ -140,16 +121,15 @@ def norm_uncertainties_ttbar(
         f"ttbar_{herwig_dsid}_AFII_MC16e_nominal"
     )
     return norm_uncertainties(
-        ntup_dir, pp8_files, ph7_files, sel_1j1b, sel_2j1b, sel_2j2b, weight_expression
+        ntup_dir, pp8_files, ph7_files, sel_1j1b, sel_2j1b, sel_2j2b
     )
 
 
 def norm_uncertainties_tW(
-    ntup_dir: str = "/atlasgpfs01/usatlas/data/ddavis/wtloop/WTA01_20200506",
+    ntup_dir: str,
     sel_1j1b: Optional[str] = None,
     sel_2j1b: Optional[str] = None,
     sel_2j2b: Optional[str] = None,
-    weight_expression: str = "weight_nominal",
 ):
     pp8_files = (
         "tW_DR_410648_AFII_MC16a_nominal,"
@@ -168,5 +148,5 @@ def norm_uncertainties_tW(
         "tW_DR_411039_AFII_MC16e_nominal"
     )
     return norm_uncertainties(
-        ntup_dir, pp8_files, ph7_files, sel_1j1b, sel_2j1b, sel_2j2b, weight_expression
+        ntup_dir, pp8_files, ph7_files, sel_1j1b, sel_2j1b, sel_2j2b
     )
