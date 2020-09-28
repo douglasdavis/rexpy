@@ -3,8 +3,6 @@
 # stdlib
 from pathlib import PosixPath
 
-BLIND_ARGS = "FitBlind=TRUE:Suffix=_asimov"
-
 
 def all_blocks(config, delimiter="\n\n"):
     """Get all blocks in a config based on a delimiter.
