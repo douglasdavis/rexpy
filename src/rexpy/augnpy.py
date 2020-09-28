@@ -88,8 +88,11 @@ def local(coms):
     log.info("starting calls (total: {})".format(ncalls))
     for i, com in enumerate(coms):
         subprocess.call("augment-tree-with-npy {}".format(com), shell=True)
-        log.info("done with {} ({}/{})".format(
-            os.path.abspath(com.split()[1]).name, i + 1, ncalls))
+        log.info(
+            "done with {} ({}/{})".format(
+                os.path.abspath(com.split()[1]).name, i + 1, ncalls
+            )
+        )
     return 0
 
 
