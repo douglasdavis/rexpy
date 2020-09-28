@@ -10,7 +10,6 @@ from functools import wraps
 
 # rexpy
 import rexpy.pycondor as pycondor
-import rexpy.confparse
 from rexpy.confparse import (
     regions_from,
     systematics_from,
@@ -231,15 +230,13 @@ def job_params(wkspace, executable, **kwargs):
     )
 
 
-def create_workspace(config, run_type, suffix):
-    """Create workspace to run steps.
+def create_workspace(config, suffix=None):
+    """Create workspace to run steps and store results.
 
     Parameters
     ----------
     config : str or os.PathLike
         Original TRExFitter config file.
-    run_type : str
-        Run environment type: 'condor' or 'local'
     suffix : str, optional
         Add a suffix to the workspace
 
@@ -252,9 +249,9 @@ def create_workspace(config, run_type, suffix):
 
     """
     config_path = pathlib.PosixPath(config)
-    workspace = config_path.parent / f"rexpy-{run_type}-{config_path.stem}"
-    if suffix:
-        workspace = pathlib.PosixPath(f"{workspace}__{suffix}")
+    workspace = config_path.parent / f"{config_path.stem}.d"
+    if suffix is not None:
+        workspace = pathlib.PosixPath(f"{config_path.stem}.{suffix}.d")
     workspace.mkdir(exist_ok=False)
     shutil.copyfile(config_path, workspace / "fit.conf")
     return workspace.absolute(), (workspace / "fit.conf").absolute()

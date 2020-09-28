@@ -257,7 +257,7 @@ def local(config, suffix, n_parallel, force_data):
     """Run TRExFitter steps locally."""
     import rexpy.batch as rpb
     curdir = PosixPath.cwd()
-    workspace, f = rpb.create_workspace(config, "local", suffix)
+    workspace, f = rpb.create_workspace(config, suffix)
     if force_data:
         f = rpc.unblind(f)
     os.chdir(workspace)
@@ -284,12 +284,12 @@ def condor(config, sys, suffix, copy_hists, ntup_only, force_data, submit):
     import rexpy.pycondor as pycondor
 
     if force_data and suffix is not None:
-        suffix = f"{suffix}_force_data"
+        suffix = f"{suffix}.force-data"
     elif force_data:
-        suffix = "force_data"
+        suffix = "force-data"
 
     # create workspace and the condo dagman
-    workspace, f = rpb.create_workspace(config, "condor", suffix)
+    workspace, f = rpb.create_workspace(config, suffix)
     dagman = pycondor.Dagman("rexpy-dag", submit=str(workspace / "sub"))
 
     if force_data:
