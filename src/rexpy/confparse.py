@@ -76,7 +76,8 @@ def top_block_titles(config, block_type):
             map(
                 lambda line: line.split(": ")[1].replace('"', "").strip(),
                 filter(
-                    lambda line: str(line).startswith("%s: " % block_type), f.readlines(),
+                    lambda line: str(line).startswith("%s: " % block_type),
+                    f.readlines(),
                 ),
             )
         )
@@ -101,7 +102,10 @@ def sub_block_values(config, key):
         return set(
             map(
                 lambda line: line.split(": ")[1].replace('"', "").strip(),
-                filter(lambda line: str(line).startswith("  %s: " % key), f.readlines(),),
+                filter(
+                    lambda line: str(line).startswith("  %s: " % key),
+                    f.readlines(),
+                ),
             )
         )
 
