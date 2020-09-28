@@ -1,6 +1,6 @@
 """Module for handling batch steps."""
 
-#stdlib
+# stdlib
 import multiprocessing
 import subprocess
 import os
@@ -21,7 +21,7 @@ from rexpy.confparse import (
 TREX_EXE = shutil.which("trex-fitter")
 
 
-def rank_arguments(config, specific_sys=None, as_blind=False):
+def rank_arguments(config, specific_sys=None):
     """Get a set of trex-fitter executable arguments for ranking.
 
     Parameters
@@ -31,8 +31,6 @@ def rank_arguments(config, specific_sys=None, as_blind=False):
     specific_sys : iterable(str), optional
         Specific systematics to use; if None (the default), uses all
         discovered systematics.
-    as_blind : bool
-        Include command line arguments for performing blind fit.
 
     Returns
     -------
@@ -41,20 +39,16 @@ def rank_arguments(config, specific_sys=None, as_blind=False):
     """
     systematics = systematics_from(config, specific_sys=specific_sys)
     args = ["r {} Ranking={}".format(config, sys) for sys in systematics]
-    if as_blind:
-        args = [f"{arg}:{BLIND_ARGS}" for arg in args]
     return args
 
 
-def grouped_impact_arguments(config, as_blind=False):
+def grouped_impact_arguments(config):
     """Get a set of trex-fitter executable arguments for grouped impact.
 
     Parameters
     ----------
     config : str
         Path of the config file.
-    as_blind : bool
-        Include command line arguments for performing blind fit.
 
     Returns
     -------
@@ -64,12 +58,10 @@ def grouped_impact_arguments(config, as_blind=False):
     groups = sub_block_values(config, "SubCategory")
     groups = list(groups) + ["Gammas", "FullSyst"]
     args = ["i {} GroupedImpact={}".format(config, g) for g in groups]
-    if as_blind:
-        args = [f"{arg}:{BLIND_ARGS}" for arg in args]
     return args
 
 
-def draw_argument(config, specific_sys=None, as_blind=False):
+def draw_argument(config, specific_sys=None):
     """Get the draw trex-fitter step argument"
 
     Parameters
@@ -79,8 +71,6 @@ def draw_argument(config, specific_sys=None, as_blind=False):
     specific_sys : iterable(str), optional
         Specific systematics to use; if None (the default), uses all
         discovered systematics.
-    as_blind : bool
-        Include command line arguments for performing blind fit.
 
     Returns
     -------
@@ -93,13 +83,10 @@ def draw_argument(config, specific_sys=None, as_blind=False):
     else:
         arg = "dp {}".format(config)
 
-    if as_blind:
-        arg = f"{arg}:{BLIND_ARGS}"
-
     return arg
 
 
-def fit_argument(config, specific_sys=None, dont_fit_vr=True, as_blind=False):
+def fit_argument(config, specific_sys=None, dont_fit_vr=True):
     """Get the fit trex-fitter step argument.
 
     Parameters
@@ -111,8 +98,6 @@ def fit_argument(config, specific_sys=None, dont_fit_vr=True, as_blind=False):
         discovered systematics.
     dont_fit_vr : bool
         Do not include VR regions in fit argument.
-    as_blind : bool
-        Include command line arguments for performing blind fit.
 
     Returns
     -------
@@ -132,9 +117,6 @@ def fit_argument(config, specific_sys=None, dont_fit_vr=True, as_blind=False):
         systematics = systematics_from(config, specific_sys=specific_sys)
         systematics = ",".join(systematics)
         arg = f"{arg}:Systematics={systematics}"
-
-    if as_blind:
-        arg = f"{arg}:{BLIND_ARGS}"
 
     return arg
 
@@ -210,8 +192,6 @@ def ntuple_arguments(config, specific_sys=None):
     return [
         "n {} Regions={}:Systematics={}".format(config, r, systematics) for r in regions
     ]
-
-
 
 
 def job_params(wkspace, executable, **kwargs):
@@ -372,12 +352,14 @@ def restore_cwd(func):
         Function to call (expected to call :py:func:`os.chdir`)
 
     """
+
     @wraps(func)
     def decorator(*args, **kwargs):
         cwd = os.getcwd()
         res = func(*args, **kwargs)
         os.chdir(cwd)
         return res
+
     return decorator
 
 

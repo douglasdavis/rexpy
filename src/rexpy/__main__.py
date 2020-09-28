@@ -64,7 +64,7 @@ def config():
 @click.option("--sel-1j1b", type=str, default=rpsc.r1j1b_selection(), help="1j1b region selection setting.", show_default=True)
 @click.option("--sel-2j1b", type=str, default=rpsc.r2j1b_selection(), help="2j1b region selection setting.", show_default=True)
 @click.option("--sel-2j2b", type=str, default=rpsc.r2j2b_selection(), help="2j2b region selection setting.", show_default=True)
-@click.option("--herwig-version", type=click.Choice(["704", "713"]), default="704", help="ttbar Herwig version.", show_default=True)
+@click.option("--herwig", type=click.Choice(["704", "713"]), default="704", help="ttbar Herwig version.", show_default=True)
 @click.option("--drop-sys", type=str, help="Drop a systematic.")
 @click.option("--do-tables", is_flag=True, help="Produce tables.")
 @click.option("--do-sys-plots", is_flag=True, help="Produce red/blue plots.")
@@ -92,7 +92,7 @@ def gen(
     sel_1j1b,
     sel_2j1b,
     sel_2j2b,
-    herwig_version,
+    herwig,
     drop_sys,
     do_tables,
     do_sys_plots,
@@ -188,7 +188,7 @@ def gen(
             print(rpv.default_vrp_blocks(sel_1j1b, sel_2j1b, sel_2j2b, is_preselection=is_preselection), file=f)
         print(rpb.sample_blocks(), file=f)
         print(rpb.norm_factor_blocks(), file=f)
-        print(rpb.sys_modeling_blocks(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_version), file=f)
+        print(rpb.sys_modeling_blocks(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig), file=f)
         print(rpb.sys_minor_blocks(), file=f)
         print(rpb.sys_sf_weight_blocks(), file=f)
         print(rpb.sys_pdf_weight_blocks(), file=f)
@@ -251,20 +251,19 @@ def run():
 @run.command("local")
 @click.argument("config", type=click.Path(resolve_path=True))
 @click.option("--suffix", type=str, help="Add suffix to workspace.")
-@click.option("--and-blind", is_flag=True, help="Run steps blind as well.")
 @click.option("--n-parallel", type=int, default=None, help="Max parallel jobs (default is CPU count)")
-def local(config, suffix, and_blind, n_parallel):
+def local(config, suffix, n_parallel):
     """Run TRExFitter steps locally."""
     import rexpy.batch as rpb
     curdir = PosixPath.cwd()
     workspace, f = rpb.create_workspace(config, "local", suffix)
     os.chdir(workspace)
     rpb.parallel_n_step(f, processes=n_parallel)
-    rpb.wfdp_step(f, do_blind=and_blind)
-    rpb.parallel_r_step(f, do_blind=and_blind, processes=n_parallel)
-    rpb.r_draw_step(f, do_blind=and_blind)
-    rpb.parallel_i_step(f, do_blind=and_blind, processes=n_parallel)
-    rpb.i_combine_step(f, do_blind=and_blind)
+    rpb.wfdp_step(f)
+    rpb.parallel_r_step(f, processes=n_parallel)
+    rpb.r_draw_step(f)
+    rpb.parallel_i_step(f, processes=n_parallel)
+    rpb.i_combine_step(f)
     os.chdir(curdir)
 
 

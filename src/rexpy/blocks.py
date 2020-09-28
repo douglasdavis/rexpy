@@ -17,6 +17,7 @@ A complete configuration will be composed of calling these functions:
 
 # stdlib
 from textwrap import dedent
+import logging
 
 # rexpy
 from rexpy.shower import norm_uncertainties_tW, norm_uncertainties_ttbar
@@ -27,6 +28,8 @@ from rexpy.systematic_tables import (
     SYS_TREES_ONESIDED,
 )
 import rexpy.simpconf as c
+
+log = logging.getLogger(__name__)
 
 
 def top_blocks(**kwargs):
@@ -51,6 +54,18 @@ def top_blocks(**kwargs):
     )
     for k in kwargs:
         params[k] = kwargs[k]
+
+    log.info("1j1b binning:    %s" % params["reg1j1b_binning"])
+    log.info("1j1b var:        %s" % params["reg1j1b_variable"])
+    log.info("1j1b selection:  %s" % params["reg1j1b_selection"])
+    log.info("2j1b binning:    %s" % params["reg2j1b_binning"])
+    log.info("2j1b var:        %s" % params["reg2j1b_variable"])
+    log.info("2j1b selection:  %s" % params["reg2j1b_selection"])
+    log.info("2j2b binning:    %s" % params["reg2j2b_binning"])
+    log.info("2j2b var:        %s" % params["reg2j2b_variable"])
+    log.info("2j2b selection:  %s" % params["reg2j2b_selection"])
+    log.info("doing tables:    %s" % params["dotables"])
+    log.info("doing systplots: %s" % params["systplots"])
 
     return dedent(
         """\

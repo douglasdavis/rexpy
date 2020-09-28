@@ -24,7 +24,7 @@ function usage() {
 OUTDIR=$(pwd)
 SHOWER="704"
 FITVAR="bdtres03"
-NTUPDIR="/ddd/atlas/data/wtloop/WTA01_20200827"
+NTUPDIR="/gpfs/mnt/atlasgpfs01/usatlas/data/ddavis/wtloop/WTA01_20200916"
 NBIN_1j1b="12"
 NBIN_2j1b="12"
 NBIN_2j2b="12"
@@ -108,170 +108,178 @@ echo "Saving configs to: ${OUTDIR}"
 echo "Fit variable: ${FITVAR}"
 echo "Showering version: ${SHOWER}"
 echo "Ntuple dir: ${NTUPDIR}"
-mkdir -p $OUTDIR
+mkdir -p ${OUTDIR}
 
-python -m rexpy config gen $OUTDIR/main.conf  \
+SEL_1j1b="reg1j1b == 1 && OS == 1 && ${FITVAR} > ${XMIN_1j1b}"
+SEL_2j1b="reg2j1b == 1 && OS == 1 && ${FITVAR} < ${XMAX_2j1b}"
+SEL_2j2b="reg2j2b == 1 && OS == 1 && ${FITVAR} > ${XMIN_2j2b} && ${FITVAR} < ${XMAX_2j2b}"
+BIN_1j1b="${NBIN_1j1b},${XMIN_1j1b},${XMAX_1j1b}"
+BIN_2j1b="${NBIN_2j1b},${XMIN_2j1b},${XMAX_2j1b}"
+BIN_2j2b="${NBIN_2j2b},${XMIN_2j2b},${XMAX_2j2b}"
+
+
+python -m rexpy config gen ${OUTDIR}/main.conf  \
        --ntup-dir ${NTUPDIR} \
        --var-1j1b ${FITVAR} \
        --var-2j1b ${FITVAR} \
        --var-2j2b ${FITVAR} \
-       --bin-1j1b "${NBIN_1j1b},${XMIN_1j1b},${XMAX_1j1b}" \
-       --bin-2j1b "${NBIN_2j1b},${XMIN_2j1b},${XMAX_2j1b}" \
-       --bin-2j2b "${NBIN_2j2b},${XMIN_2j2b},${XMAX_2j2b}" \
-       --sel-1j1b "reg1j1b == 1 && OS == 1 && ${FITVAR} > ${XMIN_1j1b}" \
-       --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
-       --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
-       --herwig-version $SHOWER \
+       --bin-1j1b ${BIN_1j1b} \
+       --bin-2j1b ${BIN_2j1b} \
+       --bin-2j2b ${BIN_2j2b} \
+       --sel-1j1b "${SEL_1j1b}" \
+       --sel-2j1b "${SEL_2j1b}" \
+       --sel-2j2b "${SEL_2j2b}" \
+       --herwig ${SHOWER} \
        --do-tables \
        --do-sys-plots
 
-python -m rexpy config gen $OUTDIR/main_plots.conf  \
+python -m rexpy config gen ${OUTDIR}/main_plots.conf  \
        --ntup-dir ${NTUPDIR} \
-       --var-1j1b $FITVAR \
-       --var-2j1b $FITVAR \
-       --var-2j2b $FITVAR \
-       --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
-       --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
-       --bin-2j2b "$NBIN_2j2b,$XMIN_2j2b,$XMAX_2j2b" \
-       --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
-       --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
-       --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
-       --herwig-version $SHOWER \
+       --var-1j1b ${FITVAR} \
+       --var-2j1b ${FITVAR} \
+       --var-2j2b ${FITVAR} \
+       --bin-1j1b ${BIN_1j1b} \
+       --bin-2j1b ${BIN_2j1b} \
+       --bin-2j2b ${BIN_2j2b} \
+       --sel-1j1b "${SEL_1j1b}" \
+       --sel-2j1b "${SEL_2j1b}" \
+       --sel-2j2b "${SEL_2j2b}" \
+       --herwig ${SHOWER} \
        --do-val-plots
 
-python -m rexpy config gen $OUTDIR/main_singlebin2j2b.conf  \
+python -m rexpy config gen ${OUTDIR}/main_singlebin2j2b.conf  \
        --ntup-dir ${NTUPDIR} \
-       --var-1j1b $FITVAR \
-       --var-2j1b $FITVAR \
-       --var-2j2b $FITVAR \
-       --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
-       --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
+       --var-1j1b ${FITVAR} \
+       --var-2j1b ${FITVAR} \
+       --var-2j2b ${FITVAR} \
+       --bin-1j1b ${BIN_1j1b} \
+       --bin-2j1b ${BIN_2j1b} \
        --bin-2j2b "1,0.0,1.0" \
-       --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
-       --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
-       --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
-       --herwig-version $SHOWER \
+       --sel-1j1b "${SEL_1j1b}" \
+       --sel-2j1b "${SEL_2j1b}" \
+       --sel-2j2b "${SEL_2j2b}" \
+       --herwig ${SHOWER} \
        --do-tables \
        --do-sys-plots
 
-python -m rexpy config gen $OUTDIR/main_1j1b.conf  \
+python -m rexpy config gen ${OUTDIR}/main_1j1b.conf  \
        --ntup-dir ${NTUPDIR} \
-       --var-1j1b $FITVAR \
-       --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
-       --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
-       --herwig-version $SHOWER \
+       --var-1j1b ${FITVAR} \
+       --bin-1j1b ${BIN_1j1b} \
+       --sel-1j1b "${SEL_1j1b}" \
+       --herwig ${SHOWER} \
        --drop-2j1b \
        --drop-2j2b
 
-python -m rexpy config gen $OUTDIR/main_2j1b.conf  \
+python -m rexpy config gen ${OUTDIR}/main_2j1b.conf  \
        --ntup-dir ${NTUPDIR} \
-       --var-2j1b $FITVAR \
-       --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
-       --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
-       --herwig-version $SHOWER \
+       --var-2j1b ${FITVAR} \
+       --bin-2j1b ${BIN_2j1b} \
+       --sel-2j1b "${SEL_2j1b}" \
+       --herwig ${SHOWER} \
        --drop-1j1b \
        --drop-2j2b
 
-python -m rexpy config gen $OUTDIR/main_2j2b.conf  \
+python -m rexpy config gen ${OUTDIR}/main_2j2b.conf  \
        --ntup-dir ${NTUPDIR} \
-       --var-2j2b $FITVAR \
-       --bin-2j2b "$NBIN_2j2b,$XMIN_2j2b,$XMAX_2j2b" \
-       --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
-       --herwig-version $SHOWER \
+       --var-2j2b ${FITVAR} \
+       --bin-2j2b ${BIN_2j2b} \
+       --sel-2j2b "${SEL_2j2b}" \
+       --herwig ${SHOWER} \
        --drop-1j1b \
        --drop-2j1b
 
-python -m rexpy config gen $OUTDIR/main_1j1b2j1b.conf  \
+python -m rexpy config gen ${OUTDIR}/main_1j1b2j1b.conf  \
        --ntup-dir ${NTUPDIR} \
-       --var-1j1b $FITVAR \
-       --var-2j1b $FITVAR \
-       --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
-       --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
-       --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
-       --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
-       --herwig-version $SHOWER \
+       --var-1j1b ${FITVAR} \
+       --var-2j1b ${FITVAR} \
+       --bin-1j1b ${BIN_1j1b} \
+       --bin-2j1b ${BIN_2j1b} \
+       --sel-1j1b "${SEL_1j1b}" \
+       --sel-2j1b "${SEL_2j1b}" \
+       --herwig ${SHOWER} \
        --drop-2j2b
 
-python -m rexpy config gen $OUTDIR/main_1j1b2j2b.conf  \
+python -m rexpy config gen ${OUTDIR}/main_1j1b2j2b.conf  \
        --ntup-dir ${NTUPDIR} \
-       --var-1j1b $FITVAR \
-       --var-2j2b $FITVAR \
-       --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
-       --bin-2j2b "$NBIN_2j2b,$XMIN_2j2b,$XMAX_2j2b" \
-       --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
-       --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
-       --herwig-version $SHOWER \
+       --var-1j1b ${FITVAR} \
+       --var-2j2b ${FITVAR} \
+       --bin-1j1b ${BIN_1j1b} \
+       --bin-2j2b ${BIN_2j2b} \
+       --sel-1j1b "${SEL_1j1b}" \
+       --sel-2j2b "${SEL_2j2b}" \
+       --herwig ${SHOWER} \
        --drop-2j1b
 
-python -m rexpy config gen $OUTDIR/main_only1516.conf  \
+python -m rexpy config gen ${OUTDIR}/main_only1516.conf  \
        --ntup-dir ${NTUPDIR} \
-       --var-1j1b $FITVAR \
-       --var-2j1b $FITVAR \
-       --var-2j2b $FITVAR \
-       --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
-       --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
-       --bin-2j2b "$NBIN_2j2b,$XMIN_2j2b,$XMAX_2j2b" \
-       --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
-       --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
-       --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
-       --herwig-version $SHOWER \
+       --var-1j1b ${FITVAR} \
+       --var-2j1b ${FITVAR} \
+       --var-2j2b ${FITVAR} \
+       --bin-1j1b ${BIN_1j1b} \
+       --bin-2j1b ${BIN_2j1b} \
+       --bin-2j2b ${BIN_2j2b} \
+       --sel-1j1b "${SEL_1j1b}" \
+       --sel-2j1b "${SEL_2j1b}" \
+       --sel-2j2b "${SEL_2j2b}" \
+       --herwig ${SHOWER} \
        --only-1516
 
-python -m rexpy config gen $OUTDIR/main_only17.conf  \
+python -m rexpy config gen ${OUTDIR}/main_only17.conf  \
        --ntup-dir ${NTUPDIR} \
-       --var-1j1b $FITVAR \
-       --var-2j1b $FITVAR \
-       --var-2j2b $FITVAR \
-       --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
-       --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
-       --bin-2j2b "$NBIN_2j2b,$XMIN_2j2b,$XMAX_2j2b" \
-       --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
-       --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
-       --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
-       --herwig-version $SHOWER \
+       --var-1j1b ${FITVAR} \
+       --var-2j1b ${FITVAR} \
+       --var-2j2b ${FITVAR} \
+       --bin-1j1b ${BIN_1j1b} \
+       --bin-2j1b ${BIN_2j1b} \
+       --bin-2j2b ${BIN_2j2b} \
+       --sel-1j1b "${SEL_1j1b}" \
+       --sel-2j1b "${SEL_2j1b}" \
+       --sel-2j2b "${SEL_2j2b}" \
+       --herwig ${SHOWER} \
        --only-17
 
-python -m rexpy config gen $OUTDIR/main_only18.conf  \
+python -m rexpy config gen ${OUTDIR}/main_only18.conf  \
        --ntup-dir ${NTUPDIR} \
-       --var-1j1b $FITVAR \
-       --var-2j1b $FITVAR \
-       --var-2j2b $FITVAR \
-       --bin-1j1b "$NBIN_1j1b,$XMIN_1j1b,$XMAX_1j1b" \
-       --bin-2j1b "$NBIN_2j1b,$XMIN_2j1b,$XMAX_2j1b" \
-       --bin-2j2b "$NBIN_2j2b,$XMIN_2j2b,$XMAX_2j2b" \
-       --sel-1j1b "reg1j1b == 1 && OS == 1 && $FITVAR > $XMIN_1j1b" \
-       --sel-2j1b "reg2j1b == 1 && OS == 1 && $FITVAR < $XMAX_2j1b" \
-       --sel-2j2b "reg2j2b == 1 && OS == 1 && $FITVAR > $XMIN_2j2b && $FITVAR < $XMAX_2j2b" \
-       --herwig-version $SHOWER \
+       --var-1j1b ${FITVAR} \
+       --var-2j1b ${FITVAR} \
+       --var-2j2b ${FITVAR} \
+       --bin-1j1b ${BIN_1j1b} \
+       --bin-2j1b ${BIN_2j1b} \
+       --bin-2j2b ${BIN_2j2b} \
+       --sel-1j1b "${SEL_1j1b}" \
+       --sel-2j1b "${SEL_2j1b}" \
+       --sel-2j2b "${SEL_2j2b}" \
+       --herwig ${SHOWER} \
        --only-18
 
-python -m rexpy config gen $OUTDIR/presel_plots.conf  \
+python -m rexpy config gen ${OUTDIR}/presel_plots.conf  \
        --ntup-dir ${NTUPDIR} \
        --is-preselection \
-       --var-1j1b $FITVAR \
-       --var-2j1b $FITVAR \
-       --var-2j2b $FITVAR \
+       --var-1j1b ${FITVAR} \
+       --var-2j1b ${FITVAR} \
+       --var-2j2b ${FITVAR} \
        --bin-1j1b "12,0.2,0.8" \
        --bin-2j1b "12,0.2,0.8" \
        --bin-2j2b "12,0.2,0.8" \
        --sel-1j1b "reg1j1b == 1 && OS == 1" \
        --sel-2j1b "reg2j1b == 1 && OS == 1" \
        --sel-2j2b "reg2j2b == 1 && OS == 1" \
-       --herwig-version $SHOWER \
+       --herwig ${SHOWER} \
        --do-val-plots
 
-python -m rexpy config gen $OUTDIR/presel.conf  \
+python -m rexpy config gen ${OUTDIR}/presel.conf  \
        --ntup-dir ${NTUPDIR} \
        --is-preselection \
        --bin-1j1b "12,0.2,0.8" \
        --bin-2j1b "12,0.2,0.8" \
        --bin-2j2b "12,0.2,0.8" \
-       --var-1j1b $FITVAR \
-       --var-2j1b $FITVAR \
-       --var-2j2b $FITVAR \
+       --var-1j1b ${FITVAR} \
+       --var-2j1b ${FITVAR} \
+       --var-2j2b ${FITVAR} \
        --sel-1j1b "reg1j1b == 1 && OS == 1" \
        --sel-2j1b "reg2j1b == 1 && OS == 1" \
        --sel-2j2b "reg2j2b == 1 && OS == 1" \
-       --herwig-version $SHOWER \
+       --herwig ${SHOWER} \
        --do-tables \
        --do-sys-plots
