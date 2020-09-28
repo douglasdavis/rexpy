@@ -270,18 +270,8 @@ def _run_wf_step(args):
     return p.wait()
 
 
-def _run_wf_step_blind(args):
-    p = subprocess.Popen(f"{args[0]} wf {args[1]} FitBlind=True:Suffix=_asimov", shell=True)
-    return p.wait()
-
-
 def _run_dp_step(args):
     p = subprocess.Popen(f"{args[0]} dp {args[1]}", shell=True)
-    return p.wait()
-
-
-def _run_dp_step_blind(args):
-    p = subprocess.Popen(f"{args[0]} dp {args[1]} FitBlind=True:Suffix=_asimov", shell=True)
     return p.wait()
 
 
@@ -290,22 +280,8 @@ def _run_r_draw_step(args):
     return p.wait()
 
 
-def _run_r_draw_step_blind(args):
-    p = subprocess.Popen(
-        f"{args[0]} r {args[1]} Ranking=plot:FitBlind=True:Suffix=_asimov", shell=True
-    )
-    return p.wait()
-
-
 def _run_r_step(args):
     p = subprocess.Popen(f"{args[0]} r {args[1]} Ranking={args[2]}", shell=True)
-    return p.wait()
-
-
-def _run_r_step_blind(args):
-    p = subprocess.Popen(
-        f"{args[0]} r {args[1]} Ranking={args[2]}:FitBlind=True:Suffix=_asimov", shell=True
-    )
     return p.wait()
 
 
@@ -314,24 +290,8 @@ def _run_i_step(args):
     return p.wait()
 
 
-def _run_i_step_blind(args):
-    p = subprocess.Popen(
-        f"{args[0]} i {args[1]} GroupedImpact={args[2]}:FitBlind=True:Suffix=_asimov",
-        shell=True,
-    )
-    return p.wait()
-
-
 def _run_i_combine_step(args):
     p = subprocess.Popen(f"{args[0]} i {args[1]} GroupedImpact=combine", shell=True)
-    return p.wait()
-
-
-def _run_i_combine_step_blind(args):
-    p = subprocess.Popen(
-        f"{args[0]} i {args[1]} GroupedImpact=combine:FitBlind=True:Suffix=_asimov",
-        shell=True,
-    )
     return p.wait()
 
 
@@ -386,27 +346,22 @@ def parallel_n_step(config, regions=None, processes=None):
 
 
 @restore_cwd
-def wfdp_step(config, do_blind=False):
+def wfdp_step(config):
     """Execute the wftp steps.
 
     Parameters
     ----------
     config : str
         Path of the config file.
-    do_blind : bool
-        Also run step in Asimov setup.
 
     """
     os.chdir(pathlib.PosixPath(config).resolve().parent)
     _run_wf_step((TREX_EXE, config))
     _run_dp_step((TREX_EXE, config))
-    if do_blind:
-        _run_wf_step_blind((TREX_EXE, config))
-        _run_dp_step_blind((TREX_EXE, config))
 
 
 @restore_cwd
-def parallel_r_step(config, systematics=None, do_blind=False, processes=None):
+def parallel_r_step(config, systematics=None, processes=None):
     """Parallelize the impart ranking step via multiprocessing.
 
     Parameters
@@ -415,8 +370,6 @@ def parallel_r_step(config, systematics=None, do_blind=False, processes=None):
         Path of the config file.
     systematics : list(str), optional
         Manually define the systematics.
-    do_blind : bool
-        Also run step in Asimov setup.
     processes : int, optional
         Max number of processes to run in parallel
 
@@ -427,38 +380,30 @@ def parallel_r_step(config, systematics=None, do_blind=False, processes=None):
     args = [(TREX_EXE, config, sys) for sys in systematics]
     pool = multiprocessing.Pool(processes=processes)
     pool.map(_run_r_step, args)
-    if do_blind:
-        pool.map(_run_r_step_blind, args)
 
 
 @restore_cwd
-def r_draw_step(config, do_blind=False):
+def r_draw_step(config):
     """Execute the ranking plot drawing step.
 
     Parameters
     ----------
     config : str
         Path of the config file.
-    do_blind : bool
-        Also run step in Asimov setup.
 
     """
     os.chdir(pathlib.PosixPath(config).resolve().parent)
     _run_r_draw_step((TREX_EXE, config))
-    if do_blind:
-        _run_r_draw_step_blind((TREX_EXE, config))
 
 
 @restore_cwd
-def parallel_i_step(config, do_blind=False, processes=None):
+def parallel_i_step(config, processes=None):
     """Parallelize the grouped impact step via multiprocessing.
 
     Parameters
     ----------
     config : str
         Path of the config file.
-    do_blind : bool
-        Also run step in Asimov setup.
     processes : int, optional
         Max number of processes to run in parallel
 
@@ -469,26 +414,20 @@ def parallel_i_step(config, do_blind=False, processes=None):
     args = [(TREX_EXE, config, g) for g in groups]
     pool = multiprocessing.Pool(processes=processes)
     pool.map(_run_i_step, args)
-    if do_blind:
-        pool.map(_run_i_step_blind, args)
 
 
 @restore_cwd
-def i_combine_step(config, do_blind=False):
+def i_combine_step(config):
     """Execute the grouped impact combine step.
 
     Parameters
     ----------
     config : str
         Path of the config file.
-    do_blind : bool
-        Also run step in Asimov setup.
 
     """
     os.chdir(pathlib.PosixPath(config).resolve().parent)
     _run_i_combine_step((TREX_EXE, config))
-    if do_blind:
-        _run_i_combine_step_blind((TREX_EXE, config))
 
 
 def condor_n_step(wkspace, sys=None, job_name="ntuple", dag=None):
@@ -519,7 +458,7 @@ def condor_n_step(wkspace, sys=None, job_name="ntuple", dag=None):
     return j
 
 
-def condor_dp_step(wkspace, sys=None, job_name="draw", dag=None, do_blind=False):
+def condor_dp_step(wkspace, sys=None, job_name="draw", dag=None):
     """Generate a condor job for running the drawing steps.
 
     Parameters
@@ -532,8 +471,6 @@ def condor_dp_step(wkspace, sys=None, job_name="draw", dag=None, do_blind=False)
         Name for the condor job.
     dag : pycondor.Dagman, optional
         Dagman to assign the job to.
-    do_blind : bool
-        Also run step in Asimov setup.
 
     Returns
     -------
@@ -544,13 +481,11 @@ def condor_dp_step(wkspace, sys=None, job_name="draw", dag=None, do_blind=False)
     jp = job_params(wkspace, TREX_EXE)
     config = wkspace / "fit.conf"
     j = pycondor.Job(name=job_name, dag=dag, **jp)
-    j.add_arg(draw_argument(config, specific_sys=sys, as_blind=False))
-    if do_blind:
-        j.add_arg(draw_argument(config, specific_sys=sys, as_blind=True))
+    j.add_arg(draw_argument(config, specific_sys=sys))
     return j
 
 
-def condor_wf_step(wkspace, sys=None, job_name="wf", dag=None, do_blind=False):
+def condor_wf_step(wkspace, sys=None, job_name="wf", dag=None):
     """Generate a condor job for running the fitting steps.
 
     Parameters
@@ -563,8 +498,6 @@ def condor_wf_step(wkspace, sys=None, job_name="wf", dag=None, do_blind=False):
         Name for the condor job.
     dag : pycondor.Dagman, optional
         Dagman to assign the job to.
-    do_blind : bool
-        Also run step in Asimov setup.
 
     Returns
     -------
@@ -577,13 +510,10 @@ def condor_wf_step(wkspace, sys=None, job_name="wf", dag=None, do_blind=False):
     fit_arg = fit_argument(config, specific_sys=sys)
     j = pycondor.Job(name=job_name, dag=dag, **jp)
     j.add_arg(fit_arg)
-    if do_blind:
-        fit_arg2 = fit_argument(config, specific_sys=sys, as_blind=True)
-        j.add_arg(fit_arg2)
     return j
 
 
-def condor_r_step(wkspace, sys=None, job_name="rank", dag=None, do_blind=False):
+def condor_r_step(wkspace, sys=None, job_name="rank", dag=None):
     """Generate a condor job for running the ranking steps.
 
     Parameters
@@ -596,8 +526,6 @@ def condor_r_step(wkspace, sys=None, job_name="rank", dag=None, do_blind=False):
         Name for the condor job.
     dag : pycondor.Dagman, optional
         Dagman to assign the job to.
-    do_blind : bool
-        Also run step in Asimov setup.
 
     Returns
     -------
@@ -608,14 +536,12 @@ def condor_r_step(wkspace, sys=None, job_name="rank", dag=None, do_blind=False):
     jp = job_params(wkspace, TREX_EXE)
     config = wkspace / "fit.conf"
     rank_args = rank_arguments(config, specific_sys=sys)
-    if do_blind:
-        rank_args += rank_arguments(config, specific_sys=sys, as_blind=True)
     j = pycondor.Job(name=job_name, dag=dag, **jp)
     j.add_args(rank_args)
     return j
 
 
-def condor_rplot_step(wkspace, job_name="rplot", dag=None, do_blind=False):
+def condor_rplot_step(wkspace, job_name="rplot", dag=None):
     """Generate a condor job for running the ranking steps.
 
     Parameters
@@ -626,8 +552,6 @@ def condor_rplot_step(wkspace, job_name="rplot", dag=None, do_blind=False):
         Name for the condor job.
     dag : pycondor.Dagman, optional
         Dagman to assign the job to.
-    do_blind : bool
-        Also run step in Asimov setup.
 
     Returns
     -------
@@ -640,12 +564,10 @@ def condor_rplot_step(wkspace, job_name="rplot", dag=None, do_blind=False):
     config = wkspace / "fit.conf"
     j = pycondor.Job(name=job_name, dag=dag, **jp)
     j.add_arg(f"r {config} Ranking=plot")
-    if do_blind:
-        j.add_arg(f"r {config} Ranking=plot:{rexpy.confparse.BLIND_ARGS}")
     return j
 
 
-def condor_i_step(wkspace, job_name="impact", dag=None, do_blind=False):
+def condor_i_step(wkspace, job_name="impact", dag=None):
     """Generate a condor job for running the ranking steps.
 
     Parameters
@@ -656,8 +578,6 @@ def condor_i_step(wkspace, job_name="impact", dag=None, do_blind=False):
         Name for the condor job.
     dag : pycondor.Dagman, optional
         Dagman to assign the job to.
-    do_blind : bool
-        Also run step in Asimov setup.
 
     Returns
     -------
@@ -668,18 +588,14 @@ def condor_i_step(wkspace, job_name="impact", dag=None, do_blind=False):
     jp = job_params(wkspace, TREX_EXE)
     config = wkspace / "fit.conf"
     impact_args = grouped_impact_arguments(config)
-    if do_blind:
-        impact_args += grouped_impact_arguments(config, as_blind=True)
     j = pycondor.Job(name=job_name, dag=dag, **jp)
     j.add_args(impact_args)
     return j
 
 
-def condor_icombine_step(wkspace, job_name="impactcomb", dag=None, do_blind=False):
+def condor_icombine_step(wkspace, job_name="impactcomb", dag=None):
     jp = job_params(wkspace, TREX_EXE)
     config = wkspace / "fit.conf"
     j = pycondor.Job(name=job_name, dag=dag, **jp)
     j.add_arg(f"i {config} GroupedImpact=combine")
-    if do_blind:
-        j.add_arg(f"i {config} GroupedImpact=combine:{rexpy.confparse.BLIND_ARGS}")
     return j

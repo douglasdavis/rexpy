@@ -210,3 +210,24 @@ def drop_region(blocks, region):
         "SummaryPlotRegions: reg1j1b,reg2j1b,reg2j2b\n  ", ""
     )
     return new_blocks
+
+
+def unblind(config):
+    """Ensure a config is unblinded.
+
+    Parameters
+    ----------
+    config : str or os.PathLike
+        Path of the config file.
+
+    Returns
+    -------
+    pathlib.PosixPath
+        Config file Path.
+
+    """
+    conf_path = PosixPath(config)
+    full_config = conf_path.read_text()
+    full_config = full_config.replace("  FitBlind: TRUE\n", "  FitBlind: FALSE\n")
+    conf_path.write_text(full_config)
+    return conf_path

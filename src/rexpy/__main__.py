@@ -250,13 +250,16 @@ def run():
 
 @run.command("local")
 @click.argument("config", type=click.Path(resolve_path=True))
-@click.option("--suffix", type=str, help="Add suffix to workspace.")
-@click.option("--n-parallel", type=int, default=None, help="Max parallel jobs (default is CPU count)")
-def local(config, suffix, n_parallel):
+@click.option("-s", "--suffix", type=str, help="Add suffix to workspace.")
+@click.option("-n", "--n-parallel", type=int, default=None, help="Max parallel jobs (default is CPU count)")
+@click.option("-d", "--force-data", is_flag=True, help="Force config to fit to data.")
+def local(config, suffix, n_parallel, force_data):
     """Run TRExFitter steps locally."""
     import rexpy.batch as rpb
     curdir = PosixPath.cwd()
     workspace, f = rpb.create_workspace(config, "local", suffix)
+    if force_data:
+        f = rpc.unblind(f)
     os.chdir(workspace)
     rpb.parallel_n_step(f, processes=n_parallel)
     rpb.wfdp_step(f)
@@ -273,16 +276,24 @@ def local(config, suffix, n_parallel):
 @click.option("-x", "--suffix", type=str, help="Add suffix to workspace.")
 @click.option("-c", "--copy-hists", type=click.Path(resolve_path=True), help="Copy existing histograms.")
 @click.option("-n", "--ntup-only", is_flag=True, help="Only fun the ntuple step.")
+@click.option("-d", "--force-data", is_flag=True, help="Force config to fit to data.")
 @click.option("--submit/--no-submit", default=False, help="Submit the jobs")
-def condor(config, sys, suffix, copy_hists, ntup_only, submit):
+def condor(config, sys, suffix, copy_hists, ntup_only, force_data, submit):
     """Run TRExFitter steps with HTCondor."""
     import rexpy.batch as rpb
-    import rexpy.helpers as rph
     import rexpy.pycondor as pycondor
+
+    if force_data and suffix is not None:
+        suffix = f"{suffix}_force_data"
+    elif force_data:
+        suffix = "force_data"
 
     # create workspace and the condo dagman
     workspace, f = rpb.create_workspace(config, "condor", suffix)
     dagman = pycondor.Dagman("rexpy-dag", submit=str(workspace / "sub"))
+
+    if force_data:
+        f = rpc.unblind(f)
 
     cwd = PosixPath.cwd()
     os.chdir(workspace)
