@@ -252,9 +252,20 @@ def create_workspace(config, suffix=None):
     workspace = config_path.parent / f"{config_path.stem}.d"
     if suffix is not None:
         workspace = pathlib.PosixPath(f"{config_path.stem}.{suffix}.d")
-    workspace.mkdir(exist_ok=False)
-    shutil.copyfile(config_path, workspace / "fit.conf")
+    workspace.mkdir(exist_ok=True)
+    if not (workspace / "fit.conf").exists():
+        shutil.copyfile(config_path, workspace / "fit.conf")
     return workspace.absolute(), (workspace / "fit.conf").absolute()
+
+
+def run_and_wait(command):
+    p = subprocess.Popen(command, shell=True)
+    return p.wait()
+
+
+def parallel_run(commands, processes=None):
+    pool = multiprocessing.Pool(processes=processes)
+    pool.map(run_and_wait, commands)
 
 
 def _run_n_step(args):
@@ -354,6 +365,34 @@ def wfdp_step(config):
     """
     os.chdir(pathlib.PosixPath(config).resolve().parent)
     _run_wf_step((TREX_EXE, config))
+    _run_dp_step((TREX_EXE, config))
+
+
+@restore_cwd
+def wf_step(config):
+    """Execute the wf steps.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+
+    """
+    os.chdir(pathlib.PosixPath(config).resolve().parent)
+    _run_wf_step((TREX_EXE, config))
+
+
+@restore_cwd
+def dp_step(config):
+    """Execute the dp steps.
+
+    Parameters
+    ----------
+    config : str
+        Path of the config file.
+
+    """
+    os.chdir(pathlib.PosixPath(config).resolve().parent)
     _run_dp_step((TREX_EXE, config))
 
 

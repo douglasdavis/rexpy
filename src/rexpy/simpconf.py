@@ -27,6 +27,33 @@ DEF_2j2b_xmin = 0.20
 DEF_2j2b_xmax = 0.90
 DEF_2j2b_lo_cut = 0.45
 DEF_2j2b_hi_cut = 0.775
+
+DEF_STAB_LIST = [
+    "ttbar_ptreweight_1j1b",
+    "ttbar_ptreweight_2j1b",
+    "ttbar_ptreweight_2j2b",
+    "ttbar_hdamp_1j1b",
+    "ttbar_hdamp_2j1b",
+    "ttbar_hdamp_2j2b",
+    "ttbar_PS_1j1b",
+    "ttbar_PS_2j1b",
+    "ttbar_PS_2j2b",
+    "ttbar_PS_migration",
+    "ttbar_AR_FSR_2j1b",
+    "ttbar_AR_FSR_1j1b",
+    "tW_DRDS",
+    "tW_PS_1j1b",
+    "tW_PS_2j1b",
+    "tW_PS_2j2b",
+    "MET_SoftTrk_Scale",
+    "Jet_Pileup_RhoTopology",
+    "Jet_JER_EffectiveNP_7restTerm",
+    "Jet_JER_EffNP_1",
+    "Jet_JER_DataVsMC",
+    "Jet_Flavor_Response",
+    "Jet_Flavor_Composition",
+    "B_ev_B_0",
+]
 ##################################################
 
 def ntuple_directory():
@@ -75,3 +102,7 @@ def r2j1b_var():
 
 def r2j2b_var():
     return f"{DEF_2j2b_var}"
+
+
+def regular_stability_test_list():
+    return DEF_STAB_LIST

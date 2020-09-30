@@ -10,6 +10,7 @@ import warnings
 import click
 
 # rexpy
+import rexpy.batch as rpbatch
 import rexpy.blocks as rpb
 import rexpy.confparse as rpc
 import rexpy.helpers as rph
@@ -46,7 +47,7 @@ def augment(rootfiledir, npyfiledir, dry, condor_sub, submit):
 
 @cli.group("config")
 def config():
-    """Handle TRExFitter configuration files."""
+    """Generate and handle TRExFitter configuration files."""
     pass
 
 
@@ -154,19 +155,6 @@ def gen(
     else:
         sel_2j2b = rph.selection_with_period(sel_2j2b, only_1516, only_17, only_18)
 
-    # if "WTA01" in ntup_dir:
-    #     import rexpy.systematic_tables
-    #     category = rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"].category
-    #     smoothing = rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"].smoothing
-    #     title = rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"].title
-    #     rexpy.systematic_tables.SYS_TREES_TWOSIDED["MET_SoftTrk_Scale"] = rexpy.systematic_tables.NTSysTree2s(
-    #         "MET_SoftTrk_ScaleUp",
-    #         "MET_SoftTrk_ScaleDown",
-    #         category,
-    #         smoothing,
-    #         title
-    #     )
-
     preamble = rpb.top_blocks(
         ntuplepaths=ntup_dir,
         reg1j1b_binning=bin_1j1b,
@@ -244,29 +232,48 @@ def rm_sys(config, sys, new_file):
 
 @cli.group("run")
 def run():
-    """Run TRExFitter n, wf, dp, r, and i steps in an automated way."""
+    """Run TRExFitter steps in an automated way."""
     pass
 
 
 @run.command("local")
 @click.argument("config", type=click.Path(resolve_path=True))
-@click.option("-s", "--suffix", type=str, help="Add suffix to workspace.")
+@click.option("-x", "--suffix", type=str, help="Add suffix to workspace.")
+@click.option("-c", "--copy-hists", type=click.Path(resolve_path=True, exists=True), help="Copy existing histograms")
 @click.option("-n", "--n-parallel", type=int, default=None, help="Max parallel jobs (default is CPU count)")
 @click.option("-d", "--force-data", is_flag=True, help="Force config to fit to data.")
-def local(config, suffix, n_parallel, force_data):
+@click.option("-s", "--steps", type=str, default="nwfdpri", help="TRExFitter steps to run", show_default=True)
+def local(config, suffix, copy_hists, n_parallel, force_data, steps):
     """Run TRExFitter steps locally."""
     import rexpy.batch as rpb
+
+    if force_data and suffix is not None:
+        suffix = f"{suffix}.force-data"
+    elif force_data:
+        suffix = "force-data"
+
     curdir = PosixPath.cwd()
     workspace, f = rpb.create_workspace(config, suffix)
+
+    # copy histograms if requested
+    if copy_hists is not None:
+        rph.copy_histograms(copy_hists, workspace)
+
     if force_data:
         f = rpc.unblind(f)
     os.chdir(workspace)
-    rpb.parallel_n_step(f, processes=n_parallel)
-    rpb.wfdp_step(f)
-    rpb.parallel_r_step(f, processes=n_parallel)
-    rpb.r_draw_step(f)
-    rpb.parallel_i_step(f, processes=n_parallel)
-    rpb.i_combine_step(f)
+    if "n" in steps and copy_hists is None:
+        rpb.parallel_n_step(f, processes=n_parallel)
+    if "wf" in steps:
+        rpb.wf_step(f)
+    if "dp" in steps:
+        rpb.dp_step(f)
+    if "r" in steps:
+        rpb.parallel_r_step(f, processes=n_parallel)
+        rpb.r_draw_step(f)
+    if "i" in steps:
+        rpb.parallel_i_step(f, processes=n_parallel)
+        rpb.i_combine_step(f)
     os.chdir(curdir)
 
 
@@ -341,6 +348,30 @@ def condor(config, sys, suffix, copy_hists, ntup_only, force_data, submit):
         dagman.build()
 
     os.chdir(cwd)
+
+
+@cli.command("sysholdout")
+@click.argument("workspace", type=click.Path(resolve_path=True, exists=True))
+@click.argument("systematics", type=str)
+@click.option("-n", "--n-parallel", type=int, default=None, help="Max parallel jobs (default is CPU count)")
+def sysholdout(workspace, systematics, n_parallel):
+    """Refit a configuration holding out a set of systematics."""
+    wsp = PosixPath(workspace)
+    syslistfile = PosixPath(systematics)
+    if systematics == "_default":
+        systematics = rpsc.regular_stability_test_list()
+    elif syslistfile.exists():
+        systematics = syslistfile.read_text().strip().split()
+    else:
+        systematics = systematics.split(",")
+
+    curdir = PosixPath.cwd()
+    os.chdir(wsp)
+    rpbatch.parallel_run(
+        [f"{rpbatch.TREX_EXE} wf fit.conf Exclude={s}:Suffix=_exclude-{s}" for s in systematics],
+        processes=n_parallel,
+    )
+    os.chdir(curdir)
 
 
 if __name__ == "__main__":
