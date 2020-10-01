@@ -282,13 +282,15 @@ def local(config, suffix, copy_hists, n_parallel, force_data, steps):
 @click.option("-s", "--sys", type=str, help="Comma separated specific systematics to use.")
 @click.option("-x", "--suffix", type=str, help="Add suffix to workspace.")
 @click.option("-c", "--copy-hists", type=click.Path(resolve_path=True), help="Copy existing histograms.")
-@click.option("-n", "--ntup-only", is_flag=True, help="Only fun the ntuple step.")
 @click.option("-d", "--force-data", is_flag=True, help="Force config to fit to data.")
+@click.option("--steps", type=str, default="nwfdpri", help="TRExFitter steps to run", show_default=True)
 @click.option("--submit/--no-submit", default=False, help="Submit the jobs")
-def condor(config, sys, suffix, copy_hists, ntup_only, force_data, submit):
+def condor(config, sys, suffix, copy_hists, force_data, steps, submit):
     """Run TRExFitter steps with HTCondor."""
     import rexpy.batch as rpb
     import rexpy.pycondor as pycondor
+
+    ntup_only = steps == "n"
 
     if force_data and suffix is not None:
         suffix = f"{suffix}.force-data"
@@ -297,7 +299,7 @@ def condor(config, sys, suffix, copy_hists, ntup_only, force_data, submit):
 
     # create workspace and the condo dagman
     workspace, f = rpb.create_workspace(config, suffix)
-    dagman = pycondor.Dagman("rexpy-dag", submit=str(workspace / "sub"))
+    dagman = pycondor.Dagman("REXPY-DAG", submit=str(workspace / "sub"))
 
     if force_data:
         f = rpc.unblind(f)
@@ -312,35 +314,64 @@ def condor(config, sys, suffix, copy_hists, ntup_only, force_data, submit):
     if copy_hists is not None:
         rph.copy_histograms(copy_hists, workspace)
 
-    # generate all condor jobs.
-    n = None
-    if copy_hists is None:
+    ############################
+    ## Create condor Job objects
+    ############################
+
+    n, wf, dp, r, rplot, i, icombine = (
+        None, None, None, None, None, None, None
+    )
+
+    if copy_hists is None and "n" in steps:
         n = rpb.condor_n_step(workspace, dag=dagman, sys=sys)
+        log.info("Running n step")
 
     if not ntup_only:
-        wf = rpb.condor_wf_step(workspace, dag=dagman, sys=sys)
-        dp = rpb.condor_dp_step(workspace, dag=dagman, sys=sys)
-        r = rpb.condor_r_step(workspace, dag=dagman, sys=sys)
-        rplot = rpb.condor_rplot_step(workspace, dag=dagman)
-
-    # setup job dependencies
-    if n is not None and not ntup_only:
-        wf.add_parent(n)
-    else:
-        pass
-    if not ntup_only:
-        dp.add_parent(wf)
-        r.add_parent(wf)
-        rplot.add_parent(r)
-        if sys is None:
+        if "wf" in steps:
+            wf = rpb.condor_wf_step(workspace, dag=dagman, sys=sys)
+            log.info("Running wf steps")
+        if "dp" in steps:
+            dp = rpb.condor_dp_step(workspace, dag=dagman, sys=sys)
+            log.info("Running dp steps")
+        if "r" in steps:
+            r = rpb.condor_r_step(workspace, dag=dagman, sys=sys)
+            rplot = rpb.condor_rplot_step(workspace, dag=dagman)
+            log.info("Running r steps")
+        if "i" in steps and sys is None:
             i = rpb.condor_i_step(workspace, dag=dagman)
             icombine = rpb.condor_icombine_step(workspace, dag=dagman)
-            i.add_parent(wf)
+            log.info("Running i steps")
+
+    #########################
+    ## setup job dependencies
+    #########################
+
+    if wf is not None and n is not None:
+        wf.add_parent(n)
+        log.info("n step now parent to wf step")
+
+    # none of these steps are done if ntup only
+    if not ntup_only:
+        if dp is not None:
+            if wf is not None:
+                dp.add_parent(wf)
+                log.info("wf steps now parent to dp steps")
+        if r is not None:
+            if wf is not None:
+                r.add_parent(wf)
+                log.info("wf steps now parent to r steps")
+            rplot.add_parent(r)
+            log.info("r steps now parent to r plotting step")
+        if i is not None:
+            if wf is not None:
+                i.add_parent(wf)
+                log.info("wf steps now parent to i steps")
             icombine.add_parent(i)
-        else:
-            pass
-    else:
-        pass
+            log.info("i steps now parent to i combination step")
+
+    ###########################
+    ## build (and maybe submit)
+    ###########################
 
     if submit:
         dagman.build_submit()
