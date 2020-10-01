@@ -11,12 +11,12 @@ import click
 
 # rexpy
 import rexpy.batch as rpbatch
-import rexpy.blocks as rpb
+import rexpy.blocks as rpblocks
 import rexpy.confparse as rpc
 import rexpy.helpers as rph
 import rexpy.valplot as rpv
 import rexpy.simpconf as rpsc
-
+import rexpy.pycondor as pycondor
 
 log = logging.getLogger("rex.py")
 
@@ -155,7 +155,7 @@ def gen(
     else:
         sel_2j2b = rph.selection_with_period(sel_2j2b, only_1516, only_17, only_18)
 
-    preamble = rpb.top_blocks(
+    preamble = rpblocks.top_blocks(
         ntuplepaths=ntup_dir,
         reg1j1b_binning=bin_1j1b,
         reg2j1b_binning=bin_2j1b,
@@ -174,14 +174,14 @@ def gen(
         print(preamble, file=f)
         if do_val_plots:
             print(rpv.default_vrp_blocks(sel_1j1b, sel_2j1b, sel_2j2b, is_preselection=is_preselection), file=f)
-        print(rpb.sample_blocks(), file=f)
-        print(rpb.norm_factor_blocks(), file=f)
-        print(rpb.sys_modeling_blocks(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig), file=f)
-        print(rpb.sys_minor_blocks(), file=f)
-        print(rpb.sys_sf_weight_blocks(), file=f)
-        print(rpb.sys_pdf_weight_blocks(), file=f)
-        print(rpb.sys_twosided_tree_blocks(), file=f)
-        print(rpb.sys_onesided_tree_blocks(), file=f)
+        print(rpblocks.sample_blocks(), file=f)
+        print(rpblocks.norm_factor_blocks(), file=f)
+        print(rpblocks.sys_modeling_blocks(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig), file=f)
+        print(rpblocks.sys_minor_blocks(), file=f)
+        print(rpblocks.sys_sf_weight_blocks(), file=f)
+        print(rpblocks.sys_pdf_weight_blocks(), file=f)
+        print(rpblocks.sys_twosided_tree_blocks(), file=f)
+        print(rpblocks.sys_onesided_tree_blocks(), file=f)
 
     if do_val_plots:
         fix_systematics(outname)
@@ -245,7 +245,6 @@ def run():
 @click.option("-s", "--steps", type=str, default="nwfdpri", help="TRExFitter steps to run", show_default=True)
 def local(config, suffix, copy_hists, n_parallel, force_data, steps):
     """Run TRExFitter steps locally."""
-    import rexpy.batch as rpb
 
     if force_data and suffix is not None:
         suffix = f"{suffix}.force-data"
@@ -253,7 +252,7 @@ def local(config, suffix, copy_hists, n_parallel, force_data, steps):
         suffix = "force-data"
 
     curdir = PosixPath.cwd()
-    workspace, f = rpb.create_workspace(config, suffix)
+    workspace, f = rpbatch.create_workspace(config, suffix)
 
     # copy histograms if requested
     if copy_hists is not None:
@@ -263,17 +262,17 @@ def local(config, suffix, copy_hists, n_parallel, force_data, steps):
         f = rpc.unblind(f)
     os.chdir(workspace)
     if "n" in steps and copy_hists is None:
-        rpb.parallel_n_step(f, processes=n_parallel)
+        rpbatch.parallel_n_step(f, processes=n_parallel)
     if "wf" in steps:
-        rpb.wf_step(f)
+        rpbatch.wf_step(f)
     if "dp" in steps:
-        rpb.dp_step(f)
+        rpbatch.dp_step(f)
     if "r" in steps:
-        rpb.parallel_r_step(f, processes=n_parallel)
-        rpb.r_draw_step(f)
+        rpbatch.parallel_r_step(f, processes=n_parallel)
+        rpbatch.r_draw_step(f)
     if "i" in steps:
-        rpb.parallel_i_step(f, processes=n_parallel)
-        rpb.i_combine_step(f)
+        rpbatch.parallel_i_step(f, processes=n_parallel)
+        rpbatch.i_combine_step(f)
     os.chdir(curdir)
 
 
@@ -287,8 +286,6 @@ def local(config, suffix, copy_hists, n_parallel, force_data, steps):
 @click.option("--submit/--no-submit", default=False, help="Submit the jobs")
 def condor(config, sys, suffix, copy_hists, force_data, steps, submit):
     """Run TRExFitter steps with HTCondor."""
-    import rexpy.batch as rpb
-    import rexpy.pycondor as pycondor
 
     ntup_only = steps == "n"
 
@@ -298,7 +295,7 @@ def condor(config, sys, suffix, copy_hists, force_data, steps, submit):
         suffix = "force-data"
 
     # create workspace and the condo dagman
-    workspace, f = rpb.create_workspace(config, suffix)
+    workspace, f = rpbatch.create_workspace(config, suffix)
     dagman = pycondor.Dagman("REXPY-DAG", submit=str(workspace / "sub"))
 
     if force_data:
@@ -323,23 +320,23 @@ def condor(config, sys, suffix, copy_hists, force_data, steps, submit):
     )
 
     if copy_hists is None and "n" in steps:
-        n = rpb.condor_n_step(workspace, dag=dagman, sys=sys)
+        n = rpbatch.condor_n_step(workspace, dag=dagman, sys=sys)
         log.info("Running n step")
 
     if not ntup_only:
         if "wf" in steps:
-            wf = rpb.condor_wf_step(workspace, dag=dagman, sys=sys)
+            wf = rpbatch.condor_wf_step(workspace, dag=dagman, sys=sys)
             log.info("Running wf steps")
         if "dp" in steps:
-            dp = rpb.condor_dp_step(workspace, dag=dagman, sys=sys)
+            dp = rpbatch.condor_dp_step(workspace, dag=dagman, sys=sys)
             log.info("Running dp steps")
         if "r" in steps:
-            r = rpb.condor_r_step(workspace, dag=dagman, sys=sys)
-            rplot = rpb.condor_rplot_step(workspace, dag=dagman)
+            r = rpbatch.condor_r_step(workspace, dag=dagman, sys=sys)
+            rplot = rpbatch.condor_rplot_step(workspace, dag=dagman)
             log.info("Running r steps")
         if "i" in steps and sys is None:
-            i = rpb.condor_i_step(workspace, dag=dagman)
-            icombine = rpb.condor_icombine_step(workspace, dag=dagman)
+            i = rpbatch.condor_i_step(workspace, dag=dagman)
+            icombine = rpbatch.condor_icombine_step(workspace, dag=dagman)
             log.info("Running i steps")
 
     #########################
@@ -384,10 +381,13 @@ def condor(config, sys, suffix, copy_hists, force_data, steps, submit):
 @cli.command("sysholdout")
 @click.argument("workspace", type=click.Path(resolve_path=True, exists=True))
 @click.argument("systematics", type=str)
+@click.option("-c", "--condor", is_flag=True, help="Run on condor instead of local")
 @click.option("-n", "--n-parallel", type=int, default=None, help="Max parallel jobs (default is CPU count)")
-def sysholdout(workspace, systematics, n_parallel):
+@click.option("--submit/--no-submit", default=False, help="Submit the jobs")
+def sysholdout(workspace, systematics, condor, n_parallel, submit):
     """Refit a configuration holding out a set of systematics."""
-    wsp = PosixPath(workspace)
+    wsp = PosixPath(workspace).resolve()
+    conf_file = wsp / "fit.conf"
     syslistfile = PosixPath(systematics)
     if systematics == "_default":
         systematics = rpsc.regular_stability_test_list()
@@ -398,10 +398,24 @@ def sysholdout(workspace, systematics, n_parallel):
 
     curdir = PosixPath.cwd()
     os.chdir(wsp)
-    rpbatch.parallel_run(
-        [f"{rpbatch.TREX_EXE} wf fit.conf Exclude={s}:Suffix=_exclude-{s}" for s in systematics],
-        processes=n_parallel,
-    )
+
+    coms = [f"wf {conf_file} Exclude={s}:Suffix=_exclude-{s}" for s in systematics]
+
+    if condor:
+        dagman = pycondor.Dagman("REXPY-DAG", submit=str(wsp / "sub"))
+        jparams = rpbatch.job_params(wsp, rpbatch.TREX_EXE)
+        job = pycondor.Job(name="exclusion-fits", dag=dagman, **jparams)
+        job.add_args(coms)
+        if submit:
+            dagman.build_submit()
+        else:
+            dagman.build()
+    else:
+        rpbatch.parallel_run(
+            [f"{rpbatch.TREX_EXE} {com}" for com in coms],
+            processes=n_parallel,
+        )
+
     os.chdir(curdir)
 
 
