@@ -23,6 +23,7 @@ function usage() {
   echo "      --do-rbd      Generate region breakdown configs"
   echo "      --do-ybd      Generate year breakdown configs"
   echo "      --do-presel   Generate preselection config(s)"
+  echo "      --step-two    Run the second step (forcing data on existing results)"
   echo "      --submit      Submit jobs"
   echo ""
 }
@@ -45,79 +46,65 @@ DO_PLOTS=0
 DO_RBD=0
 DO_YBD=0
 DO_PRESEL=0
+STEP_TWO=0
 SUBMIT=0
 
 while [[ $# -gt 0 ]]
 do
   key="$1"
   case $key in
-    -h|--help)      usage
-                    exit 0
-                    ;;
-    -f|--fitvar)    shift
-                    FITVAR="$1"
-                    ;;
-    -o|--outdir)    shift
-                    OUTDIR="$1"
-                    ;;
-    -s|--shower)    shift
-                    SHOWER="$1"
-                    ;;
-    -n|--ntup-dir)  shift
-                    NTUPDIR="$1"
-                    ;;
-    --nbin-1j1b)    shift
-                    NBIN_1j1b="$1"
-                    ;;
-    --nbin-2j1b)    shift
-                    NBIN_2j1b="$1"
-                    ;;
-    --nbin-2j2b)    shift
-                    NBIN_2j2b="$1"
-                    ;;
-    --xmin-1j1b)    shift
-                    XMIN_1j1b="$1"
-                    ;;
-    --xmin-2j1b)    shift
-                    XMIN_2j1b="$1"
-                    ;;
-    --xmin-2j2b)    shift
-                    XMIN_2j2b="$1"
-                    ;;
-    --xmax-1j1b)    shift
-                    XMAX_1j1b="$1"
-                    ;;
-    --xmax-2j1b)    shift
-                    XMAX_2j1b="$1"
-                    ;;
-    --xmax-2j2b)    shift
-                    XMAX_2j2b="$1"
-                    ;;
-    --do-main)      DO_MAIN=1
-                    ;;
-    --do-plots)     DO_PLOTS=1
-                    ;;
-    --do-rbd)       DO_RBD=1
-                    ;;
-    --do-ybd)       DO_YBD=1
-                    ;;
-    --do-presel)    DO_PRESEL=1
-                    ;;
-    --submit)       SUBMIT=1
-                    ;;
-    *)              echo "Unknown option '$key'"
-                    usage
-                    exit 1
-                    ;;
+    -h|--help)      usage; exit 0 ;;
+    -f|--fitvar)    shift; FITVAR="$1" ;;
+    -o|--outdir)    shift; OUTDIR="$1" ;;
+    -s|--shower)    shift; SHOWER="$1" ;;
+    -n|--ntup-dir)  shift; NTUPDIR="$1" ;;
+    --nbin-1j1b)    shift; NBIN_1j1b="$1" ;;
+    --nbin-2j1b)    shift; NBIN_2j1b="$1" ;;
+    --nbin-2j2b)    shift; NBIN_2j2b="$1" ;;
+    --xmin-1j1b)    shift; XMIN_1j1b="$1" ;;
+    --xmin-2j1b)    shift; XMIN_2j1b="$1" ;;
+    --xmin-2j2b)    shift; XMIN_2j2b="$1" ;;
+    --xmax-1j1b)    shift; XMAX_1j1b="$1" ;;
+    --xmax-2j1b)    shift; XMAX_2j1b="$1" ;;
+    --xmax-2j2b)    shift; XMAX_2j2b="$1" ;;
+    --do-main)      DO_MAIN=1 ;;
+    --do-plots)     DO_PLOTS=1 ;;
+    --do-rbd)       DO_RBD=1 ;;
+    --do-ybd)       DO_YBD=1 ;;
+    --do-presel)    DO_PRESEL=1 ;;
+    --step-two)     STEP_TWO=1 ;;
+    --submit)       SUBMIT=1 ;;
+    *)              echo "Unknown option '$key'"; usage; exit 1 ;;
   esac
   shift
 done
 
-echo "Saving configs to: ${OUTDIR}"
-echo "Fit variable: ${FITVAR}"
-echo "Showering version: ${SHOWER}"
-echo "Ntuple dir: ${NTUPDIR}"
-mkdir -p ${OUTDIR}
+if [[ "${STEP_TWO}" -eq 1 ]]; then
+  echo "Doing step 2"
+  [[ -d "${OUTDIR}/main.d/tW/Histograms" ]]               && rexpy run condor main.conf --copy-hists ${OUTDIR}/main.d/tW/Histograms --force-data --steps wf --submit
+  [[ -d "${OUTDIR}/main_plots.d/tW/Histograms" ]]         && rexpy run condor main_plots.conf --copy-hists ${OUTDIR}/main_plots.d/tW/Histograms --force-data --steps wfdp --submit
+  [[ -d "${OUTDIR}/main_1j1b.d/tW/Histograms" ]]          && rexpy run condor main_1j1b.conf --copy-hists ${OUTDIR}/main_1j1b.d/tW/Histograms --force-data --steps wf --submit
+  [[ -d "${OUTDIR}/main_1j1b2j1b.d/tW/Histograms" ]]      && rexpy run condor main_1j1b2j1b.conf --copy-hists ${OUTDIR}/main_1j1b2j1b.d/tW/Histograms --force-data --steps wf --submit
+  [[ -d "${OUTDIR}/main_1j1b2j2b.d/tW/Histograms" ]]      && rexpy run condor main_1j1b2j2b.conf --copy-hists ${OUTDIR}/main_1j1b2j2b.d/tW/Histograms --force-data --steps wf --submit
+  [[ -d "${OUTDIR}/main_2j1b.d/tW/Histograms" ]]          && rexpy run condor main_2j1b.conf --copy-hists ${OUTDIR}/main_2j1b.d/tW/Histograms --force-data --steps wf --submit
+  [[ -d "${OUTDIR}/main_2j2b.d/tW/Histograms" ]]          && rexpy run condor main_2j2b.conf --copy-hists ${OUTDIR}/main_2j2b.d/tW/Histograms --force-data --steps wf --submit
+  [[ -d "${OUTDIR}/main_only1516.d/tW/Histograms" ]]      && rexpy run condor main_only1516.conf --copy-hists ${OUTDIR}/main_only1516.d/tW/Histograms --force-data --steps wf --submit
+  [[ -d "${OUTDIR}/main_only17.d/tW/Histograms" ]]        && rexpy run condor main_only17.conf --copy-hists ${OUTDIR}/main_only17.d/tW/Histograms --force-data --steps wf --submit
+  [[ -d "${OUTDIR}/main_only18.d/tW/Histograms" ]]        && rexpy run condor main_only18.conf --copy-hists ${OUTDIR}/main_only18.d/tW/Histograms --force-data --steps wf --submit
+  [[ -d "${OUTDIR}/main_singlebin2j2b.d/tW/Histograms" ]] && rexpy run condor main_singlebin2j2b.conf --copy-hists ${OUTDIR}/main_singlebin2j2b.d/tW/Histograms --force-data --steps wf --submit
+  [[ -d "${OUTDIR}/presel_plots.d/tW/Histograms" ]]       && rexpy run condor presel_plots.conf --copy-hists ${OUTDIR}/presel_plots.d/tW/Histograms --force-data --steps wfdp --submit
+  [[ -d "${OUTDIR}/presel.d/tW/Histograms" ]]             && rexpy run condor presel.conf --copy-hists ${OUTDIR}/presel.d/tW/Histograms --force-data --steps wfdp --submit
+  exit 0
+fi
+
+if [[ "${STEP_TWO}" -eq 0 ]]; then
+  echo "Doing step 1"
+  echo "Saving configs to: ${OUTDIR}"
+  echo "Fit variable: ${FITVAR}"
+  echo "Showering version: ${SHOWER}"
+  echo "Ntuple dir: ${NTUPDIR}"
+  mkdir -p ${OUTDIR}
+fi
 
 SEL_1j1b="reg1j1b == 1 && OS == 1 && ${FITVAR} > ${XMIN_1j1b}"
 SEL_2j1b="reg2j1b == 1 && OS == 1 && ${FITVAR} < ${XMAX_2j1b}"
