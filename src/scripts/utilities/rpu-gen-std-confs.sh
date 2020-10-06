@@ -235,7 +235,7 @@ if [[ "${DO_YBD}" -eq 1 ]]; then
          --sel-2j2b "${SEL_2j2b}" \
          --herwig ${SHOWER} \
          --only-1516
-  [[ "${SUBMIT}" -eq 1 ]] && rexpy run condor ${OUTDIR}/main_only1516.conf --steps nwfdp --submit
+  [[ "${SUBMIT}" -eq 1 ]] && rexpy run condor ${OUTDIR}/main_only1516.conf --steps nwfdpr --submit
 
   python -m rexpy config gen ${OUTDIR}/main_only17.conf  \
          --ntup-dir ${NTUPDIR} \
@@ -250,7 +250,7 @@ if [[ "${DO_YBD}" -eq 1 ]]; then
          --sel-2j2b "${SEL_2j2b}" \
          --herwig ${SHOWER} \
          --only-17
-  [[ "${SUBMIT}" -eq 1 ]] && rexpy run condor ${OUTDIR}/main_only17.conf --steps nwfdp --submit
+  [[ "${SUBMIT}" -eq 1 ]] && rexpy run condor ${OUTDIR}/main_only17.conf --steps nwfdpr --submit
 
   python -m rexpy config gen ${OUTDIR}/main_only18.conf  \
          --ntup-dir ${NTUPDIR} \
@@ -265,7 +265,7 @@ if [[ "${DO_YBD}" -eq 1 ]]; then
          --sel-2j2b "${SEL_2j2b}" \
          --herwig ${SHOWER} \
          --only-18
-  [[ "${SUBMIT}" -eq 1 ]] && rexpy run condor ${OUTDIR}/main_only18.conf --steps nwfdp --submit
+  [[ "${SUBMIT}" -eq 1 ]] && rexpy run condor ${OUTDIR}/main_only18.conf --steps nwfdpr --submit
 fi
 
 if [[ "${DO_PRESEL}" -eq 1 ]]; then
