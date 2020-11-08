@@ -81,7 +81,7 @@ done
 
 if [[ "${STEP_TWO}" -eq 1 ]]; then
   echo "Doing step 2"
-  [[ -d "${OUTDIR}/main.d/tW/Histograms" ]]               && rexpy run condor main.conf --copy-hists ${OUTDIR}/main.d/tW/Histograms --force-data --steps wf --submit
+  [[ -d "${OUTDIR}/main.d/tW/Histograms" ]]               && rexpy run condor main.conf --copy-hists ${OUTDIR}/main.d/tW/Histograms --force-data --steps wfdpri --submit
   [[ -d "${OUTDIR}/main_plots.d/tW/Histograms" ]]         && rexpy run condor main_plots.conf --copy-hists ${OUTDIR}/main_plots.d/tW/Histograms --force-data --steps wfdp --submit
   [[ -d "${OUTDIR}/main_1j1b.d/tW/Histograms" ]]          && rexpy run condor main_1j1b.conf --copy-hists ${OUTDIR}/main_1j1b.d/tW/Histograms --force-data --steps wf --submit
   [[ -d "${OUTDIR}/main_1j1b2j1b.d/tW/Histograms" ]]      && rexpy run condor main_1j1b2j1b.conf --copy-hists ${OUTDIR}/main_1j1b2j1b.d/tW/Histograms --force-data --steps wf --submit
