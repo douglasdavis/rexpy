@@ -1,6 +1,16 @@
+import enum
 import os
 import shutil
 from pathlib import PosixPath
+from typing import List
+
+
+class RexStep(enum.Enum):
+    N = 1
+    WF = 2
+    DP = 3
+    R = 4
+    I = 5
 
 
 def selection_with_period(raw, only_1516=False, only_17=False, only_18=False):
@@ -48,3 +58,20 @@ def copy_histograms(from_path, to_workspace):
         shutil.copyfile(
             entry, str(to_workspace / "tW" / "Histograms" / PosixPath(entry).name)
         )
+
+
+def parse_steps(cl_arg: str) -> List[RexStep]:
+    steps = []
+    if "n" in cl_arg:
+        steps.append(RexStep.N)
+    if all(x in cl_arg for x in ["w", "f"]):
+        steps.append(RexStep.WF)
+    if all(x in cl_arg for x in ["d", "p"]):
+        steps.append(RexStep.DP)
+    if "r" in cl_arg:
+        steps.append(RexStep.R)
+    if "i" in cl_arg:
+        steps.append(RexStep.I)
+    return steps
+
+s

@@ -246,6 +246,8 @@ def run():
 def local(config, suffix, copy_hists, n_parallel, force_data, steps):
     """Run TRExFitter steps locally."""
 
+    from rexpy.helpers import RexStep
+
     if force_data and suffix is not None:
         suffix = f"{suffix}.force-data"
     elif force_data:
@@ -261,16 +263,19 @@ def local(config, suffix, copy_hists, n_parallel, force_data, steps):
     if force_data:
         f = rpc.unblind(f)
     os.chdir(workspace)
-    if "n" in steps and copy_hists is None:
+
+    steps = rph.parse_steps(steps)
+    print(f"Running steps {steps}")
+    if RexStep.N in steps and copy_hists is None:
         rpbatch.parallel_n_step(f, processes=n_parallel)
-    if "wf" in steps:
+    if RexStep.WF in steps:
         rpbatch.wf_step(f)
-    if "dp" in steps:
+    if RexStep.DP in steps:
         rpbatch.dp_step(f)
-    if "r" in steps:
+    if RexStep.R in steps:
         rpbatch.parallel_r_step(f, processes=n_parallel)
         rpbatch.r_draw_step(f)
-    if "i" in steps:
+    if RexStep.I in steps:
         rpbatch.parallel_i_step(f, processes=n_parallel)
         rpbatch.i_combine_step(f)
     os.chdir(curdir)

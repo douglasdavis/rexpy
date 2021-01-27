@@ -4,9 +4,10 @@
 import multiprocessing
 import subprocess
 import os
-import pathlib
 import shutil
 from functools import wraps
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 # rexpy
 import rexpy.pycondor as pycondor
@@ -20,7 +21,7 @@ from rexpy.confparse import (
 TREX_EXE = shutil.which("trex-fitter")
 
 
-def rank_arguments(config, specific_sys=None):
+def rank_arguments(config: str, specific_sys: Optional[List[str]] = None) -> List[str]:
     """Get a set of trex-fitter executable arguments for ranking.
 
     Parameters
@@ -41,7 +42,7 @@ def rank_arguments(config, specific_sys=None):
     return args
 
 
-def grouped_impact_arguments(config):
+def grouped_impact_arguments(config: str) -> List[str]:
     """Get a set of trex-fitter executable arguments for grouped impact.
 
     Parameters
@@ -60,7 +61,7 @@ def grouped_impact_arguments(config):
     return args
 
 
-def draw_argument(config, specific_sys=None):
+def draw_argument(config: str, specific_sys: Optional[List[str]] = None) -> str:
     """Get the draw trex-fitter step argument"
 
     Parameters
@@ -85,7 +86,11 @@ def draw_argument(config, specific_sys=None):
     return arg
 
 
-def fit_argument(config, specific_sys=None, dont_fit_vr=True):
+def fit_argument(
+    config: str,
+    specific_sys: Optional[List[str]] = None,
+    dont_fit_vr: bool = True
+) -> str:
     """Get the fit trex-fitter step argument.
 
     Parameters
@@ -120,7 +125,7 @@ def fit_argument(config, specific_sys=None, dont_fit_vr=True):
     return arg
 
 
-def ntuple_arguments_granular(config, fitname="tW"):
+def ntuple_arguments_granular(config: str, fitname: str = "tW") -> Tuple[List[str], List[str]]:
     """Get the set of granular trex-fitter ntupling instructions
 
     Parameters
@@ -162,7 +167,7 @@ def ntuple_arguments_granular(config, fitname="tW"):
     return args, updates
 
 
-def ntuple_arguments(config, specific_sys=None):
+def ntuple_arguments(config: str, specific_sys: Optional[List[str]] = None) -> List[str]:
     """Get the set of trex-fitter executable arguments for ntupling.
 
     Parameters
@@ -193,7 +198,7 @@ def ntuple_arguments(config, specific_sys=None):
     ]
 
 
-def job_params(wkspace, executable, **kwargs):
+def job_params(wkspace: str, executable: str, **kwargs) -> Dict[str, Any]:
     """Turn a set of keyword arguments into a condor preamble.
 
     Parameters
@@ -230,7 +235,7 @@ def job_params(wkspace, executable, **kwargs):
     )
 
 
-def create_workspace(config, suffix=None):
+def create_workspace(config: str, suffix: Optional[str] = None) -> Tuple[Path, Path]:
     """Create workspace to run steps and store results.
 
     Parameters
@@ -242,63 +247,63 @@ def create_workspace(config, suffix=None):
 
     Returns
     -------
-    pathlib.PosixPath
+    pathlib.Path
         Created workspace path.
-    pathlib.PosixPath
+    pathlib.Path
         Copy of configuration file in the workspace.
 
     """
-    config_path = pathlib.PosixPath(config)
+    config_path = Path(config)
     workspace = config_path.parent / f"{config_path.stem}.d"
     if suffix is not None:
-        workspace = pathlib.PosixPath(f"{config_path.stem}.{suffix}.d")
+        workspace = Path(f"{config_path.stem}.{suffix}.d")
     workspace.mkdir(exist_ok=True)
     if not (workspace / "fit.conf").exists():
         shutil.copyfile(config_path, workspace / "fit.conf")
     return workspace.absolute(), (workspace / "fit.conf").absolute()
 
 
-def run_and_wait(command):
+def run_and_wait(command: str) -> int:
     p = subprocess.Popen(command, shell=True)
     return p.wait()
 
 
-def parallel_run(commands, processes=None):
+def parallel_run(commands: str, processes: Optional[int] = None) -> None:
     pool = multiprocessing.Pool(processes=processes)
     pool.map(run_and_wait, commands)
 
 
-def _run_n_step(args):
+def _run_n_step(args) -> int:
     p = subprocess.Popen(f"{args[0]} n {args[1]} Regions={args[2]}", shell=True)
     return p.wait()
 
 
-def _run_wf_step(args):
+def _run_wf_step(args) -> int:
     p = subprocess.Popen(f"{args[0]} wf {args[1]}", shell=True)
     return p.wait()
 
 
-def _run_dp_step(args):
+def _run_dp_step(args) -> int:
     p = subprocess.Popen(f"{args[0]} dp {args[1]}", shell=True)
     return p.wait()
 
 
-def _run_r_draw_step(args):
+def _run_r_draw_step(args) -> int:
     p = subprocess.Popen(f"{args[0]} r {args[1]} Ranking=plot", shell=True)
     return p.wait()
 
 
-def _run_r_step(args):
+def _run_r_step(args) -> int:
     p = subprocess.Popen(f"{args[0]} r {args[1]} Ranking={args[2]}", shell=True)
     return p.wait()
 
 
-def _run_i_step(args):
+def _run_i_step(args) -> int:
     p = subprocess.Popen(f"{args[0]} i {args[1]} GroupedImpact={args[2]}", shell=True)
     return p.wait()
 
 
-def _run_i_combine_step(args):
+def _run_i_combine_step(args) -> int:
     p = subprocess.Popen(f"{args[0]} i {args[1]} GroupedImpact=combine", shell=True)
     return p.wait()
 
@@ -345,7 +350,7 @@ def parallel_n_step(config, regions=None, processes=None):
         Max number of processes to run in parallel
 
     """
-    os.chdir(pathlib.PosixPath(config).resolve().parent)
+    os.chdir(Path(config).resolve().parent)
     if regions is None:
         regions = regions_from(config)
     args = [(TREX_EXE, config, region) for region in regions]
@@ -363,7 +368,7 @@ def wfdp_step(config):
         Path of the config file.
 
     """
-    os.chdir(pathlib.PosixPath(config).resolve().parent)
+    os.chdir(Path(config).resolve().parent)
     _run_wf_step((TREX_EXE, config))
     _run_dp_step((TREX_EXE, config))
 
@@ -378,7 +383,7 @@ def wf_step(config):
         Path of the config file.
 
     """
-    os.chdir(pathlib.PosixPath(config).resolve().parent)
+    os.chdir(Path(config).resolve().parent)
     _run_wf_step((TREX_EXE, config))
 
 
@@ -392,7 +397,7 @@ def dp_step(config):
         Path of the config file.
 
     """
-    os.chdir(pathlib.PosixPath(config).resolve().parent)
+    os.chdir(Path(config).resolve().parent)
     _run_dp_step((TREX_EXE, config))
 
 
@@ -410,7 +415,7 @@ def parallel_r_step(config, systematics=None, processes=None):
         Max number of processes to run in parallel
 
     """
-    os.chdir(pathlib.PosixPath(config).resolve().parent)
+    os.chdir(Path(config).resolve().parent)
     if systematics is None:
         systematics = systematics_from(config)
     args = [(TREX_EXE, config, sys) for sys in systematics]
@@ -428,7 +433,7 @@ def r_draw_step(config):
         Path of the config file.
 
     """
-    os.chdir(pathlib.PosixPath(config).resolve().parent)
+    os.chdir(Path(config).resolve().parent)
     _run_r_draw_step((TREX_EXE, config))
 
 
@@ -444,7 +449,7 @@ def parallel_i_step(config, processes=None):
         Max number of processes to run in parallel
 
     """
-    os.chdir(pathlib.PosixPath(config).resolve().parent)
+    os.chdir(Path(config).resolve().parent)
     args = grouped_impact_arguments(config)
     groups = [a.split()[-1].split("=")[-1] for a in args]
     args = [(TREX_EXE, config, g) for g in groups]
@@ -462,7 +467,7 @@ def i_combine_step(config):
         Path of the config file.
 
     """
-    os.chdir(pathlib.PosixPath(config).resolve().parent)
+    os.chdir(Path(config).resolve().parent)
     _run_i_combine_step((TREX_EXE, config))
 
 
@@ -471,7 +476,7 @@ def condor_n_step(wkspace, sys=None, job_name="ntuple", dag=None):
 
     Parameters
     ----------
-    wkspace : pathlib.Path
+    wkspace : Path
         Path of the config file.
     sys : list(str), optional
         Specific ystematics to use.
