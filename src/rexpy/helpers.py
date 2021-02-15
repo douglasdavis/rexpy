@@ -73,5 +73,3 @@ def parse_steps(cl_arg: str) -> List[RexStep]:
     if "i" in cl_arg:
         steps.append(RexStep.I)
     return steps
-
-s
