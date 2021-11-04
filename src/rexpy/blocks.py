@@ -195,7 +195,7 @@ def sample_blocks(**kwargs):
     Sample: "ttbar"
       NtupleFiles: ttbar_410472_FS_MC16a_nominal,ttbar_410472_FS_MC16e_nominal,ttbar_410472_FS_MC16d_nominal
       Title: "Top pair"
-      TexTitle: "$t\bar{{t}}$"
+      TexTitle: "$t\\bar{{t}}$"
       FillColor: 634
       LineColor: 1
       Type: BACKGROUND
@@ -258,7 +258,7 @@ def _tW_shower_norms(ntup_dir, sel_1j1b=None, sel_2j1b=None, sel_2j2b=None):
     return """\
 Systematic: "tW_PS_norm"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_PS_Model"
   Title: "tW Parton Shower Norm"
   Type: OVERALL
   OverallUp: {0}
@@ -267,7 +267,7 @@ Systematic: "tW_PS_norm"
 
 Systematic: "tW_PS_migration"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_PS_Model"
   Title: "tW Parton Shower Migration"
   NuisanceParameter: "tW_PS_migration"
   Type: OVERALL
@@ -278,7 +278,7 @@ Systematic: "tW_PS_migration"
 
 Systematic: "tW_PS_migration"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_PS_Model"
   Title: "tW Parton Shower Migration"
   NuisanceParameter: "tW_PS_migration"
   Type: OVERALL
@@ -289,7 +289,7 @@ Systematic: "tW_PS_migration"
 
 Systematic: "tW_PS_migration"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_PS_Model"
   Title: "tW Parton Shower Migration"
   NuisanceParameter: "tW_PS_migration"
   Type: OVERALL
@@ -314,7 +314,7 @@ def _ttbar_shower_norms(
     return """\
 Systematic: "ttbar_PS_norm"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_PS_Model"
   Title: "ttbar Parton Shower Norm"
   Type: OVERALL
   OverallUp: {0}
@@ -323,7 +323,7 @@ Systematic: "ttbar_PS_norm"
 
 Systematic: "ttbar_PS_migration"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_PS_Model"
   Title: "ttbar Parton Shower Migration"
   NuisanceParameter: "ttbar_PS_migration"
   Type: OVERALL
@@ -334,7 +334,7 @@ Systematic: "ttbar_PS_migration"
 
 Systematic: "ttbar_PS_migration"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_PS_Model"
   Title: "ttbar Parton Shower Migration"
   NuisanceParameter: "ttbar_PS_migration"
   Type: OVERALL
@@ -345,7 +345,7 @@ Systematic: "ttbar_PS_migration"
 
 Systematic: "ttbar_PS_migration"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_PS_Model"
   Title: "ttbar Parton Shower Migration"
   NuisanceParameter: "ttbar_PS_migration"
   Type: OVERALL
@@ -376,7 +376,7 @@ def sys_modeling_blocks(
     return """\
 Systematic: "tW_DRDS"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_DRDS_Model"
   Symmetrisation: ONESIDED
   Samples: tW
   Title: "tW DR vs DS"
@@ -387,7 +387,7 @@ Systematic: "tW_DRDS"
 
 Systematic: "tW_PS_1j1b"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_PS_Model"
   Title: "tW Parton Shower Shape 1j1b"
   ReferenceSample: tW_AFII
   Symmetrisation: ONESIDED
@@ -399,7 +399,7 @@ Systematic: "tW_PS_1j1b"
 
 Systematic: "tW_PS_2j1b"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_PS_Model"
   Title: "tW Parton Shower Shape 2j1b"
   ReferenceSample: tW_AFII
   Symmetrisation: ONESIDED
@@ -411,7 +411,7 @@ Systematic: "tW_PS_2j1b"
 
 Systematic: "tW_PS_2j2b"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_PS_Model"
   Title: "tW Parton Shower Shape 2j2b"
   ReferenceSample: tW_AFII
   Symmetrisation: ONESIDED
@@ -423,7 +423,7 @@ Systematic: "tW_PS_2j2b"
 
 Systematic: "ttbar_PS_1j1b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_PS_Model"
   Title: "ttbar Parton Shower Shape 1j1b"
   ReferenceSample: ttbar_AFII
   Symmetrisation: ONESIDED
@@ -435,7 +435,7 @@ Systematic: "ttbar_PS_1j1b"
 
 Systematic: "ttbar_PS_2j1b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_PS_Model"
   Title: "ttbar Parton Shower Shape 2j1b"
   ReferenceSample: ttbar_AFII
   Symmetrisation: ONESIDED
@@ -447,7 +447,7 @@ Systematic: "ttbar_PS_2j1b"
 
 Systematic: "ttbar_PS_2j2b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_PS_Model"
   Title: "ttbar Parton Shower Shape 2j2b"
   ReferenceSample: ttbar_AFII
   Symmetrisation: ONESIDED
@@ -459,7 +459,7 @@ Systematic: "ttbar_PS_2j2b"
 
 Systematic: "tW_AR_ISR_scale_muR_1j1b"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_ISR_Model"
   Title: "tW ISR Scale muR Variation 1j1b"
   WeightUp: "weight_sys_scale_muR_20"
   WeightDown: "weight_sys_scale_muR_05"
@@ -470,7 +470,7 @@ Systematic: "tW_AR_ISR_scale_muR_1j1b"
 
 Systematic: "tW_AR_ISR_scale_muR_2j1b"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_ISR_Model"
   Title: "tW ISR Scale muR Variation 2j1b"
   WeightUp: "weight_sys_scale_muR_20"
   WeightDown: "weight_sys_scale_muR_05"
@@ -481,7 +481,7 @@ Systematic: "tW_AR_ISR_scale_muR_2j1b"
 
 Systematic: "tW_AR_ISR_scale_muR_2j2b"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_ISR_Model"
   Title: "tW ISR Scale muR Variation 2j2b"
   WeightUp: "weight_sys_scale_muR_20"
   WeightDown: "weight_sys_scale_muR_05"
@@ -492,7 +492,7 @@ Systematic: "tW_AR_ISR_scale_muR_2j2b"
 
 Systematic: "tW_AR_ISR_scale_muF_1j1b"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_ISR_Model"
   Title: "tW ISR Scale muF Variation 1j1b"
   WeightUp: "weight_sys_scale_muF_20"
   WeightDown: "weight_sys_scale_muF_05"
@@ -503,7 +503,7 @@ Systematic: "tW_AR_ISR_scale_muF_1j1b"
 
 Systematic: "tW_AR_ISR_scale_muF_2j1b"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_ISR_Model"
   Title: "tW ISR Scale muF Variation 2j1b"
   WeightUp: "weight_sys_scale_muF_20"
   WeightDown: "weight_sys_scale_muF_05"
@@ -514,7 +514,7 @@ Systematic: "tW_AR_ISR_scale_muF_2j1b"
 
 Systematic: "tW_AR_ISR_scale_muF_2j2b"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_ISR_Model"
   Title: "tW ISR Scale muF Variation 2j2b"
   WeightUp: "weight_sys_scale_muF_20"
   WeightDown: "weight_sys_scale_muF_05"
@@ -525,7 +525,7 @@ Systematic: "tW_AR_ISR_scale_muF_2j2b"
 
 Systematic: "tW_AR_ISR_A14_1j1b"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_ISR_Model"
   Title: "tW ISR A14 1j1b"
   WeightUp: "weight_sys_isr_alphaS_Var3cUp"
   WeightDown: "weight_sys_isr_alphaS_Var3cDown"
@@ -536,7 +536,7 @@ Systematic: "tW_AR_ISR_A14_1j1b"
 
 Systematic: "tW_AR_ISR_A14_2j1b"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_ISR_Model"
   Title: "tW ISR A14 2j1b"
   WeightUp: "weight_sys_isr_alphaS_Var3cUp"
   WeightDown: "weight_sys_isr_alphaS_Var3cDown"
@@ -547,7 +547,7 @@ Systematic: "tW_AR_ISR_A14_2j1b"
 
 Systematic: "tW_AR_ISR_A14_2j2b"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_ISR_Model"
   Title: "tW ISR A14 2j2b"
   WeightUp: "weight_sys_isr_alphaS_Var3cUp"
   WeightDown: "weight_sys_isr_alphaS_Var3cDown"
@@ -558,7 +558,7 @@ Systematic: "tW_AR_ISR_A14_2j2b"
 
 Systematic: "tW_AR_FSR_1j1b"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_FSR_Model"
   Title: "tW FSR 1j1b"
   WeightUp: "weight_sys_fsr_muR_20"
   WeightDown: "weight_sys_fsr_muR_05"
@@ -569,7 +569,7 @@ Systematic: "tW_AR_FSR_1j1b"
 
 Systematic: "tW_AR_FSR_2j1b"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_FSR_Model"
   Title: "tW FSR 2j1b"
   WeightUp: "weight_sys_fsr_muR_20"
   WeightDown: "weight_sys_fsr_muR_05"
@@ -580,7 +580,7 @@ Systematic: "tW_AR_FSR_2j1b"
 
 Systematic: "tW_AR_FSR_2j2b"
   Category: "Signal_Model"
-  SubCategory: "Signal_Model"
+  SubCategory: "tW_FSR_Model"
   Title: "tW FSR 2j2b"
   WeightUp: "weight_sys_fsr_muR_20"
   WeightDown: "weight_sys_fsr_muR_05"
@@ -591,7 +591,7 @@ Systematic: "tW_AR_FSR_2j2b"
 
 Systematic: "ttbar_AR_ISR_scale_muR_1j1b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_ISR_Model"
   Title: "ttbar ISR Scale muR Variation 1j1b"
   WeightUp: "weight_sys_scale_muR_20"
   WeightDown: "weight_sys_scale_muR_05"
@@ -602,7 +602,7 @@ Systematic: "ttbar_AR_ISR_scale_muR_1j1b"
 
 Systematic: "ttbar_AR_ISR_scale_muR_2j1b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_ISR_Model"
   Title: "ttbar ISR Scale muR Variation 2j1b"
   WeightUp: "weight_sys_scale_muR_20"
   WeightDown: "weight_sys_scale_muR_05"
@@ -613,7 +613,7 @@ Systematic: "ttbar_AR_ISR_scale_muR_2j1b"
 
 Systematic: "ttbar_AR_ISR_scale_muR_2j2b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_ISR_Model"
   Title: "ttbar ISR Scale muR Variation 2j2b"
   WeightUp: "weight_sys_scale_muR_20"
   WeightDown: "weight_sys_scale_muR_05"
@@ -624,7 +624,7 @@ Systematic: "ttbar_AR_ISR_scale_muR_2j2b"
 
 Systematic: "ttbar_AR_ISR_scale_muF_1j1b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_ISR_Model"
   Title: "ttbar ISR Scale muF Variation 1j1b"
   WeightUp: "weight_sys_scale_muF_20"
   WeightDown: "weight_sys_scale_muF_05"
@@ -635,7 +635,7 @@ Systematic: "ttbar_AR_ISR_scale_muF_1j1b"
 
 Systematic: "ttbar_AR_ISR_scale_muF_2j1b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_ISR_Model"
   Title: "ttbar ISR Scale muF Variation 2j1b"
   WeightUp: "weight_sys_scale_muF_20"
   WeightDown: "weight_sys_scale_muF_05"
@@ -646,7 +646,7 @@ Systematic: "ttbar_AR_ISR_scale_muF_2j1b"
 
 Systematic: "ttbar_AR_ISR_scale_muF_2j2b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_ISR_Model"
   Title: "ttbar ISR Scale muF Variation 2j2b"
   WeightUp: "weight_sys_scale_muF_20"
   WeightDown: "weight_sys_scale_muF_05"
@@ -657,7 +657,7 @@ Systematic: "ttbar_AR_ISR_scale_muF_2j2b"
 
 Systematic: "ttbar_AR_ISR_A14_1j1b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_ISR_Model"
   Title: "ttbar ISR A14 1j1b"
   WeightUp: "weight_sys_isr_alphaS_Var3cUp"
   WeightDown: "weight_sys_isr_alphaS_Var3cDown"
@@ -668,7 +668,7 @@ Systematic: "ttbar_AR_ISR_A14_1j1b"
 
 Systematic: "ttbar_AR_ISR_A14_2j1b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_ISR_Model"
   Title: "ttbar ISR A14 2j1b"
   WeightUp: "weight_sys_isr_alphaS_Var3cUp"
   WeightDown: "weight_sys_isr_alphaS_Var3cDown"
@@ -679,7 +679,7 @@ Systematic: "ttbar_AR_ISR_A14_2j1b"
 
 Systematic: "ttbar_AR_ISR_A14_2j2b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_ISR_Model"
   Title: "ttbar ISR A14 2j2b"
   WeightUp: "weight_sys_isr_alphaS_Var3cUp"
   WeightDown: "weight_sys_isr_alphaS_Var3cDown"
@@ -690,7 +690,7 @@ Systematic: "ttbar_AR_ISR_A14_2j2b"
 
 Systematic: "ttbar_AR_FSR_1j1b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_FSR_Model"
   Title: "ttbar FSR 1j1b"
   WeightUp: "weight_sys_fsr_muR_20"
   WeightDown: "weight_sys_fsr_muR_05"
@@ -701,7 +701,7 @@ Systematic: "ttbar_AR_FSR_1j1b"
 
 Systematic: "ttbar_AR_FSR_2j1b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_FSR_Model"
   Title: "ttbar FSR 2j1b"
   WeightUp: "weight_sys_fsr_muR_20"
   WeightDown: "weight_sys_fsr_muR_05"
@@ -712,7 +712,7 @@ Systematic: "ttbar_AR_FSR_2j1b"
 
 Systematic: "ttbar_AR_FSR_2j2b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_FSR_Model"
   Title: "ttbar FSR 2j2b"
   WeightUp: "weight_sys_fsr_muR_20"
   WeightDown: "weight_sys_fsr_muR_05"
@@ -723,7 +723,7 @@ Systematic: "ttbar_AR_FSR_2j2b"
 
 Systematic: "ttbar_hdamp_1j1b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_hdamp_Model"
   Title: "ttbar hdamp 1j1b"
   ReferenceSample: ttbar_AFII
   Symmetrisation: ONESIDED
@@ -734,7 +734,7 @@ Systematic: "ttbar_hdamp_1j1b"
 
 Systematic: "ttbar_hdamp_2j1b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_hdamp_Model"
   Title: "ttbar hdamp 2j1b"
   ReferenceSample: ttbar_AFII
   Symmetrisation: ONESIDED
@@ -745,7 +745,7 @@ Systematic: "ttbar_hdamp_2j1b"
 
 Systematic: "ttbar_hdamp_2j2b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_hdamp_Model"
   Title: "ttbar hdamp 2j2b"
   ReferenceSample: ttbar_AFII
   Symmetrisation: ONESIDED
@@ -756,7 +756,7 @@ Systematic: "ttbar_hdamp_2j2b"
 
 Systematic: "ttbar_ptreweight_1j1b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_pT_reweighting"
   Title: "ttbar pt reweight 1j1b"
   WeightUp: "weight_sys_noreweight"
   Symmetrisation: ONESIDED
@@ -766,7 +766,7 @@ Systematic: "ttbar_ptreweight_1j1b"
 
 Systematic: "ttbar_ptreweight_2j1b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_pT_reweighting"
   Title: "ttbar pt reweight 2j1b"
   WeightUp: "weight_sys_noreweight"
   Symmetrisation: ONESIDED
@@ -776,7 +776,7 @@ Systematic: "ttbar_ptreweight_2j1b"
 
 Systematic: "ttbar_ptreweight_2j2b"
   Category: "Background_Model"
-  SubCategory: "Background_Model"
+  SubCategory: "ttbar_pT_reweighting"
   Title: "ttbar pt reweight 2j2b"
   WeightUp: "weight_sys_noreweight"
   Symmetrisation: ONESIDED
