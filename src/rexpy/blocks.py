@@ -20,7 +20,11 @@ from textwrap import dedent
 import logging
 
 # rexpy
-from rexpy.shower import norm_uncertainties_tW, norm_uncertainties_ttbar
+from rexpy.shower import (
+    norm_uncertainties_tW,
+    norm_uncertainties_ttbar,
+    norm_uncertainties_ttbar_splits,
+)
 from rexpy.systematic_tables import (
     SYS_WEIGHTS,
     PDF_WEIGHTS,
@@ -357,6 +361,62 @@ Systematic: "ttbar_PS_migration"
     )
 
 
+def _ttbar_shower_norms_splits(
+    ntup_dir, sel_1j1b=None, sel_2j1b=None, sel_2j2b=None, herwig_dsid="410558",
+):
+    overall, m1j1b, m2j1b, m2j2b = norm_uncertainties_ttbar_splits(
+        ntup_dir,
+        sel_1j1b,
+        sel_2j1b,
+        sel_2j2b,
+        herwig_dsid,
+    )
+    return """\
+Systematic: "ttbar_PS_norm"
+  Category: "Background_Model"
+  SubCategory: "ttbar_PS_Model"
+  Title: "ttbar Parton Shower Norm"
+  Type: OVERALL
+  OverallUp: {0}
+  OverallDown: -{0}
+  Samples: ttbar
+
+Systematic: "ttbar_PS_migration"
+  Category: "Background_Model"
+  SubCategory: "ttbar_PS_Model"
+  Title: "ttbar Parton Shower Migration"
+  NuisanceParameter: "ttbar_PS_migration"
+  Type: OVERALL
+  OverallUp: {1}
+  OverallDown: -{1}
+  Samples: ttbar
+  Regions: reg1j1b
+
+Systematic: "ttbar_PS_migration"
+  Category: "Background_Model"
+  SubCategory: "ttbar_PS_Model"
+  Title: "ttbar Parton Shower Migration"
+  NuisanceParameter: "ttbar_PS_migration"
+  Type: OVERALL
+  OverallUp: {2}
+  OverallDown: -{2}
+  Samples: ttbar
+  Regions: reg2j1b
+
+Systematic: "ttbar_PS_migration"
+  Category: "Background_Model"
+  SubCategory: "ttbar_PS_Model"
+  Title: "ttbar Parton Shower Migration"
+  NuisanceParameter: "ttbar_PS_migration"
+  Type: OVERALL
+  OverallUp: {3}
+  OverallDown: -{3}
+  Samples: ttbar
+  Regions: reg2j2b""".format(
+        overall, m1j1b, m2j1b, m2j2b
+    )
+
+
 def _herwig_version_to_dsid(herwig_version):
     if herwig_version == "704":
         return "410558"
@@ -371,7 +431,7 @@ def sys_modeling_blocks(
 ):
     herwig_dsid = _herwig_version_to_dsid(herwig_version)
     tW_norms = _tW_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b)
-    ttbar_norms = _ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_dsid,)
+    ttbar_norms = _ttbar_shower_norms(ntup_dir, sel_1j1b, sel_2j1b, sel_2j2b, herwig_dsid)
     shower_norm_blocks = "{}\n\n{}".format(tW_norms, ttbar_norms)
     return """\
 Systematic: "tW_DRDS"
